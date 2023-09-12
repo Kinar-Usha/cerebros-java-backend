@@ -1,14 +1,12 @@
-package com.cerebros.models;
+package com.cerebros.services;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class ClientIdTest {
-
-	private ClientId clientId;
+class MockFMTSTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
