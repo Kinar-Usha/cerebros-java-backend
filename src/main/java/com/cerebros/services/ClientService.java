@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -13,6 +14,7 @@ import com.cerebros.contants.Country;
 import com.cerebros.models.Client;
 import com.cerebros.models.ClientIdentification;
 import com.cerebros.models.Person;
+import com.cerebros.models.Preferences;
 
 public class ClientService {
 
@@ -20,6 +22,9 @@ public class ClientService {
 
 	// ========== Fields and their Getters/Setters ==========
 	private HashMap<String, Client> clients;
+	Set<Preferences> preferences=new HashSet<>();
+	
+	boolean roboAdvisorTermsAccept = false;
 
 	public HashMap<String, Client> getClients() {
 		return clients;
@@ -44,6 +49,8 @@ public class ClientService {
 		super();
 		setClients(new HashMap<String, Client>());
 		setEmailToClientId(new HashMap<String, String>());
+		
+		
 	}
 
 	// ======================== Methods =======================
@@ -122,5 +129,41 @@ public class ClientService {
 		emailToClientId.put("jane.doe@gmail.com", "789");
 
 	}
+	
+	public void addPreferences(Preferences preference,Boolean roboAdvisorTermsAccept) throws Exception {
+		
+		if(roboAdvisorTermsAccept) {
+			if(preference==null) {
+				throw new NullPointerException("Preference cannot be null");
+			}		
+			preferences.add(preference);
+			
+		}
+		else {
+		throw new Exception("Accept RoboAdvisor-Terms and Conditions");
+		}
+		
+	}
+	
+	public Set<Preferences> getPreferences() {
+		return preferences;
+	}
+	
+	public void updatePreference(Preferences preference) throws Exception {
+		
+		if (preference == null) {
+	        throw new IllegalArgumentException("Preference cannot be null");
+	    } 
+		for(Preferences pref :preferences) {
+				if(pref.getClientEmail().equals(preference.getClientEmail())) {
+					preferences.remove(preference);
+					preferences.add(preference);
+				    return;
+				}
+		}
+		
+		throw new Exception("Preference update failed");	
+	}
+	
 
 }
