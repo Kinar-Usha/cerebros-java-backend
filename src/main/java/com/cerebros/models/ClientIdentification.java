@@ -15,6 +15,9 @@ public class ClientIdentification {
 	}
 
 	public void setType(String type) {
+		if(type == null || type.isEmpty()){
+			throw new IllegalArgumentException("Invalid type");
+		}
 		this.type = type;
 	}
 
@@ -23,6 +26,9 @@ public class ClientIdentification {
 	}
 
 	public void setValue(String value) {
+		if(type == null || type.isEmpty()){
+			throw new IllegalArgumentException("Invalid value");
+		}
 		this.value = value;
 	}
 

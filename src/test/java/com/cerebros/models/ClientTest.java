@@ -12,7 +12,7 @@ class ClientTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		client = new Client(null, null, null, null, null);
+//		client = new Client(null, null, null, null, null);
 	}
 
 	@AfterEach

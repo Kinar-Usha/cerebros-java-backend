@@ -8,7 +8,7 @@ public class Client extends Person {
 	private String clientId;
 	private Set<ClientIdentification> clientIdentifications;
 
-	public Client(String email, LocalDate dateofBirth, String country, String postalCode,
+	public Client(String clientId, String email, LocalDate dateofBirth, String country, String postalCode,
 			Set<ClientIdentification> clientIdentifications) {
 		super(email, dateofBirth, country, postalCode);
 		setClientIdentifications(clientIdentifications);
