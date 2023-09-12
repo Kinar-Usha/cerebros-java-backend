@@ -1,12 +1,11 @@
 package com.cerebros.services;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class ClientServiceTest {
 
@@ -30,10 +29,16 @@ class ClientServiceTest {
 	}
 
 	@ParameterizedTest
+	@ValueSource(strings = {"Kin.s@gmail.com", "k1@gmail.com", "A_kinar@yahoo.com"})
+	void TestVerifyEmailAdressFormat_success(String email){
+		assertDoesNotThrow(()->clientService.verifyEmailAddress(email));
+
+	}
+
+	@ParameterizedTest
 	@ValueSource(strings = { "sadsad", "invalidemail@", "@invalidemail.com", "invalidemail.com", "ds@dsd" })
 	void verifyInvalidEmailAddress(String email) {
-		boolean emailExists = clientService.verifyEmailAddress(email);
-		assertFalse(emailExists);
+		assertThrows(IllegalArgumentException.class,()->clientService.verifyEmailAddress(email));
 	}
 
 	// TODO to be done by bhavesh based on mock fmts
