@@ -1,23 +1,22 @@
 package com.cerebros.models;
 
+import com.cerebros.contants.ClientIdentificationType;
+
 public class ClientIdentification {
 
-	private String type;
+	private ClientIdentificationType type;
 	private String value;
 
-	public ClientIdentification(String type, String value) {
+	public ClientIdentification(ClientIdentificationType type, String value) {
 		setType(type);
 		setValue(value);
 	}
 
-	public String getType() {
+	public ClientIdentificationType getType() {
 		return type;
 	}
 
-	public void setType(String type) {
-		if(type == null || type.isEmpty()){
-			throw new IllegalArgumentException("Invalid type");
-		}
+	public void setType(ClientIdentificationType type) {
 		this.type = type;
 	}
 
@@ -26,9 +25,6 @@ public class ClientIdentification {
 	}
 
 	public void setValue(String value) {
-		if(type == null || type.isEmpty()){
-			throw new IllegalArgumentException("Invalid value");
-		}
 		this.value = value;
 	}
 

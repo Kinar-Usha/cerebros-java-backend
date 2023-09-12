@@ -30,7 +30,7 @@ class PortfolioServiceTest {
 		portfolioList.add(portfolio1);
 		portfolioList.add(portfolio2);
 		portfolioList.add(portfolio3);
-		clientPortfolios.put("1", portfolioList);
+		clientPortfolios.put("a@bc.com", portfolioList);
 		portfolioService = new PortfolioService(clientPortfolios);
 
 
@@ -56,7 +56,7 @@ class PortfolioServiceTest {
 
 	@Test
 	void testGetPortfolioSuccess(){
-		assertEquals(portfolioList,portfolioService.getPortfolio("1"));
+		assertEquals(portfolioList,portfolioService.getPortfolio("a@bc.com"));
 	}
 
 }

@@ -19,11 +19,11 @@ public class PortfolioService {
         this.clientPortfolios = clientPortfolios;
     }
 
-    public List<Portfolio> getPortfolio(String clientId){
-        if(clientService.verifyClientId(clientId)){
-            List<Portfolio> clientPortfoliosList = clientPortfolios.get(clientId);
+    public List<Portfolio> getPortfolio(String clientEmail){
+        if(clientService.verifyEmailAddress(clientEmail)){
+            List<Portfolio> clientPortfoliosList = clientPortfolios.get(clientEmail);
             if (clientPortfoliosList == null || clientPortfoliosList.isEmpty()) {
-                throw new PortfolioNotFoundException(clientId);
+                throw new PortfolioNotFoundException(clientEmail);
             }
 
             return clientPortfoliosList;

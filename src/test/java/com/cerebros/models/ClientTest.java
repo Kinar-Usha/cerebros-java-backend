@@ -1,10 +1,17 @@
 package com.cerebros.models;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.Assert.assertNotNull;
+
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.cerebros.contants.ClientIdentificationType;
+import com.cerebros.contants.Country;
 
 class ClientTest {
 
@@ -12,16 +19,23 @@ class ClientTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-//		client = new Client(null, null, null, null, null);
 	}
 
 	@AfterEach
 	void tearDown() throws Exception {
-		client = null;
 	}
 
 	@Test
-	void test() {
+	void createClient() {
+
+		ClientIdentification clientIdentification = new ClientIdentification(ClientIdentificationType.SSN,
+				"333-22-4444");
+		Set<ClientIdentification> clientIdentifications = new HashSet<ClientIdentification>();
+		clientIdentifications.add(clientIdentification);
+
+		client = new Client("bhavesh@gmail.com", LocalDate.of(2001, 9, 6), Country.INDIA, "201014",
+				clientIdentifications);
+
 		assertNotNull(client);
 	}
 
