@@ -21,6 +21,7 @@ import com.cerebros.contants.ClientIdentificationType;
 import com.cerebros.contants.Country;
 import com.cerebros.models.ClientIdentification;
 import com.cerebros.models.Person;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ClientServiceTest {
 
@@ -44,10 +45,16 @@ class ClientServiceTest {
 	}
 
 	@ParameterizedTest
+	@ValueSource(strings = {"Kin.s@gmail.com", "k1@gmail.com", "A_kinar@yahoo.com"})
+	void TestVerifyEmailAdressFormat_success(String email){
+		assertDoesNotThrow(()->clientService.verifyEmailAddress(email));
+
+	}
+
+	@ParameterizedTest
 	@ValueSource(strings = { "sadsad", "invalidemail@", "@invalidemail.com", "invalidemail.com", "ds@dsd" })
 	void verifyInvalidEmailAddress(String email) {
-		boolean emailExists = clientService.verifyEmailAddress(email);
-		assertFalse(emailExists);
+		assertThrows(IllegalArgumentException.class,()->clientService.verifyEmailAddress(email));
 	}
 
 	// TODO check if email exists in the clients mockdata
