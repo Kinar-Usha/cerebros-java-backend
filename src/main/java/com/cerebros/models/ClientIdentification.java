@@ -1,20 +1,22 @@
 package com.cerebros.models;
 
+import com.cerebros.contants.ClientIdentificationType;
+
 public class ClientIdentification {
 
-	private String type;
+	private ClientIdentificationType type;
 	private String value;
 
-	public ClientIdentification(String type, String value) {
+	public ClientIdentification(ClientIdentificationType type, String value) {
 		setType(type);
 		setValue(value);
 	}
 
-	public String getType() {
+	public ClientIdentificationType getType() {
 		return type;
 	}
 
-	public void setType(String type) {
+	public void setType(ClientIdentificationType type) {
 		this.type = type;
 	}
 
