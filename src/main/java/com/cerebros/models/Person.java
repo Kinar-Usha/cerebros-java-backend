@@ -2,14 +2,16 @@ package com.cerebros.models;
 
 import java.time.LocalDate;
 
+import com.cerebros.contants.Country;
+
 public class Person {
 
 	private String email;
 	private LocalDate dateofBirth;
-	private String country;
+	private Country country;
 	private String postalCode;
 
-	public Person(String email, LocalDate dateofBirth, String country, String postalCode) {
+	public Person(String email, LocalDate dateofBirth, Country country, String postalCode) {
 		this.setEmail(email);
 		this.setDateofBirth(dateofBirth);
 		this.setCountry(country);
@@ -32,11 +34,11 @@ public class Person {
 		this.dateofBirth = dateofBirth;
 	}
 
-	public String getCountry() {
+	public Country getCountry() {
 		return country;
 	}
 
-	public void setCountry(String country) {
+	public void setCountry(Country country) {
 		this.country = country;
 	}
 
