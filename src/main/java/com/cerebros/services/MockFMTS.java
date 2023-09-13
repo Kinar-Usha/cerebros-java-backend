@@ -1,13 +1,16 @@
 package com.cerebros.services;
 
+import java.util.List;
+
 import com.cerebros.constants.ClientIdentificationType;
 import com.cerebros.models.ClientIdentification;
+import com.cerebros.models.Instrument;
 
 public class MockFMTS {
 
-	public boolean verifyClientIdentification(ClientIdentification clientIdentification) {
+	private List<Instrument> instruments;
 
-		// DONE
+	public boolean verifyClientIdentification(ClientIdentification clientIdentification) {
 		// verify the syntax of each type of indentification
 		// SSN = 111-22-3333
 		// Aadhaar = 1234-4567-7890
@@ -41,6 +44,18 @@ public class MockFMTS {
 		}
 
 		return false;
+	}
+
+	public List<Instrument> getInstruments() {
+		return instruments;
+	}
+
+	public void setInstruments(List<Instrument> instruments) {
+		this.instruments = instruments;
+	}
+
+	public void setMockInstruments(List<Instrument> instruments) {
+		setInstruments(instruments);
 	}
 
 }
