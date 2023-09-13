@@ -1,8 +1,10 @@
 package com.cerebros.services;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -11,6 +13,7 @@ import java.util.regex.Pattern;
 import com.cerebros.constants.ClientIdentificationType;
 import com.cerebros.constants.Country;
 import com.cerebros.exceptions.ClientAlreadyExistsException;
+import com.cerebros.exceptions.InvalidCredentialsException;
 import com.cerebros.models.Client;
 import com.cerebros.models.ClientIdentification;
 import com.cerebros.models.Person;
@@ -203,6 +206,28 @@ public class ClientService {
 		}
 
 		throw new Exception("Preference update failed");
+	}
+
+	public boolean login(String email, String password) {
+
+		// Verify Email exists
+		if (!clients.containsKey(email)) {
+			throw new InvalidCredentialsException("Email is not registered");
+		}
+
+		// Verify Password
+		Client client = clients.get(email);
+		Set<ClientIdentification> clientIdentifications = client.getClientIdentifications();
+
+		List<String> passwords = new ArrayList<String>();
+		for (ClientIdentification cid : clientIdentifications) {
+			passwords.add(cid.getValue());
+		}
+
+		if (!passwords.contains(password))
+			throw new InvalidCredentialsException("Password should be one of your identification values");
+
+		return true;
 	}
 
 }

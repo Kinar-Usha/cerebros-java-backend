@@ -19,6 +19,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import com.cerebros.constants.ClientIdentificationType;
 import com.cerebros.constants.Country;
 import com.cerebros.exceptions.ClientAlreadyExistsException;
+import com.cerebros.exceptions.InvalidCredentialsException;
 import com.cerebros.models.ClientIdentification;
 import com.cerebros.models.Person;
 import com.cerebros.models.Preferences;
@@ -189,6 +190,46 @@ class ClientServiceTest {
 		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 				() -> clientService.updatePreference(null));
 		assertEquals("Preference cannot be null", exception.getMessage());
+	}
+
+	@Test
+	public void invalidEmailLogin() {
+		clientService.setupMockClients();
+
+		String email = "bhavesh@gmail.com";
+		String password = "333-22-44445";
+
+		assertThrows(InvalidCredentialsException.class, () -> clientService.login(email, password));
+	}
+
+	@Test
+	public void validEmailLogin() {
+		clientService.setupMockClients();
+
+		String email = "bhavesh@gmail.com";
+		String password = "333-22-4444";
+
+		assertTrue(clientService.login(email, password));
+	}
+
+	@Test
+	public void validEmailLoginWithSSN() {
+		clientService.setupMockClients();
+
+		String email = "jane.doe@gmail.com";
+		String password = "333-21-4444";
+
+		assertTrue(clientService.login(email, password));
+	}
+
+	@Test
+	public void validEmailLoginWithPassport() {
+		clientService.setupMockClients();
+
+		String email = "jane.doe@gmail.com";
+		String password = "B7654321";
+
+		assertTrue(clientService.login(email, password));
 	}
 
 }
