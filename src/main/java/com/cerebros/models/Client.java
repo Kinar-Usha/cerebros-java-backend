@@ -1,18 +1,16 @@
 package com.cerebros.models;
 
-import java.time.LocalDate;
 import java.util.Set;
 
-import com.cerebros.contants.Country;
-
-public class Client extends Person {
+public class Client {
 
 	private String clientId;
+	private Person person;
+	private Preferences preferences;
 	private Set<ClientIdentification> clientIdentifications;
 
-	public Client(String email, LocalDate dateofBirth, Country country, String postalCode,
-			Set<ClientIdentification> clientIdentifications) {
-		super(email, dateofBirth, country, postalCode);
+	public Client(Person person, Set<ClientIdentification> clientIdentifications) {
+		setPerson(person);
 		setClientIdentifications(clientIdentifications);
 		setClientId(clientId);
 	}
@@ -22,12 +20,28 @@ public class Client extends Person {
 
 	}
 
+	public Person getPerson() {
+		return person;
+	}
+
+	public void setPerson(Person person) {
+		this.person = person;
+	}
+
 	public Set<ClientIdentification> getClientIdentifications() {
 		return clientIdentifications;
 	}
 
 	public void setClientIdentifications(Set<ClientIdentification> clientIdentifications) {
 		this.clientIdentifications = clientIdentifications;
+	}
+
+	public Preferences getPreferences() {
+		return preferences;
+	}
+
+	public void setPreferences(Preferences preferences) {
+		this.preferences = preferences;
 	}
 
 }

@@ -9,9 +9,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.ArrayList;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,8 +23,6 @@ import com.cerebros.models.ClientIdentification;
 import com.cerebros.models.Person;
 import com.cerebros.models.Preferences;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class ClientServiceTest {
 
 	private ClientService clientService;
@@ -38,7 +34,7 @@ class ClientServiceTest {
 
 	@AfterEach
 	void tearDown() throws Exception {
-		clientService=null;
+		clientService = null;
 	}
 
 	@ParameterizedTest
@@ -50,16 +46,16 @@ class ClientServiceTest {
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = {"Kin.s@gmail.com", "k1@gmail.com", "A_kinar@yahoo.com"})
-	void TestVerifyEmailAdressFormat_success(String email){
-		assertDoesNotThrow(()->clientService.verifyEmailAddress(email));
+	@ValueSource(strings = { "Kin.s@gmail.com", "k1@gmail.com", "A_kinar@yahoo.com" })
+	void TestVerifyEmailAdressFormat_success(String email) {
+		assertDoesNotThrow(() -> clientService.verifyEmailAddress(email));
 
 	}
 
 	@ParameterizedTest
 	@ValueSource(strings = { "sadsad", "invalidemail@", "@invalidemail.com", "invalidemail.com", "ds@dsd" })
 	void verifyInvalidEmailAddress(String email) {
-		assertThrows(IllegalArgumentException.class,()->clientService.verifyEmailAddress(email));
+		assertThrows(IllegalArgumentException.class, () -> clientService.verifyEmailAddress(email));
 	}
 
 	// TODO check if email exists in the clients mockdata
@@ -105,58 +101,62 @@ class ClientServiceTest {
 		Set<ClientIdentification> clientIdentifications = new HashSet<ClientIdentification>();
 		clientIdentifications.add(clientIdentification);
 
-		clientService.registerClient(person, clientIdentification);
+		clientService.registerClient("bhavesh@gmail.com", LocalDate.of(2001, 9, 6), Country.INDIA, "201014",
+				clientIdentifications);
 
 		int afterClientsLength = clientService.getClients().size();
 
 		assertEquals(beforeClientsLength + 1, afterClientsLength);
 	}
-	
+
 	@Test
 	void testAddPreference() throws Exception {
-		Preferences preference = new Preferences("abc@gmail.com","Retirement","Low","1-3 years","Less than $50,000");
-		clientService.addPreferences(preference,true);
-		assertEquals(1,clientService.getPreferences().size() );		
+		Preferences preference = new Preferences("abc@gmail.com", "Retirement", "Low", "1-3 years",
+				"Less than $50,000");
+		clientService.addPreferences(preference, true);
+		assertEquals(1, clientService.getPreferences().size());
 	}
-	
-	@Test
-    public void testAddPreferencesWithNullPreference() {
-        assertThrows(NullPointerException.class, () -> clientService.addPreferences(null, true));
-        assertEquals(0, clientService.getPreferences().size()); 
-    }
-	
-	 @Test
-	    public void testAddPreferencesWithoutAcceptingTerms() {
-		    Preferences preference = new Preferences("abc@gmail.com","Retirement","Low","1-3 years","Less than $50,000");
-		    Exception exception =assertThrows(Exception.class, () -> clientService.addPreferences(preference, false));
-	        assertEquals("Accept RoboAdvisor-Terms and Conditions", exception.getMessage());
-	        assertEquals(0, clientService.getPreferences().size()); 
-	  }
-	 
-	  
-	 @Test
-	  public void testUpdatePreferenceWithExistingPreference() throws Exception {
-		 	Preferences preference = new Preferences("abc@gmail.com","Retirement","Low","1-3 years","Less than $50,000");
-			clientService.addPreferences(preference,true);
-	        preference = new Preferences("abc@gmail.com", "Education","Low","1-3 years","Less than $50,000");
-	        clientService.updatePreference(preference);
-	        assertTrue( clientService.getPreferences().contains(preference));
-	    }
-	 
-	 
-	 @Test
-	    public void testUpdatePreferenceWithNonExistingPreference() {
-	        Preferences nonExistingPreference = new Preferences("nonexistent@example.com", "Retirement","Low","1-3 years","Less than $50,000");
-	        Exception exception = assertThrows(Exception.class, () -> clientService.updatePreference(nonExistingPreference));
-	        assertEquals("Preference update failed", exception.getMessage());
-	        assertFalse(clientService.getPreferences().contains(nonExistingPreference));
-	    }
-	 
-	 @Test
-	    public void testUpdatePreferenceWithNullPreference() {
-	        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> clientService.updatePreference(null));
-	        assertEquals("Preference cannot be null", exception.getMessage());
-	    }
 
-	
+	@Test
+	public void testAddPreferencesWithNullPreference() {
+		assertThrows(NullPointerException.class, () -> clientService.addPreferences(null, true));
+		assertEquals(0, clientService.getPreferences().size());
+	}
+
+	@Test
+	public void testAddPreferencesWithoutAcceptingTerms() {
+		Preferences preference = new Preferences("abc@gmail.com", "Retirement", "Low", "1-3 years",
+				"Less than $50,000");
+		Exception exception = assertThrows(Exception.class, () -> clientService.addPreferences(preference, false));
+		assertEquals("Accept RoboAdvisor-Terms and Conditions", exception.getMessage());
+		assertEquals(0, clientService.getPreferences().size());
+	}
+
+	@Test
+	public void testUpdatePreferenceWithExistingPreference() throws Exception {
+		Preferences preference = new Preferences("abc@gmail.com", "Retirement", "Low", "1-3 years",
+				"Less than $50,000");
+		clientService.addPreferences(preference, true);
+		preference = new Preferences("abc@gmail.com", "Education", "Low", "1-3 years", "Less than $50,000");
+		clientService.updatePreference(preference);
+		assertTrue(clientService.getPreferences().contains(preference));
+	}
+
+	@Test
+	public void testUpdatePreferenceWithNonExistingPreference() {
+		Preferences nonExistingPreference = new Preferences("nonexistent@example.com", "Retirement", "Low", "1-3 years",
+				"Less than $50,000");
+		Exception exception = assertThrows(Exception.class,
+				() -> clientService.updatePreference(nonExistingPreference));
+		assertEquals("Preference update failed", exception.getMessage());
+		assertFalse(clientService.getPreferences().contains(nonExistingPreference));
+	}
+
+	@Test
+	public void testUpdatePreferenceWithNullPreference() {
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+				() -> clientService.updatePreference(null));
+		assertEquals("Preference cannot be null", exception.getMessage());
+	}
+
 }
