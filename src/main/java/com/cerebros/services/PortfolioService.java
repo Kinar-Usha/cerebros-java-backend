@@ -26,7 +26,7 @@ public class PortfolioService {
         clientPortfolios.put("bhavesh@gmail.com", portfolioList);
 //        clientPortfolios.put("john.doe@gmail.com", portfolioList);
         clientPortfolios.put("jane.doe@gmail.com", portfolioList);
-        clientPortfolios.put("noholding@gmail.com", new ArrayList<>());
+        clientPortfolios.put("john.doe@gmail.com", new ArrayList<>());
         clientService.setupMockClients();
 
     }
@@ -85,7 +85,7 @@ public void updatePortfolio(Trade trade) {
             BigDecimal totalValueBeforeTrade = portfolioItem.getHoldings().multiply( portfolioItem.getPrice());
             BigDecimal totalTradeValue = trade.getQuantity().multiply( trade.getExecutionPrice());
             portfolioItem.setHoldings( portfolioItem.getHoldings().add( trade.getQuantity()));
-            portfolioItem.setPrice((totalValueBeforeTrade.add( totalTradeValue)).divide (portfolioItem.getHoldings().add( trade.getQuantity()),1, RoundingMode.HALF_UP));
+            portfolioItem.setPrice(totalValueBeforeTrade.add(totalTradeValue).divide(portfolioItem.getHoldings().add(trade.getQuantity()), 1, RoundingMode.HALF_UP));
         } else if (trade.getDirection().equals("S")) {
             BigDecimal totalValueBeforeTrade = portfolioItem.getHoldings().multiply( portfolioItem.getPrice());
             BigDecimal totalTradeValue = trade.getQuantity().multiply( trade.getExecutionPrice());
@@ -97,6 +97,8 @@ public void updatePortfolio(Trade trade) {
         }
     } else {
         if (trade.getDirection().equals("B")) {
+            Portfolio newItem = new Portfolio(trade.getInstrumentId(),"","",trade.getQuantity(),trade.getExecutionPrice());
+            mockPortfolioData.add(newItem);
 
             // Call to get instruments and add to mockPortfolioData here
             // You would need to implement this logic

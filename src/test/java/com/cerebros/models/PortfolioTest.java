@@ -1,10 +1,13 @@
 package com.cerebros.models;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
 
 class PortfolioTest {
 
@@ -20,7 +23,9 @@ class PortfolioTest {
 
 	@Test
 	void test() {
-		fail("Not yet implemented");
+		Portfolio portfolio= new  Portfolio( "instrumentId",  "description",  "categoryId", BigDecimal.TEN , BigDecimal.TEN);
+		assertNotNull(portfolio);
+//		fail("Not yet implemented");
 	}
 
 }

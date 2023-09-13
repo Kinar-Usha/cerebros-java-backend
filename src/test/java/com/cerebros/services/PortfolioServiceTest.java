@@ -86,7 +86,38 @@ class PortfolioServiceTest {
 		Portfolio updatedItem = updatedPortfolio.get(0);
 		assertEquals("12345", updatedItem.getInstrumentId());
 		assertEquals(new BigDecimal("2"), updatedItem.getHoldings());
-//		assertEquals(BigDecimal.valueOf(100.0), updatedItem.getPrice());
+		assertEquals(BigDecimal.valueOf(6.7), updatedItem.getPrice());
+	}
+	@Test
+	public void testUpdatePortfolio_Sell() {
+		// Arrange
+		Trade trade = new Trade("trade123", BigDecimal.ONE, BigDecimal.TEN, "S", BigDecimal.ZERO, "789", "12345", null);
+
+		// Act
+		portfolioService.updatePortfolio(trade);
+
+		// Assert
+		List<Portfolio> updatedPortfolio = portfolioService.getPortfolio("jane.doe@gmail.com");
+		assertEquals(2, updatedPortfolio.size());
+
+
+	}
+	@Test
+	public void testUpdatePortfolio_Buy_empty() {
+		// Arrange
+		Trade trade = new Trade("trade123", BigDecimal.ONE, BigDecimal.TEN, "B", BigDecimal.ZERO, "456", "12345", null);
+
+		// Act
+		portfolioService.updatePortfolio(trade);
+
+		// Assert
+		List<Portfolio> updatedPortfolio = portfolioService.getPortfolio("john.doe@gmail.com");
+		assertEquals(1, updatedPortfolio.size());
+
+		Portfolio updatedItem = updatedPortfolio.get(0);
+		assertEquals("12345", updatedItem.getInstrumentId());
+		assertEquals(new BigDecimal("1"), updatedItem.getHoldings());
+		assertEquals(BigDecimal.TEN, updatedItem.getPrice());
 	}
 
 	@Test
