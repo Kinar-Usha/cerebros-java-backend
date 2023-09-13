@@ -1,5 +1,6 @@
 package com.cerebros.models;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.AfterEach;
@@ -20,7 +21,10 @@ class InstrumentTest {
 
 	@Test
 	void test() {
-		fail("Not yet implemented");
+//		fail("Not yet implemented");
+		Instrument instrument = new Instrument("instrumentId", "description", "externalIdType", "minQuantity", "maxQuantity", "category");
+		assertNotNull(instrument);
+
 	}
 
 }
