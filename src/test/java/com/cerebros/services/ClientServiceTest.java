@@ -18,6 +18,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import com.cerebros.constants.ClientIdentificationType;
 import com.cerebros.constants.Country;
+import com.cerebros.exceptions.ClientAlreadyExistsException;
 import com.cerebros.models.ClientIdentification;
 import com.cerebros.models.Person;
 import com.cerebros.models.Preferences;
@@ -57,7 +58,6 @@ class ClientServiceTest {
 		assertThrows(IllegalArgumentException.class, () -> clientService.verifyEmailAddress(email));
 	}
 
-	// TODO check if email exists in the clients mockdata
 	@ParameterizedTest
 	@ValueSource(strings = { "nonexistentemail@test.com", "notfound@gmail.com", "missingemail@abc.com" })
 	void verifyNonexistentEmailAddress(String email) {
@@ -107,6 +107,38 @@ class ClientServiceTest {
 		int afterClientsLength = clientService.getAllClients().size();
 
 		assertEquals(beforeClientsLength + 1, afterClientsLength);
+	}
+
+	@Test
+	void registrationAddsExistingClient() {
+
+		clientService.setupMockClients();
+
+		Person person = new Person("bhavesh@gmail.com", LocalDate.of(2001, 9, 6), Country.INDIA, "201014");
+
+		ClientIdentification clientIdentification = new ClientIdentification(ClientIdentificationType.SSN,
+				"333-22-4444");
+		Set<ClientIdentification> clientIdentifications = new HashSet<ClientIdentification>();
+		clientIdentifications.add(clientIdentification);
+
+		assertThrows(ClientAlreadyExistsException.class,
+				() -> clientService.registerClient(person, clientIdentifications));
+	}
+
+	@Test
+	void registrationAddsExistingClientWithNewEmail() {
+
+		clientService.setupMockClients();
+
+		Person person = new Person("bhavesh2@gmail.com", LocalDate.of(2001, 9, 6), Country.INDIA, "201014");
+
+		ClientIdentification clientIdentification = new ClientIdentification(ClientIdentificationType.SSN,
+				"333-22-4444");
+		Set<ClientIdentification> clientIdentifications = new HashSet<ClientIdentification>();
+		clientIdentifications.add(clientIdentification);
+
+		assertThrows(ClientAlreadyExistsException.class,
+				() -> clientService.registerClient(person, clientIdentifications));
 	}
 
 	@Test

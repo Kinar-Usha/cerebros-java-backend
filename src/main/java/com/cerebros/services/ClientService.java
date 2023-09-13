@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import com.cerebros.constants.ClientIdentificationType;
 import com.cerebros.constants.Country;
+import com.cerebros.exceptions.ClientAlreadyExistsException;
 import com.cerebros.models.Client;
 import com.cerebros.models.ClientIdentification;
 import com.cerebros.models.Person;
@@ -80,10 +81,8 @@ public class ClientService {
 	}
 
 	public void registerClient(Person person, Set<ClientIdentification> clientIdentifications) {
-		// TODO verify ClientIdentification
-		// TODO generate UID
-		// TODO add client to hashmaps
 
+		// Verify Identification
 		boolean isIdentificationValid = true;
 		for (ClientIdentification cid : clientIdentifications) {
 			isIdentificationValid = fmts.verifyClientIdentification(cid);
@@ -91,6 +90,27 @@ public class ClientService {
 				throw new IllegalArgumentException("Cannot register client with invalid client identification");
 		}
 
+		// Verify Email
+		boolean isEmailValid = verifyEmailAddress(person.getEmail());
+
+		if (!isEmailValid) {
+			throw new ClientAlreadyExistsException("User with this email is already registered");
+		}
+
+		// Verify Identification doesn't already exist
+		for (String e : clients.keySet()) {
+			Client c = clients.get(e);
+			Set<ClientIdentification> existingIds = c.getClientIdentifications();
+
+			for (ClientIdentification existingId : existingIds) {
+				for (ClientIdentification currentId : clientIdentifications) {
+					if (currentId.getValue() == existingId.getValue())
+						throw new ClientAlreadyExistsException("User with this identification is already registered");
+				}
+			}
+		}
+
+		// Register client
 		String clientId = generateClientUID();
 		System.out.println(clientId);
 
