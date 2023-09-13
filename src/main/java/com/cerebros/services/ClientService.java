@@ -8,8 +8,8 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.cerebros.contants.ClientIdentificationType;
-import com.cerebros.contants.Country;
+import com.cerebros.constants.ClientIdentificationType;
+import com.cerebros.constants.Country;
 import com.cerebros.models.Client;
 import com.cerebros.models.ClientIdentification;
 import com.cerebros.models.Person;
@@ -26,73 +26,77 @@ public class ClientService {
 
 	boolean roboAdvisorTermsAccept = false;
 
-	public HashMap<String, Client> getClients() {
+	public HashMap<String, Client> getAllClients() {
 		return clients;
 	}
 
-	public void setClients(HashMap<String, Client> clients) {
+	public void setAllClients(HashMap<String, Client> clients) {
 		this.clients = clients;
 	}
 
-	private HashMap<String, String> emailToClientId;
-
-	public HashMap<String, String> getEmailToClientId() {
-		return emailToClientId;
+	public Client getClient(String email) {
+		return clients.get(email);
 	}
 
-	public void setEmailToClientId(HashMap<String, String> emailToClientId) {
-		this.emailToClientId = emailToClientId;
-	}
+//	private HashMap<String, String> emailToClientId;
+//
+//	public HashMap<String, String> getEmailToClientId() {
+//		return emailToClientId;
+//	}
+//
+//	public void setEmailToClientId(HashMap<String, String> emailToClientId) {
+//		this.emailToClientId = emailToClientId;
+//	}
 
 	// ===================== Constructors =====================
 	public ClientService() {
 		super();
-		setClients(new HashMap<String, Client>());
-		setEmailToClientId(new HashMap<String, String>());
+		setAllClients(new HashMap<String, Client>());
+//		setEmailToClientId(new HashMap<String, String>());
 
 	}
 
 	// ======================== Methods =======================
 	public boolean verifyEmailAddress(String email) {
+		// DONE check the email address by regex
+		// DONE If regex of email is fine, then check if it exists in the mock data
+		// using MockFMTS
+		// DONE return true or false here. The appropriate use of true or false here
+		// depends on login or signup use case
+		// DONE if the regex itself is invalid, throw error
+
 		Pattern pattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 
 		Matcher matcher = pattern.matcher(email);
 		if (!matcher.matches()) {
 			throw new IllegalArgumentException("Invalid Email Format");
+		} else {
+			if (clients.containsKey(email))
+				return false;
 		}
 
-		// DONE check the email address by regex
-		// TODO If regex of email is fine, then check if it exists in the mock data
-		// using MockFMTS
-		// TODO return true or false here. The appropriate use of true or false here
-		// depends on login or signup use case
-		// TODO if the regex itself is invalid, return false
 		return true;
+
 	}
 
-	public String registerClient(Person person, Set<ClientIdentification> clientIdentifications) {
+	public void registerClient(Person person, Set<ClientIdentification> clientIdentifications) {
 		// TODO verify ClientIdentification
 		// TODO generate UID
 		// TODO add client to hashmaps
 
-//		boolean isClientI
-//		for (ClientIdentification cid : clientIdentifications) {
-//			
-//		}
-//
-//		boolean isIdValid = fmts.verifyClientIdentification(clientIdentification);
-//
-//		if (isIdValid) {
-//			String clientId = generateClientUID();
-//			System.out.print(clientId);
-//			
-//			Client client = new Client("bhavesh@gmail.com", LocalDate.of(2001, 9, 6), Country.INDIA, "201014",
-//					clientIdentificationsA);
-//			
-//			clients.put(person.getEmail(), )
-//		}
+		boolean isIdentificationValid = true;
+		for (ClientIdentification cid : clientIdentifications) {
+			isIdentificationValid = fmts.verifyClientIdentification(cid);
+			if (isIdentificationValid == false)
+				throw new IllegalArgumentException("Cannot register client with invalid client identification");
+		}
 
-		return "";
+		String clientId = generateClientUID();
+		System.out.println(clientId);
+
+		Client client = new Client(clientId, person, clientIdentifications);
+		clients.put(person.getEmail(), client);
+
 	}
 
 	private String generateClientUID() {
@@ -113,7 +117,7 @@ public class ClientService {
 		Set<ClientIdentification> clientIdentificationsA = new HashSet<ClientIdentification>();
 		clientIdentificationsA.add(clientIdentificationA);
 
-		Client clientA = new Client(personA, clientIdentificationsA);
+		Client clientA = new Client("123", personA, clientIdentificationsA);
 
 		// Client B
 		Person personB = new Person("john.doe@gmail.com", LocalDate.of(1990, 5, 15), Country.USA, "90210");
@@ -122,7 +126,7 @@ public class ClientService {
 		Set<ClientIdentification> clientIdentificationsB = new HashSet<ClientIdentification>();
 		clientIdentificationsB.add(clientIdentificationB);
 
-		Client clientB = new Client(personB, clientIdentificationsB);
+		Client clientB = new Client("456", personB, clientIdentificationsB);
 
 		// Client C
 		Person personC = new Person("jane.doe@gmail.com", LocalDate.of(1995, 2, 28), Country.IRELAND, "M5V 2L7");
@@ -134,16 +138,16 @@ public class ClientService {
 		clientIdentificationsC.add(clientIdentificationC1);
 		clientIdentificationsC.add(clientIdentificationC2);
 
-		Client clientC = new Client(personC, clientIdentificationsC);
+		Client clientC = new Client("789", personC, clientIdentificationsC);
 
 		// Add to clients
 		clients.put("bhavesh@gmail.com", clientA);
 		clients.put("john.doe@gmail.com", clientB);
 		clients.put("jane.doe@gmail.com", clientC);
 
-		emailToClientId.put("bhavesh@gmail.com", "123");
-		emailToClientId.put("john.doe@gmail.com", "456");
-		emailToClientId.put("jane.doe@gmail.com", "789");
+//		emailToClientId.put("bhavesh@gmail.com", "123");
+//		emailToClientId.put("john.doe@gmail.com", "456");
+//		emailToClientId.put("jane.doe@gmail.com", "789");
 
 	}
 

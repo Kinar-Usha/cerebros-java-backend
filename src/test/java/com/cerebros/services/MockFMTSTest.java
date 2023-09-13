@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import com.cerebros.contants.ClientIdentificationType;
+import com.cerebros.constants.ClientIdentificationType;
 import com.cerebros.models.ClientIdentification;
 
 class MockFMTSTest {

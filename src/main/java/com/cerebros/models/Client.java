@@ -9,15 +9,18 @@ public class Client {
 	private Preferences preferences;
 	private Set<ClientIdentification> clientIdentifications;
 
-	public Client(Person person, Set<ClientIdentification> clientIdentifications) {
+	public Client(String clientId, Person person, Set<ClientIdentification> clientIdentifications) {
 		setPerson(person);
 		setClientIdentifications(clientIdentifications);
 		setClientId(clientId);
 	}
 
-	private void setClientId(String clientId2) {
-		// TODO Auto-generated method stub
+	public void setClientId(String clientId) {
+		this.clientId = clientId;
+	}
 
+	public String getClientId() {
+		return clientId;
 	}
 
 	public Person getPerson() {

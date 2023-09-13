@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -17,8 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import com.cerebros.contants.ClientIdentificationType;
-import com.cerebros.contants.Country;
+import com.cerebros.constants.ClientIdentificationType;
+import com.cerebros.constants.Country;
 import com.cerebros.models.ClientIdentification;
 import com.cerebros.models.Person;
 import com.cerebros.models.Preferences;
@@ -38,11 +37,11 @@ class ClientServiceTest {
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = { "bhavesh@gmail.com", "kin.s@gmail.com", "abc@test.com", "reshmi.lDs@gma.com",
-			"bl@a32.ml" })
+	@ValueSource(strings = { "bhavesh@gmail.com", "john.doe@gmail.com", "jane.doe@gmail.com" })
 	void verifyExistingEmailAddress(String email) {
-		boolean emailExists = clientService.verifyEmailAddress(email);
-		assertTrue(emailExists);
+		// Should return false for emails that already exist in the clients
+		clientService.setupMockClients();
+		assertFalse(clientService.verifyEmailAddress(email));
 	}
 
 	@ParameterizedTest
@@ -62,7 +61,9 @@ class ClientServiceTest {
 	@ParameterizedTest
 	@ValueSource(strings = { "nonexistentemail@test.com", "notfound@gmail.com", "missingemail@abc.com" })
 	void verifyNonexistentEmailAddress(String email) {
-		fail("Not yet implemented");
+		// Should return true for emails that are not registered yet
+		clientService.setupMockClients();
+		assertTrue(clientService.verifyEmailAddress(email));
 	}
 
 	@Test
@@ -74,7 +75,7 @@ class ClientServiceTest {
 		Set<ClientIdentification> clientIdentifications = new HashSet<ClientIdentification>();
 		clientIdentifications.add(clientIdentification);
 
-		assertThrows(IllegalArgumentException.class, () -> clientService.registerClient(person, clientIdentification));
+		assertThrows(IllegalArgumentException.class, () -> clientService.registerClient(person, clientIdentifications));
 	}
 
 	@Test
@@ -86,13 +87,13 @@ class ClientServiceTest {
 		Set<ClientIdentification> clientIdentifications = new HashSet<ClientIdentification>();
 		clientIdentifications.add(clientIdentification);
 
-		assertDoesNotThrow(() -> clientService.registerClient(person, clientIdentification));
+		assertDoesNotThrow(() -> clientService.registerClient(person, clientIdentifications));
 	}
 
 	@Test
 	void registrationAddsToMockClients() {
 
-		int beforeClientsLength = clientService.getClients().size();
+		int beforeClientsLength = clientService.getAllClients().size();
 
 		Person person = new Person("bhavesh@gmail.com", LocalDate.of(2001, 9, 6), Country.INDIA, "201014");
 
@@ -101,10 +102,9 @@ class ClientServiceTest {
 		Set<ClientIdentification> clientIdentifications = new HashSet<ClientIdentification>();
 		clientIdentifications.add(clientIdentification);
 
-		clientService.registerClient("bhavesh@gmail.com", LocalDate.of(2001, 9, 6), Country.INDIA, "201014",
-				clientIdentifications);
+		clientService.registerClient(person, clientIdentifications);
 
-		int afterClientsLength = clientService.getClients().size();
+		int afterClientsLength = clientService.getAllClients().size();
 
 		assertEquals(beforeClientsLength + 1, afterClientsLength);
 	}

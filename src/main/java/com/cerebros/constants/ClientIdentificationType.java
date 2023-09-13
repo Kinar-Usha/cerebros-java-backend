@@ -1,4 +1,4 @@
-package com.cerebros.contants;
+package com.cerebros.constants;
 
 public enum ClientIdentificationType {
 

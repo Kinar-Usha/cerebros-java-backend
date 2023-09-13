@@ -1,6 +1,6 @@
 package com.cerebros.models;
 
-import com.cerebros.contants.ClientIdentificationType;
+import com.cerebros.constants.ClientIdentificationType;
 
 public class ClientIdentification {
 

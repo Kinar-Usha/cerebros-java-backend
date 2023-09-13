@@ -2,7 +2,7 @@ package com.cerebros.models;
 
 import java.time.LocalDate;
 
-import com.cerebros.contants.Country;
+import com.cerebros.constants.Country;
 
 public class Person {
 
