@@ -43,23 +43,23 @@ class TradeServiceTest {
 	}
 	@Test
 	void testTradesCorrectlySorted() throws NoTradeHistoryFoundException {
-		List<Trade> trades=tradeService.getClientTradeHistory("client1", Comparator.comparing(Trade::getTradeId).reversed());
+		List<Trade> trades=tradeService.getClientTradeHistory("bhavesh@gmail.com", Comparator.comparing(Trade::getTradeId).reversed());
 		assertTrue(trades.get(0).getTradeId().compareTo(trades.get(1).getTradeId())>0);
 	}
 
 	@Test
 	void testTradeslessThan100Returned() throws NoTradeHistoryFoundException {
-		List<Trade> trades=tradeService.getClientTradeHistory("client1", Comparator.comparing(Trade::getTradeId));
+		List<Trade> trades=tradeService.getClientTradeHistory("bhavesh@gmail.com", Comparator.comparing(Trade::getTradeId));
 		assertEquals(35, trades.size());
 	}
 	@Test
 	void testTradesExactly100Returned() throws NoTradeHistoryFoundException {
-		List<Trade> trades=tradeService.getClientTradeHistory("client2", Comparator.comparing(Trade::getTradeId));
+		List<Trade> trades=tradeService.getClientTradeHistory("john.doe@gmail.com", Comparator.comparing(Trade::getTradeId));
 		assertEquals(100, trades.size());
 	}
 	@Test
 	void testTradesMoreThan100Returned() throws NoTradeHistoryFoundException {
-		List<Trade> trades=tradeService.getClientTradeHistory("client3", Comparator.comparing(Trade::getTradeId));
+		List<Trade> trades=tradeService.getClientTradeHistory("jane.doe@gmail.com", Comparator.comparing(Trade::getTradeId));
 		assertEquals(100, trades.size());
 	}
 

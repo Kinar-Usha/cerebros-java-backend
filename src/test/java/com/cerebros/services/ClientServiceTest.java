@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,6 +19,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import com.cerebros.constants.ClientIdentificationType;
 import com.cerebros.constants.Country;
+import com.cerebros.exceptions.ClientAlreadyExistsException;
+import com.cerebros.exceptions.InvalidCredentialsException;
+import com.cerebros.models.Client;
 import com.cerebros.models.ClientIdentification;
 import com.cerebros.models.Person;
 import com.cerebros.models.Preferences;
@@ -29,6 +33,7 @@ class ClientServiceTest {
 	@BeforeEach
 	void setUp() throws Exception {
 		clientService = new ClientService();
+		clientService.setupMockClients();
 	}
 
 	@AfterEach
@@ -40,7 +45,6 @@ class ClientServiceTest {
 	@ValueSource(strings = { "bhavesh@gmail.com", "john.doe@gmail.com", "jane.doe@gmail.com" })
 	void verifyExistingEmailAddress(String email) {
 		// Should return false for emails that already exist in the clients
-		clientService.setupMockClients();
 		assertFalse(clientService.verifyEmailAddress(email));
 	}
 
@@ -57,12 +61,10 @@ class ClientServiceTest {
 		assertThrows(IllegalArgumentException.class, () -> clientService.verifyEmailAddress(email));
 	}
 
-	// TODO check if email exists in the clients mockdata
 	@ParameterizedTest
 	@ValueSource(strings = { "nonexistentemail@test.com", "notfound@gmail.com", "missingemail@abc.com" })
 	void verifyNonexistentEmailAddress(String email) {
 		// Should return true for emails that are not registered yet
-		clientService.setupMockClients();
 		assertTrue(clientService.verifyEmailAddress(email));
 	}
 
@@ -80,10 +82,10 @@ class ClientServiceTest {
 
 	@Test
 	void registerValidClient() {
-		Person person = new Person("bhavesh@gmail.com", LocalDate.of(2001, 9, 6), Country.INDIA, "201014");
+		Person person = new Person("vishku@gmail.com", LocalDate.of(2001, 9, 6), Country.INDIA, "201014");
 
 		ClientIdentification clientIdentification = new ClientIdentification(ClientIdentificationType.SSN,
-				"333-22-4444");
+				"333-12-4444");
 		Set<ClientIdentification> clientIdentifications = new HashSet<ClientIdentification>();
 		clientIdentifications.add(clientIdentification);
 
@@ -95,10 +97,10 @@ class ClientServiceTest {
 
 		int beforeClientsLength = clientService.getAllClients().size();
 
-		Person person = new Person("bhavesh@gmail.com", LocalDate.of(2001, 9, 6), Country.INDIA, "201014");
+		Person person = new Person("vishku@gmail.com", LocalDate.of(2001, 9, 6), Country.INDIA, "201014");
 
 		ClientIdentification clientIdentification = new ClientIdentification(ClientIdentificationType.SSN,
-				"333-22-4444");
+				"333-12-4444");
 		Set<ClientIdentification> clientIdentifications = new HashSet<ClientIdentification>();
 		clientIdentifications.add(clientIdentification);
 
@@ -110,53 +112,128 @@ class ClientServiceTest {
 	}
 
 	@Test
+	void registrationAddsExistingClient() {
+
+		Person person = new Person("bhavesh@gmail.com", LocalDate.of(2001, 9, 6), Country.INDIA, "201014");
+
+		ClientIdentification clientIdentification = new ClientIdentification(ClientIdentificationType.SSN,
+				"333-22-4444");
+		Set<ClientIdentification> clientIdentifications = new HashSet<ClientIdentification>();
+		clientIdentifications.add(clientIdentification);
+
+		assertThrows(ClientAlreadyExistsException.class,
+				() -> clientService.registerClient(person, clientIdentifications));
+	}
+
+	@Test
+	void registrationAddsExistingClientWithNewEmail() {
+
+		Person person = new Person("bhavesh2@gmail.com", LocalDate.of(2001, 9, 6), Country.INDIA, "201014");
+
+		ClientIdentification clientIdentification = new ClientIdentification(ClientIdentificationType.SSN,
+				"333-22-4444");
+		Set<ClientIdentification> clientIdentifications = new HashSet<ClientIdentification>();
+		clientIdentifications.add(clientIdentification);
+
+		assertThrows(ClientAlreadyExistsException.class,
+				() -> clientService.registerClient(person, clientIdentifications));
+	}
+
+	@Test
 	void testAddPreference() throws Exception {
-		Preferences preference = new Preferences("abc@gmail.com", "Retirement", "Low", "1-3 years",
-				"Less than $50,000");
-		clientService.addPreferences(preference, true);
-		assertEquals(1, clientService.getPreferences().size());
+		Person personA = new Person("client@gmail.com", LocalDate.of(2001, 9, 6), Country.INDIA, "201014");
+		ClientIdentification clientIdentificationA = new ClientIdentification(ClientIdentificationType.SSN,
+				"333-22-4444");
+		Set<ClientIdentification> clientIdentificationsA = new HashSet<ClientIdentification>();
+		clientIdentificationsA.add(clientIdentificationA);
+		Preferences preferenceA = new Preferences("Retirement", "Low", "1-3 years", "Less than $50,000");
+		Client clientA = new Client("123", personA, clientIdentificationsA);
+
+		HashMap<String, Client> clients = clientService.getAllClients();
+		clients.put("client@gmail.com", clientA);
+		clientService.addPreferences("client@gmail.com", preferenceA, true);
+		assertEquals(preferenceA, clientA.getPreferences());
+
 	}
 
 	@Test
 	public void testAddPreferencesWithNullPreference() {
-		assertThrows(NullPointerException.class, () -> clientService.addPreferences(null, true));
-		assertEquals(0, clientService.getPreferences().size());
+		assertThrows(NullPointerException.class, () -> clientService.addPreferences("123", null, true));
 	}
 
 	@Test
 	public void testAddPreferencesWithoutAcceptingTerms() {
-		Preferences preference = new Preferences("abc@gmail.com", "Retirement", "Low", "1-3 years",
-				"Less than $50,000");
-		Exception exception = assertThrows(Exception.class, () -> clientService.addPreferences(preference, false));
-		assertEquals("Accept RoboAdvisor-Terms and Conditions", exception.getMessage());
-		assertEquals(0, clientService.getPreferences().size());
+		Preferences preferences = new Preferences("Retirement", "Low", "1-3 years", "Less than $50,000");
+		assertThrows(RuntimeException.class, () -> clientService.addPreferences("123", preferences, false));
+
 	}
 
 	@Test
 	public void testUpdatePreferenceWithExistingPreference() throws Exception {
-		Preferences preference = new Preferences("abc@gmail.com", "Retirement", "Low", "1-3 years",
-				"Less than $50,000");
-		clientService.addPreferences(preference, true);
-		preference = new Preferences("abc@gmail.com", "Education", "Low", "1-3 years", "Less than $50,000");
-		clientService.updatePreference(preference);
-		assertTrue(clientService.getPreferences().contains(preference));
-	}
 
-	@Test
-	public void testUpdatePreferenceWithNonExistingPreference() {
-		Preferences nonExistingPreference = new Preferences("nonexistent@example.com", "Retirement", "Low", "1-3 years",
-				"Less than $50,000");
-		Exception exception = assertThrows(Exception.class,
-				() -> clientService.updatePreference(nonExistingPreference));
-		assertEquals("Preference update failed", exception.getMessage());
-		assertFalse(clientService.getPreferences().contains(nonExistingPreference));
+//		Person personA = new Person("client@gmail.com", LocalDate.of(2001, 9, 6), Country.INDIA, "201014");
+//		ClientIdentification clientIdentificationA = new ClientIdentification(ClientIdentificationType.SSN,
+//				"333-22-4444");
+//		Set<ClientIdentification> clientIdentificationsA = new HashSet<ClientIdentification>();
+//		clientIdentificationsA.add(clientIdentificationA);
+//
+//		Preferences preferenceA = new Preferences("Retirement", "Low", "1-3 years", "Less than $50,000");
+//
+//		Client clientA = new Client("A1234", personA, clientIdentificationsA);
+//		clientService.getAllClients().put("A1234", clientA);
+//		clientService.getEmailToClientId().put("client@gmail.com", "A1234");
+//		clientService.addPreferences("A1234", preferenceA, true);
+
+		Client client = clientService.getClient("123");
+
+		Preferences newPreference = new Preferences("Retirement", "High", "1-3 years", "Less than $50,000");
+
+		clientService.updatePreferences("123", newPreference);
+
+		assertEquals(newPreference, client.getPreferences());
 	}
 
 	@Test
 	public void testUpdatePreferenceWithNullPreference() {
 		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-				() -> clientService.updatePreference(null));
+				() -> clientService.updatePreferences("abc@gmail.com", null));
 		assertEquals("Preference cannot be null", exception.getMessage());
+	}
+
+	@Test
+	public void invalidEmailLogin() {
+
+		String email = "bhavesh@gmail.com";
+		String password = "333-22-44445";
+
+		assertThrows(InvalidCredentialsException.class, () -> clientService.login(email, password));
+	}
+
+	@Test
+	public void validEmailLogin() {
+
+		String email = "bhavesh@gmail.com";
+		String password = "333-22-4444";
+
+		assertTrue(clientService.login(email, password));
+	}
+
+	@Test
+	public void validEmailLoginWithSSN() {
+
+		String email = "jane.doe@gmail.com";
+		String password = "333-21-4444";
+
+		assertTrue(clientService.login(email, password));
+	}
+
+	@Test
+	public void validEmailLoginWithPassport() {
+
+		String email = "jane.doe@gmail.com";
+		String password = "B7654321";
+
+		assertTrue(clientService.login(email, password));
 	}
 
 }

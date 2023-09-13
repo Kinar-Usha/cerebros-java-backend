@@ -1,14 +1,9 @@
 package com.cerebros.services;
 
-import java.util.HashMap;
-
 import com.cerebros.constants.ClientIdentificationType;
-import com.cerebros.models.Client;
 import com.cerebros.models.ClientIdentification;
 
 public class MockFMTS {
-
-	private HashMap<String, Client> clients;
 
 	public boolean verifyClientIdentification(ClientIdentification clientIdentification) {
 

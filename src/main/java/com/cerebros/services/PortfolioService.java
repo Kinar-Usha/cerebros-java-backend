@@ -16,7 +16,7 @@ public class PortfolioService {
 
     private final ClientService clientService= new ClientService();
     private Map<String, List<Portfolio>> clientPortfolios;
-    public void setupdDummyPortfolio(){
+    public void setupDummyPortfolio(){
         Portfolio portfolio1= new Portfolio("12345","testDesc", "GOVT",  BigDecimal.ONE,  BigDecimal.TEN);
         Portfolio portfolio2= new Portfolio("2345","testDesc", "CORP", new BigDecimal("300"), new BigDecimal("20.00").setScale(2, RoundingMode.HALF_UP));
         Portfolio portfolio3= new Portfolio("345","testDesc", "CD", new BigDecimal("200"), new BigDecimal("20.00").setScale(2, RoundingMode.HALF_UP));
@@ -46,12 +46,11 @@ public class PortfolioService {
                 throw new PortfolioNotFoundException(clientEmail);
             }
 
-            return clientPortfoliosList;
-        }
-        else {
-            throw new IllegalArgumentException("User not found");
-        }
-    }
+			return clientPortfoliosList;
+		} else {
+			throw new IllegalArgumentException("User not found");
+		}
+	}
 //    public void addPortfolio(String clientId, Portfolio newPortfolio) {
 //        if(clientService.verifyClientId(clientId)){
 //            clientPortfolios.computeIfAbsent(clientId, k -> new ArrayList<>());
@@ -72,7 +71,8 @@ public class PortfolioService {
 //    }
 public void updatePortfolio(Trade trade) {
     Portfolio portfolioItem = null;
-    List<Portfolio> mockPortfolioData= clientPortfolios.get(trade.getClientid());
+
+    List<Portfolio> mockPortfolioData= clientPortfolios.get(clientService.getClient(trade.getClientid()).getPerson().getEmail());
     for (Portfolio item : mockPortfolioData) {
         if (item.getInstrumentId().equals(trade.getInstrumentId())) {
             portfolioItem = item;

@@ -13,6 +13,7 @@ public class Client {
 		setPerson(person);
 		setClientIdentifications(clientIdentifications);
 		setClientId(clientId);
+		this.preferences = null;
 	}
 
 	public void setClientId(String clientId) {

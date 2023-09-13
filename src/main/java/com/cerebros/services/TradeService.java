@@ -21,10 +21,10 @@ public class TradeService {
     public void setupTradeHistory(){
         for(String clientId:new String[]{"bhavesh@gmail.com","john.doe@gmail.com", "jane.doe@gmail.com"}){
             for(int i=0;i<105;i++){
-                if(clientId.equals("client1") && i==35){
+                if(clientId.equals("bhavesh@gmail.com") && i==35){
                     break;
                 }
-                if(clientId.equals("client2") && i==100){
+                if(clientId.equals("john.doe@gmail.com") && i==100){
                     break;
                 }
                 Order order= new Order("orderId_"+clientId+i,new BigDecimal("10"),new BigDecimal("100.0"), "B", clientId,"instrument"+i);

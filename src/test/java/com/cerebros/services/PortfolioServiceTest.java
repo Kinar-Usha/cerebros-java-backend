@@ -33,7 +33,7 @@ class PortfolioServiceTest {
 		portfolioList.add(portfolio3);
 
 		portfolioService = new PortfolioService();
-		portfolioService.setupdDummyPortfolio();
+		portfolioService.setupDummyPortfolio();
 		clientService=new ClientService();
 		clientService.setupMockClients();
 
@@ -74,7 +74,7 @@ class PortfolioServiceTest {
 	@Test
 	public void testUpdatePortfolio_Buy() {
 		// Arrange
-		Trade trade = new Trade("trade123", BigDecimal.ONE, BigDecimal.TEN, "B", BigDecimal.ZERO, "jane.doe@gmail.com", "12345", null);
+		Trade trade = new Trade("trade123", BigDecimal.ONE, BigDecimal.TEN, "B", BigDecimal.ZERO, "789", "12345", null);
 
 		// Act
 		portfolioService.updatePortfolio(trade);
