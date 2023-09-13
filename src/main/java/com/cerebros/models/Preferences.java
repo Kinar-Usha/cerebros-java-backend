@@ -1,15 +1,14 @@
 package com.cerebros.models;
 
 public class Preferences {
-	private String clientEmail;
+
 	private String  purpose;
 	private String risk;
 	private String time;
 	private String income;
 	
-	public Preferences(String clientEmail,String purpose, String risk, String time, String income) {
+	public Preferences(String purpose, String risk, String time, String income) {
 		super();
-		this.clientEmail=clientEmail;
 		this.purpose = purpose;
 		this.risk = risk;
 		this.time = time;
@@ -50,13 +49,7 @@ public class Preferences {
 		this.income = income;
 	}
 
-	public String getClientEmail() {
-		return clientEmail;
-	}
 
-	public void setClientEmail(String clientEmail) {
-		this.clientEmail = clientEmail;
-	};
 	
 	
 	
