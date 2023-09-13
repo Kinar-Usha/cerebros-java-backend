@@ -1,10 +1,7 @@
 package com.cerebros.models;
 
-import static org.junit.jupiter.api.Assertions.fail;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 class ClientIdentificationTest {
 
@@ -15,13 +12,7 @@ class ClientIdentificationTest {
 	}
 
 	@AfterEach
-	 void tearDown() throws Exception {
-	}
-
-	@Test
-	void test() {
-
-		fail("Not yet implemented");
+	void tearDown() throws Exception {
 	}
 
 }

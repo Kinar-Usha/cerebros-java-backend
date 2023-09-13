@@ -10,8 +10,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.cerebros.contants.ClientIdentificationType;
-import com.cerebros.contants.Country;
+import com.cerebros.constants.ClientIdentificationType;
+import com.cerebros.constants.Country;
 
 class ClientTest {
 
@@ -28,13 +28,14 @@ class ClientTest {
 	@Test
 	void createClient() {
 
+		Person person = new Person("bhavesh@gmail.com", LocalDate.of(2001, 9, 6), Country.USA, "201014");
+
 		ClientIdentification clientIdentification = new ClientIdentification(ClientIdentificationType.SSN,
 				"333-22-4444");
 		Set<ClientIdentification> clientIdentifications = new HashSet<ClientIdentification>();
 		clientIdentifications.add(clientIdentification);
 
-		client = new Client("bhavesh@gmail.com", LocalDate.of(2001, 9, 6), Country.INDIA, "201014",
-				clientIdentifications);
+		client = new Client("123", person, clientIdentifications);
 
 		assertNotNull(client);
 	}
