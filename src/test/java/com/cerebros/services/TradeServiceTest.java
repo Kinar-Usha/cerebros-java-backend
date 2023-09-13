@@ -6,6 +6,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 
@@ -63,6 +64,21 @@ class TradeServiceTest {
 		assertEquals(100, trades.size());
 	}
 
+	@Test
+	void testAddToTradesHistory() {
+		Trade trade = new Trade("trade123", BigDecimal.ONE, BigDecimal.TEN, "B", BigDecimal.ZERO, "789", "12345", null);
+
+		assertDoesNotThrow(()->{
+			tradeService.updateClientTradeHistory(trade);
+		});
+	}
+	@Test
+	void testAddToTradesHistory_null() {
+
+		assertThrows(IllegalArgumentException.class,()->{
+			tradeService.updateClientTradeHistory(null);
+		});
+	}
 
 
 

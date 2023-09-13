@@ -45,4 +45,12 @@ public class TradeService {
         }
         return clientTrades;
     }
+    public void updateClientTradeHistory(Trade trade){
+        if(trade!=null){
+            allTrades.add(trade);
+        }
+        else{
+            throw new IllegalArgumentException("Trade is empty");
+        }
+    }
 }

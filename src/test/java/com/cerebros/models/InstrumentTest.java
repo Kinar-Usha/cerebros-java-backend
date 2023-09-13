@@ -7,6 +7,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+
 class InstrumentTest {
 
 	private Instrument instrument;
@@ -22,7 +24,7 @@ class InstrumentTest {
 	@Test
 	void test() {
 //		fail("Not yet implemented");
-		Instrument instrument = new Instrument("instrumentId", "description", "externalIdType", "minQuantity", "maxQuantity", "category");
+		Instrument instrument = new Instrument("instrumentId", "description", "externalIdType",  "category","maxQuantity", BigDecimal.ZERO,BigDecimal.ZERO);
 		assertNotNull(instrument);
 
 	}

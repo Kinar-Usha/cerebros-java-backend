@@ -103,6 +103,20 @@ class PortfolioServiceTest {
 
 	}
 	@Test
+	public void testUpdatePortfolio_SellException() {
+		// Arrange
+		Trade trade = new Trade("trade123", BigDecimal.ONE, BigDecimal.TEN, "S", BigDecimal.ZERO, "789", "123456", null);
+
+		// Act
+
+		// Assert
+		assertThrows(RuntimeException.class, ()->{
+			portfolioService.updatePortfolio(trade);
+		});
+
+
+	}
+	@Test
 	public void testUpdatePortfolio_Buy_empty() {
 		// Arrange
 		Trade trade = new Trade("trade123", BigDecimal.ONE, BigDecimal.TEN, "B", BigDecimal.ZERO, "456", "12345", null);

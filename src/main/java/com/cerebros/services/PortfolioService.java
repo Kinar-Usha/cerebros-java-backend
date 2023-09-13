@@ -15,7 +15,7 @@ public class PortfolioService {
     List<Portfolio> portfolioList= new ArrayList<>();
 
     private final ClientService clientService= new ClientService();
-    private Map<String, List<Portfolio>> clientPortfolios;
+    private final Map<String, List<Portfolio>> clientPortfolios;
     public void setupDummyPortfolio(){
         Portfolio portfolio1= new Portfolio("12345","testDesc", "GOVT",  BigDecimal.ONE,  BigDecimal.TEN);
         Portfolio portfolio2= new Portfolio("2345","testDesc", "CORP", new BigDecimal("300"), new BigDecimal("20.00").setScale(2, RoundingMode.HALF_UP));
@@ -107,6 +107,5 @@ public void updatePortfolio(Trade trade) {
         }
     }
     clientPortfolios.put(trade.getClientid(),mockPortfolioData);
-    System.out.println(mockPortfolioData);
-}
+    }
 }
