@@ -34,9 +34,9 @@ class ClientTest {
 				"333-22-4444");
 		Set<ClientIdentification> clientIdentifications = new HashSet<ClientIdentification>();
 		clientIdentifications.add(clientIdentification);
-		Preferences preference = new Preferences( "Retirement", "Low", "1-3 years",
-				"Less than $50,000");
-		client = new Client("123", person, clientIdentifications,preference);
+		Preferences preference = new Preferences("Retirement", "Low", "1-3 years", "Less than $50,000");
+		client = new Client("123", person, clientIdentifications);
+		client.setPreferences(preference);
 
 		assertNotNull(client);
 	}
