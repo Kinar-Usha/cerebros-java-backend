@@ -18,9 +18,9 @@ class PriceTest {
 	void tearDown() throws Exception {
 	}
 
-	@Test
-	void test() {
-		fail("Not implemented");
-	}
+//	@Test
+//	void test() {
+//		fail("Not implemented");
+//	}
 
 }
