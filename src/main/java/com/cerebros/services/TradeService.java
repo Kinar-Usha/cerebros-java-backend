@@ -19,7 +19,7 @@ public class TradeService {
 
     }
     public void setupTradeHistory(){
-        for(String clientId:new String[]{"client1", "client2", "client3"}){
+        for(String clientId:new String[]{"bhavesh@gmail.com","john.doe@gmail.com", "jane.doe@gmail.com"}){
             for(int i=0;i<105;i++){
                 if(clientId.equals("client1") && i==35){
                     break;
