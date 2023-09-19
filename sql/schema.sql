@@ -12,7 +12,7 @@ DROP TABLE Cerebros_Client;
 
 
 
-ALTER SESSION SET CURRENT_SCHEMA = Scott;
+--ALTER SESSION SET CURRENT_SCHEMA = Scott;
 
 
 -- Create the Client table
@@ -280,6 +280,7 @@ VALUES
 INSERT INTO Cerebros_Orders (orderId, clientId, instrumentId, direction, quantity, targetPrice, placedTimestamp)
 VALUES
     ('BUY_ORDER_T67897_1', 'YOUR_CLIENTID', 'T67897', 'B', 200, 0.999375, '21-AUG-19');
+COMMIT;
 
 --    ('BUY_ORDER_T67899_1', 'YOUR_CLIENTID', 'T67899', 'B', 400, 1.00375, '2023-09-19 13:30:00'),
 --    ('BUY_ORDER_T67880_1', 'YOUR_CLIENTID', 'T67880', 'B', 800, 1.0596875, '2023-09-19 14:00:00'),
