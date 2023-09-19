@@ -1,7 +1,4 @@
--- Connect to the database
--- You need to connect to your database using appropriate credentials before running these commands.
 
--- Create the SCOTT schema if it doesn't exist
 DROP TABLE Cerebros_Trades;
 DROP TABLE Cerebros_Orders;
 DROP TABLE Cerebros_Prices;
@@ -12,21 +9,23 @@ DROP TABLE Cerebros_ClientPasswords;
 DROP TABLE Cerebros_Person;
 DROP TABLE Cerebros_INSTRUMENTS;
 DROP TABLE Cerebros_Client;
--- Use the SCOTT schema
+
+
+
 ALTER SESSION SET CURRENT_SCHEMA = Scott;
 
 
 -- Create the Client table
 CREATE TABLE Cerebros_Client (
     clientId VARCHAR(50) PRIMARY KEY,
-    person_id VARCHAR(50),
-    preference_id VARCHAR(50)
+    personId VARCHAR(50),
+    preferenceId VARCHAR(50)
 );
 
 -- Create the Person table
 CREATE TABLE Cerebros_Person (
-    person_id INT PRIMARY KEY,
-    client_id VARCHAR(50),
+    personId INT PRIMARY KEY,
+    clientId VARCHAR(50),
     name VARCHAR(255),
     email VARCHAR(255),
     dob DATE,
@@ -70,7 +69,7 @@ CREATE TABLE Cerebros_Instruments (
 
 -- Create the Portfolio table
 CREATE TABLE Cerebros_Portfolio (
-    portfolio_id INT PRIMARY KEY,
+    portfolioId INT PRIMARY KEY,
     clientId VARCHAR(50),
     instrumentId VARCHAR(50),
     holdings DECIMAL(10, 2)
@@ -80,8 +79,10 @@ CREATE TABLE Cerebros_Portfolio (
 CREATE TABLE Cerebros_Trades (
     tradeId INT PRIMARY KEY,
     clientId VARCHAR(50),
-    instrument_id VARCHAR(50),
+    instrumentId VARCHAR(50),
     orderId VARCHAR(50),
+    direction varchar(10),
+    quantity DECIMAL(10,2),
     executionPrice DECIMAL(10, 2),
     cashValue DECIMAL(10, 2),
     executedTimestamp TIMESTAMP
@@ -217,31 +218,33 @@ VALUES
 --    (12, 'YOUR_CLIENT_ID', 'T67883', 150), -- Example data, replace with actual values
 --    (13, 'YOUR_CLIENT_ID', 'T67878', 250); -- Example data, replace with actual values
 -------------------------------------------------------------------
-INSERT INTO Cerebros_Trades (tradeId, clientId, instrument_id, orderId, executionPrice, cashValue, executedTimestamp)
+
+---- add quantity and direction values
+INSERT INTO Cerebros_Trades (tradeId, clientId, instrumentId, orderId, executionPrice, cashValue, executedTimestamp)
 VALUES
     (1, 'YOUR_CLIENT_ID', 'Q123', 'BUY_ORDER_Q123_1', 104.75, -10475.00, '21-AUG-19');
-INSERT INTO Cerebros_Trades (tradeId, clientId, instrument_id, orderId, executionPrice, cashValue, executedTimestamp)
+INSERT INTO Cerebros_Trades (tradeId, clientId, instrumentId, orderId, executionPrice, cashValue, executedTimestamp)
 VALUES
     (2, 'YOUR_CLIENT_ID', 'Q456', 'BUY_ORDER_Q456_1', 323.39, -16169.50, '21-AUG-19');
-INSERT INTO Cerebros_Trades (tradeId, clientId, instrument_id, orderId, executionPrice, cashValue, executedTimestamp)
+INSERT INTO Cerebros_Trades (tradeId, clientId, instrumentId, orderId, executionPrice, cashValue, executedTimestamp)
 VALUES
     (3, 'YOUR_CLIENT_ID', 'N123456', 'BUY_ORDER_N123456_1', 104.25, -20850.00, '21-AUG-19');
-INSERT INTO Cerebros_Trades (tradeId, clientId, instrument_id, orderId, executionPrice, cashValue, executedTimestamp)
+INSERT INTO Cerebros_Trades (tradeId, clientId, instrumentId, orderId, executionPrice, cashValue, executedTimestamp)
 VALUES
     (4, 'YOUR_CLIENT_ID', 'N123789', 'BUY_ORDER_N123789_1', 95.92, -9592.00, '21-AUG-19');
-INSERT INTO Cerebros_Trades (tradeId, clientId, instrument_id, orderId, executionPrice, cashValue, executedTimestamp)
+INSERT INTO Cerebros_Trades (tradeId, clientId, instrumentId, orderId, executionPrice, cashValue, executedTimestamp)
 VALUES
     (5, 'YOUR_CLIENT_ID', 'C100', 'BUY_ORDER_C100_1', 1.03375, -1033.75, '21-AUG-19');
-INSERT INTO Cerebros_Trades (tradeId, clientId, instrument_id, orderId, executionPrice, cashValue, executedTimestamp)
+INSERT INTO Cerebros_Trades (tradeId, clientId, instrumentId, orderId, executionPrice, cashValue, executedTimestamp)
 VALUES
     (6, 'YOUR_CLIENT_ID', 'T67890', 'BUY_ORDER_T67890_1', 0.998125, -9981.25, '21-AUG-19');
-INSERT INTO Cerebros_Trades (tradeId, clientId, instrument_id, orderId, executionPrice, cashValue, executedTimestamp)
+INSERT INTO Cerebros_Trades (tradeId, clientId, instrumentId, orderId, executionPrice, cashValue, executedTimestamp)
 VALUES
     (7, 'YOUR_CLIENT_ID', 'T67894', 'BUY_ORDER_T67894_1', 1.000, -10000.00, '21-AUG-19');
-INSERT INTO Cerebros_Trades (tradeId, clientId, instrument_id, orderId, executionPrice, cashValue, executedTimestamp)
+INSERT INTO Cerebros_Trades (tradeId, clientId, instrumentId, orderId, executionPrice, cashValue, executedTimestamp)
 VALUES
     (8, 'YOUR_CLIENT_ID', 'T67895', 'BUY_ORDER_T67895_1', 0.999375, -9993.75, '21-AUG-19');
-INSERT INTO Cerebros_Trades (tradeId, clientId, instrument_id, orderId, executionPrice, cashValue, executedTimestamp)
+INSERT INTO Cerebros_Trades (tradeId, clientId, instrumentId, orderId, executionPrice, cashValue, executedTimestamp)
 VALUES
     (9, 'YOUR_CLIENT_ID', 'T67897', 'BUY_ORDER_T67897_1', 0.999375, -9993.75, '21-AUG-19');
 --    (10, 'YOUR_CLIENT_ID', 'T67899', 'BUY_ORDER_T67899_1', 1.00375, -10037.50, '2023-09-19 13:30:00'),
