@@ -1,12 +1,12 @@
 -- Create the Client table
-CREATE TABLE Client (
+CREATE TABLE Cerebros_Client (
     clientId VARCHAR(50) PRIMARY KEY,
     person_id VARCHAR(50),
     preference_id VARCHAR(50)
 );
 
 -- Create the Person table
-CREATE TABLE Person (
+CREATE TABLE Cerebros_Person (
     person_id INT PRIMARY KEY,
     client_id VARCHAR(50),
     name VARCHAR(255),
@@ -17,13 +17,13 @@ CREATE TABLE Person (
 );
 
 -- Create the ClientPasswords table
-CREATE TABLE ClientPasswords (
+CREATE TABLE Cerebros_ClientPasswords (
     clientId VARCHAR(50) PRIMARY KEY,
     passwordHash VARCHAR(255)
 );
 
 -- Create the ClientIdentifications table
-CREATE TABLE ClientIdentifications (
+CREATE TABLE Cerebros_ClientIdentifications (
     clientId VARCHAR(50),
     idType VARCHAR(50),
     idNumber VARCHAR(255),
@@ -31,7 +31,7 @@ CREATE TABLE ClientIdentifications (
 );
 
 -- Create the ClientPreferences table
-CREATE TABLE ClientPreferences (
+CREATE TABLE Cerebros_ClientPreferences (
     clientId VARCHAR(50) PRIMARY KEY,
     purpose ENUM('Investment', 'Savings', 'Retirement', 'Other'),
     riskTolerance ENUM('Low', 'Moderate', 'High'),
@@ -40,7 +40,7 @@ CREATE TABLE ClientPreferences (
 );
 
 -- Create the Instruments table
-CREATE TABLE Instruments (
+CREATE TABLE Cerebros_Instruments (
     instrumentId INT PRIMARY KEY,
     description VARCHAR(255),
     externalIdType VARCHAR(50),
@@ -51,7 +51,7 @@ CREATE TABLE Instruments (
 );
 
 -- Create the Portfolio table
-CREATE TABLE Portfolio (
+CREATE TABLE Cerebros_Portfolio (
     portfolio_id INT PRIMARY KEY,
     clientId VARCHAR(50),
     instrumentId INT,
@@ -59,7 +59,7 @@ CREATE TABLE Portfolio (
 );
 
 -- Create the Trades table
-CREATE TABLE Trades (
+CREATE TABLE Cerebros_Trades (
     tradeId INT PRIMARY KEY,
     clientId VARCHAR(50),
     instrument_id INT,
@@ -70,7 +70,7 @@ CREATE TABLE Trades (
 );
 
 -- Create the Orders table
-CREATE TABLE Orders (
+CREATE TABLE Cerebros_Orders (
     orderId INT PRIMARY KEY,
     clientId VARCHAR(50),
     instrumentId INT,
@@ -81,7 +81,7 @@ CREATE TABLE Orders (
 );
 
 -- Create the Prices table
-CREATE TABLE Prices (
+CREATE TABLE Cerebros_Prices (
     pricesId INT PRIMARY KEY,
     instrumentId INT,
     bidPrice DECIMAL(10, 2),
