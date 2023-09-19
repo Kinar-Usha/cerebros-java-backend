@@ -1,6 +1,11 @@
 package com.cerebros.models;
 
 import java.math.BigDecimal;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+
+import com.cerebros.services.TradeService;
 
 public class Trade {
     private String tradeId;
@@ -43,6 +48,7 @@ public class Trade {
     public Order getOrder() {
         return order;
     }
+    
 
     public Trade(String tradeId, BigDecimal quantity, BigDecimal executionPrice, String direction, BigDecimal cashValue, String clientid, String instrumentId, Order order) {
         this.tradeId = tradeId;
@@ -54,4 +60,24 @@ public class Trade {
         this.instrumentId = instrumentId;
         this.order = order;
     }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Trade trade = (Trade) o;
+        return Objects.equals(tradeId, trade.tradeId) &&
+                Objects.equals(quantity, trade.quantity) &&
+                Objects.equals(executionPrice, trade.executionPrice) &&
+                Objects.equals(direction, trade.direction) &&
+                Objects.equals(cashValue, trade.cashValue) &&
+                Objects.equals(clientid, trade.clientid) &&
+                Objects.equals(instrumentId, trade.instrumentId) &&
+                Objects.equals(order, trade.order);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(tradeId, quantity, executionPrice, direction, cashValue, clientid, instrumentId, order);
+    }
+
 }

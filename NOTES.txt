@@ -1,9 +1,74 @@
-FMTS
-- getAllInstruments
-- executeOrder
+Tables
+------
+
+Client
+- clientId (PK)
+- person_ID(FK)
+- preference_id(FK)
 
 
-TradingService
-- retrieveInstruments
-- buy
-- sell
+Person
+-person_id (PK)
+- client_id (FK)
+- name
+- email
+- dob
+- postalCode
+- country
+- clientId(FK)(identifications)
+
+ClientPasswords
+- clientId (PK)(FK)
+- passwordHash
+
+ClientIdentifications
+- clientId (PK)
+- idType (PK)
+- idNumber
+
+ClientPreferences 
+- clientId (PK)
+- purpose (enum)
+- riskTolerance (enum)
+- timeHorizon (enum)
+- incomeBracket (enum)
+
+Instruments
+- instrumentId (PK)
+- description
+- externalIdType
+- externalId
+- categoryId
+- minQuantity
+- maxQuantity
+
+Portfolio
+- portfolio_id(PK)
+- clientId (FK)
+- instrumentId (FK)
+- holdings
+
+Trades
+- tradeId (PK)
+- clientId (FK)
+- instrument_id (FK)
+- orderId (FK)
+- executionPrice
+- cashValue
+- executedTimestamp
+
+Orders
+- orderId (PK)
+- clientId (FK)
+- instrumentId (FK)
+- direction
+- quantity
+- targetPrice
+- placedTimestamp
+
+Prices
+- pricesId (PK)
+- instrumentId (FK)
+- bidPrice
+- askPrice
+- timestamp
