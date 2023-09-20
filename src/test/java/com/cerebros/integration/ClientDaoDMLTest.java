@@ -35,6 +35,7 @@ class ClientDaoDMLTest {
 	private Person person2;
 	private Client client2;
 	private Preferences preference2;
+	ClientIdentification clientIdentification2;
 
 	@BeforeEach
 	void setUp() throws Exception {
