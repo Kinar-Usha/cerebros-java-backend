@@ -14,18 +14,18 @@ import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 public class DbTestUtils
 {
 
-	private static final String SQL_SCRIPT = "sql/emp_populate.sql";
+    private static final String SQL_SCRIPT = "sql/emp_populate.sql";
 
 	private Connection connection;
 
 	public DbTestUtils(Connection connection) {
 		this.connection = connection;
 	}
-	
+
 	/**
 	 * Re-run the database initialization script.
 	 * Only pure SQL scripts allowed - PL/SQL statements must be removed
-	 * 
+	 *
 	 * Alternatively, for simple schemas, we could drop all rows in the required
 	 * tables, then insert test data: Statement stmt = connection.createStatement();
 	 * stmt.executeUpdate("delete from emp"); stmt.executeUpdate("insert into emp
@@ -33,7 +33,7 @@ public class DbTestUtils
 	 */
 	public void initDb() {
 		ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
-		
+
 		populator.setContinueOnError(true);
 		populator.addScript(new FileSystemResource(SQL_SCRIPT));
 		populator.populate(connection);

@@ -5,7 +5,7 @@ DROP TABLE Cerebros_Portfolio;
 DROP TABLE Cerebros_ClientIdentifications;
 DROP TABLE Cerebros_ClientPreferences;
 DROP TABLE Cerebros_ClientPasswords;
-DROP TABLE Cerebros_Person;
+--DROP TABLE Cerebros_Person;
 DROP TABLE Cerebros_INSTRUMENTS;
 DROP TABLE Cerebros_Client;
 
@@ -23,7 +23,7 @@ CREATE TABLE Cerebros_Client (
 CREATE TABLE Cerebros_ClientPasswords (
     clientId VARCHAR(50),
     passwordHash VARCHAR(255),
-    CONSTRAINT "Cerebros_ClientPasswords_PK" PRIMARY KEY (CLIENTID) ENABLE, 
+    CONSTRAINT "Cerebros_ClientPasswords_PK" PRIMARY KEY (CLIENTID) ENABLE,
     CONSTRAINT "Cerebros_ClientPasswords_FK" FOREIGN KEY (CLIENTID) REFERENCES Cerebros_Client (CLIENTID) ENABLE
 );
 
@@ -43,7 +43,7 @@ CREATE TABLE Cerebros_ClientPreferences (
     riskTolerance VARCHAR2(10) CHECK (riskTolerance IN ('Low', 'Moderate', 'High')),
     timeHorizon VARCHAR2(20) CHECK (timeHorizon IN ('Short-term', 'Medium-term', 'Long-term')),
     incomeBracket VARCHAR2(10) CHECK (incomeBracket IN ('Low', 'Middle', 'High')),
-    CONSTRAINT "Cerebros_ClientPreferences_PK" PRIMARY KEY (CLIENTID) ENABLE, 
+    CONSTRAINT "Cerebros_ClientPreferences_PK" PRIMARY KEY (CLIENTID) ENABLE,
     CONSTRAINT "Cerebros_ClientPreferences_FK" FOREIGN KEY (CLIENTID) REFERENCES Cerebros_Client (CLIENTID) ENABLE
 );
 
@@ -98,6 +98,30 @@ CREATE TABLE Cerebros_Prices (
     askPrice DECIMAL(10, 2),
     timestamp TIMESTAMP
 );
+
+ALTER TABLE Cerebros_Portfolio
+ADD FOREIGN KEY (instrumentId)
+REFERENCES Cerebros_Instruments (instrumentId);
+
+ALTER TABLE Cerebros_Trades
+ADD FOREIGN KEY (instrumentId)
+REFERENCES Cerebros_Instruments (instrumentId);
+
+ALTER TABLE Cerebros_Orders
+ADD FOREIGN KEY (instrumentId)
+REFERENCES Cerebros_Instruments (instrumentId);
+
+ALTER TABLE Cerebros_Prices
+ADD FOREIGN KEY (instrumentId)
+REFERENCES Cerebros_Instruments (instrumentId);
+
+ALTER TABLE Cerebros_Trades
+ADD FOREIGN KEY (orderId)
+REFERENCES Cerebros_Orders (orderId);
+
+
+
+
 SET SCAN OFF
 
 ------------------------------------------------------------
@@ -216,6 +240,38 @@ VALUES
 --    (11, 'YOUR_CLIENTID', 'T67880', 800), -- Example data, replace with actual values
 --    (12, 'YOUR_CLIENTID', 'T67883', 150), -- Example data, replace with actual values
 --    (13, 'YOUR_CLIENTID', 'T67878', 250); -- Example data, replace with actual values
+
+
+
+
+-----------------------------------------------------------------
+INSERT INTO Cerebros_Orders (orderId, clientId, instrumentId, direction, quantity, targetPrice, placedTimestamp)
+VALUES
+    ('BUY_ORDER_Q123_1', 'YOUR_CLIENTID', 'Q123', 'B', 100, 104.75, '21-AUG-19');
+INSERT INTO Cerebros_Orders (orderId, clientId, instrumentId, direction, quantity, targetPrice, placedTimestamp)
+VALUES
+    ('BUY_ORDER_Q456_1', 'YOUR_CLIENTID', 'Q456', 'B', 50, 323.39, '21-AUG-19');
+INSERT INTO Cerebros_Orders (orderId, clientId, instrumentId, direction, quantity, targetPrice, placedTimestamp)
+VALUES
+    ('BUY_ORDER_N123456_1', 'YOUR_CLIENTID', 'N123456', 'B', 200, 104.25, '21-AUG-19');
+INSERT INTO Cerebros_Orders (orderId, clientId, instrumentId, direction, quantity, targetPrice, placedTimestamp)
+VALUES
+    ('BUY_ORDER_N123789_1', 'YOUR_CLIENTID', 'N123789', 'B', 10, 95.92, '21-AUG-19');
+INSERT INTO Cerebros_Orders (orderId, clientId, instrumentId, direction, quantity, targetPrice, placedTimestamp)
+VALUES
+    ('BUY_ORDER_C100_1', 'YOUR_CLIENTID', 'C100', 'B', 500, 1.03375, '21-AUG-19');
+INSERT INTO Cerebros_Orders (orderId, clientId, instrumentId, direction, quantity, targetPrice, placedTimestamp)
+VALUES
+    ('BUY_ORDER_T67890_1', 'YOUR_CLIENTID', 'T67890', 'B', 1000, 0.998125, '21-AUG-19');
+INSERT INTO Cerebros_Orders (orderId, clientId, instrumentId, direction, quantity, targetPrice, placedTimestamp)
+VALUES
+    ('BUY_ORDER_T67894_1', 'YOUR_CLIENTID', 'T67894', 'B', 300, 1.000, '21-AUG-19');
+INSERT INTO Cerebros_Orders (orderId, clientId, instrumentId, direction, quantity, targetPrice, placedTimestamp)
+VALUES
+    ('BUY_ORDER_T67895_1', 'YOUR_CLIENTID', 'T67895', 'B', 700, 0.999375, '21-AUG-19');
+INSERT INTO Cerebros_Orders (orderId, clientId, instrumentId, direction, quantity, targetPrice, placedTimestamp)
+VALUES
+    ('BUY_ORDER_T67897_1', 'YOUR_CLIENTID', 'T67897', 'B', 200, 0.999375, '21-AUG-19');
 -------------------------------------------------------------------
 
 ---- add quantity and direction values
@@ -252,33 +308,7 @@ VALUES
 --    (13, 'YOUR_CLIENTID', 'T67878', 'BUY_ORDER_T67878_1', 1162.42, -290605.00, '2023-09-19 15:00:00');
 --
 --------------------------------------------------------------------
-INSERT INTO Cerebros_Orders (orderId, clientId, instrumentId, direction, quantity, targetPrice, placedTimestamp)
-VALUES
-    ('BUY_ORDER_Q123_1', 'YOUR_CLIENTID', 'Q123', 'B', 100, 104.75, '21-AUG-19');
-INSERT INTO Cerebros_Orders (orderId, clientId, instrumentId, direction, quantity, targetPrice, placedTimestamp)
-VALUES
-    ('BUY_ORDER_Q456_1', 'YOUR_CLIENTID', 'Q456', 'B', 50, 323.39, '21-AUG-19');
-INSERT INTO Cerebros_Orders (orderId, clientId, instrumentId, direction, quantity, targetPrice, placedTimestamp)
-VALUES
-    ('BUY_ORDER_N123456_1', 'YOUR_CLIENTID', 'N123456', 'B', 200, 104.25, '21-AUG-19');
-INSERT INTO Cerebros_Orders (orderId, clientId, instrumentId, direction, quantity, targetPrice, placedTimestamp)
-VALUES
-    ('BUY_ORDER_N123789_1', 'YOUR_CLIENTID', 'N123789', 'B', 10, 95.92, '21-AUG-19');
-INSERT INTO Cerebros_Orders (orderId, clientId, instrumentId, direction, quantity, targetPrice, placedTimestamp)
-VALUES
-    ('BUY_ORDER_C100_1', 'YOUR_CLIENTID', 'C100', 'B', 500, 1.03375, '21-AUG-19');
-INSERT INTO Cerebros_Orders (orderId, clientId, instrumentId, direction, quantity, targetPrice, placedTimestamp)
-VALUES
-    ('BUY_ORDER_T67890_1', 'YOUR_CLIENTID', 'T67890', 'B', 1000, 0.998125, '21-AUG-19');
-INSERT INTO Cerebros_Orders (orderId, clientId, instrumentId, direction, quantity, targetPrice, placedTimestamp)
-VALUES
-    ('BUY_ORDER_T67894_1', 'YOUR_CLIENTID', 'T67894', 'B', 300, 1.000, '21-AUG-19');
-INSERT INTO Cerebros_Orders (orderId, clientId, instrumentId, direction, quantity, targetPrice, placedTimestamp)
-VALUES
-    ('BUY_ORDER_T67895_1', 'YOUR_CLIENTID', 'T67895', 'B', 700, 0.999375, '21-AUG-19');
-INSERT INTO Cerebros_Orders (orderId, clientId, instrumentId, direction, quantity, targetPrice, placedTimestamp)
-VALUES
-    ('BUY_ORDER_T67897_1', 'YOUR_CLIENTID', 'T67897', 'B', 200, 0.999375, '21-AUG-19');
+
 
 
 COMMIT;

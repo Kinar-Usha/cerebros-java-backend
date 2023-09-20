@@ -2,6 +2,7 @@ package com.cerebros.models;
 
 import java.math.BigDecimal;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -16,6 +17,12 @@ public class Trade {
     private String clientid;
     private String instrumentId;
     private Order order;
+
+    public Date getExecutedTime() {
+        return executedTime;
+    }
+
+    private Date executedTime;
 
     public String getTradeId() {
         return tradeId;
@@ -60,6 +67,19 @@ public class Trade {
         this.instrumentId = instrumentId;
         this.order = order;
     }
+
+    public Trade(String tradeId, BigDecimal quantity, BigDecimal executionPrice, String direction, BigDecimal cashValue, String clientid, String instrumentId, Order order, Date executedTime) {
+        this.tradeId = tradeId;
+        this.quantity = quantity;
+        this.executionPrice = executionPrice;
+        this.direction = direction;
+        this.cashValue = cashValue;
+        this.clientid = clientid;
+        this.instrumentId = instrumentId;
+        this.order = order;
+        this.executedTime = executedTime;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
