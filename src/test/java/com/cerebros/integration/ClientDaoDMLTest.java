@@ -1,8 +1,10 @@
 package com.cerebros.integration;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.jdbc.JdbcTestUtils;
 
 import com.cerebros.constants.ClientIdentificationType;
 import com.cerebros.constants.Country;
@@ -87,6 +90,59 @@ class ClientDaoDMLTest {
 		client2.setClientIdentifications(clientIdentifications2);
 
 		assertThrows(ClientAlreadyExistsException.class, () -> dao.register(client2, "123456"));
+	}
+
+	@Test
+	void registerClientWithExistingPassport_DoesNotInsertAnyRows() {
+		int oldSize = JdbcTestUtils.countRowsInTable(jdbcTemplate, "cerebros_client");
+
+		ClientIdentification clientIdentification2 = new ClientIdentification(ClientIdentificationType.PASSPORT,
+				"B7654321");
+		Set<ClientIdentification> clientIdentifications2 = new HashSet<ClientIdentification>();
+		clientIdentifications2.add(clientIdentification2);
+
+		client2.setClientIdentifications(clientIdentifications2);
+
+		assertThrows(ClientAlreadyExistsException.class, () -> dao.register(client2, "123456"));
+		assertEquals(oldSize, JdbcTestUtils.countRowsInTable(jdbcTemplate, "cerebros_client"));
+	}
+
+	@Test
+	void registerClientWithNullClientID() {
+		client2.setClientIdentifications(null);
+		assertThrows(NullPointerException.class, () -> dao.register(client2, "123456"));
+	}
+
+	@Test
+	void testRegisterClientIncreasedRowCount() throws SQLException {
+		int oldSize = JdbcTestUtils.countRowsInTable(jdbcTemplate, "cerebros_client");
+		dao.register(client2, "123456");
+		assertEquals(oldSize + 1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "cerebros_client"));
+	}
+
+	@Test
+	void registerClientInserted_Client() throws SQLException {
+		assertEquals(0, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "cerebros_client", "clientId = 'JANE_ID'"));
+		dao.register(client2, "123456");
+		assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "cerebros_client", "clientId = 'JANE_ID'"));
+	}
+
+	@Test
+	void registerClientInserted_ClientIdentifications() throws SQLException {
+		assertEquals(0, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "cerebros_clientIdentifications",
+				"clientId = 'JANE_ID' AND idType = 'PSP'"));
+		dao.register(client2, "123456");
+		assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "cerebros_clientIdentifications",
+				"clientId = 'JANE_ID' AND idType = 'PSP'"));
+	}
+
+	@Test
+	void registerClientInserted_ClientPasswords() throws SQLException {
+		assertEquals(0, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "cerebros_clientPasswords",
+				"clientId = 'JANE_ID' AND passwordHash = '123456'"));
+		dao.register(client2, "123456");
+		assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "cerebros_clientPasswords",
+				"clientId = 'JANE_ID' AND passwordHash = '123456'"));
 	}
 
 }
