@@ -24,14 +24,12 @@ public class ClientDaoImpl implements ClientDao {
 	@Override
 	public boolean emailExists(String email) {
 		// TODO Return true if email exists in DB
-		String sql = """
-				SELECT
-				    clientId
-				FROM
-				    cerebros_client
-				WHERE
-					email = ?
-				   """;
+		String sql = "SELECT\n" +
+				"\t\t\t\t    clientId\n" +
+				"\t\t\t\tFROM\n" +
+				"\t\t\t\t    cerebros_client\n" +
+				"\t\t\t\tWHERE\n" +
+				"\t\t\t\t\temail = ?";
 		boolean emailAlreadyExists = false;
 
 		try (Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {

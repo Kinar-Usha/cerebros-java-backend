@@ -107,6 +107,32 @@ public class TradesDaoTest {
 
     }
     @Test
+    void testInsertSellIntoTrades() throws SQLException {
+        int oldSize= JdbcTestUtils.countRowsInTable(jdbcTemplate,"Cerebros_Trades");
+        String orderId = "BUY_ORDER_Q123_11";
+        String clientId = "YOUR_CLIENTID";
+        String instrumentId = "Q123";
+        String direction = "S";
+        BigDecimal quantity = new BigDecimal("100");
+        BigDecimal targetPrice = new BigDecimal("104.75");
+        Date placedTimestamp = null;
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yy");
+            placedTimestamp = dateFormat.parse("21-AUG-19");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Order order = new Order(orderId, quantity, targetPrice, direction, clientId, instrumentId, placedTimestamp);
+
+        // Create a dummy Trade
+        Trade trade = new Trade("11", quantity, targetPrice, direction, targetPrice.multiply(quantity).negate(), clientId, instrumentId, order, placedTimestamp);
+        tradesDao.addTrade(trade, clientId);
+        assertEquals(oldSize+1, JdbcTestUtils.countRowsInTable(jdbcTemplate,"Cerebros_Trades"));
+        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"Cerebros_Trades", "tradeId=11"));
+        codeExecuted = true;
+
+    }
+    @Test
     void negativeTestInsertIntoTradesInstrumentInvalid(){
         String orderId = "BUY_ORDER_Q123_11";
         String clientId = "YOUR_CLIENTID";

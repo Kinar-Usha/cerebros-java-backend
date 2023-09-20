@@ -9,4 +9,5 @@ import java.util.List;
 public interface PortfolioDao {
     List<Portfolio> getPortfolio(String clientId) throws SQLException, ClientNotFoundException;
 
+    void addToPortfolio(Portfolio dummyPortfolio, String clientId);
 }
