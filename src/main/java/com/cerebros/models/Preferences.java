@@ -1,12 +1,14 @@
 package com.cerebros.models;
 
+import java.util.Objects;
+
 public class Preferences {
 
-	private String  purpose;
+	private String purpose;
 	private String risk;
 	private String time;
 	private String income;
-	
+
 	public Preferences(String purpose, String risk, String time, String income) {
 		super();
 		this.purpose = purpose;
@@ -14,8 +16,9 @@ public class Preferences {
 		this.time = time;
 		this.income = income;
 	}
-	
-	public Preferences() {}
+
+	public Preferences() {
+	}
 
 	public String getPurpose() {
 		return purpose;
@@ -49,13 +52,22 @@ public class Preferences {
 		this.income = income;
 	}
 
+	@Override
+	public int hashCode() {
+		return Objects.hash(income, purpose, risk, time);
+	}
 
-	
-	
-	
-	
-	
-	
-    
-	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Preferences other = (Preferences) obj;
+		return Objects.equals(income, other.income) && Objects.equals(purpose, other.purpose)
+				&& Objects.equals(risk, other.risk) && Objects.equals(time, other.time);
+	}
+
 }
