@@ -30,7 +30,7 @@ CREATE TABLE Cerebros_ClientPasswords (
 -- Create the ClientIdentifications table
 CREATE TABLE Cerebros_ClientIdentifications (
     clientId VARCHAR(50),
-    idType VARCHAR(50),
+    idType VARCHAR(50) CHECK (idType IN ('SSN', 'ADH', 'PSP')),
     idNumber VARCHAR(255) UNIQUE,
     CONSTRAINT "Cerebros_ClientIdentifications_PK" PRIMARY KEY (CLIENTID, IDTYPE) ENABLE, 
     CONSTRAINT "Cerebros_ClientIdentifications_FK" FOREIGN KEY (CLIENTID) REFERENCES Cerebros_Client (CLIENTID) ENABLE
@@ -105,6 +105,8 @@ SET SCAN OFF
 INSERT INTO CEREBROS_CLIENT (CLIENTID, NAME, EMAIL, DOB, POSTALCODE, COUNTRY) VALUES ('YOUR_CLIENTID', 'John Doe', 'john.doe@gmail.com', TO_DATE('2001-09-11', 'YYYY-MM-DD'), '600097', 'IN');
 INSERT INTO CEREBROS_CLIENTPASSWORDS (CLIENTID, PASSWORDHASH) VALUES ('YOUR_CLIENTID', '1234567890');
 INSERT INTO CEREBROS_CLIENTPREFERENCES (CLIENTID, PURPOSE, RISKTOLERANCE, TIMEHORIZON, INCOMEBRACKET) VALUES ('YOUR_CLIENTID', 'Investment', 'High', 'Long-term', 'High');
+INSERT INTO CEREBROS_CLIENTIDENTIFICATIONS (CLIENTID, IDTYPE, IDNUMBER) VALUES ('YOUR_CLIENTID', 'PSP', 'B7654321');
+
 
 ------------------------------------------------------------
 INSERT INTO Cerebros_Instruments (instrumentId, description, externalIdType, externalId, categoryId, minQuantity, maxQuantity)
