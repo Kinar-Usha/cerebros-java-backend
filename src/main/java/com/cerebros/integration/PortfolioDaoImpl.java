@@ -1,5 +1,6 @@
 package com.cerebros.integration;
 
+import com.cerebros.exceptions.ClientNotFoundException;
 import com.cerebros.models.Portfolio;
 import org.slf4j.LoggerFactory;
 
@@ -24,16 +25,22 @@ public class PortfolioDaoImpl implements PortfolioDao{
     }
 
     @Override
-    public List<Portfolio> getPortfolio() throws SQLException {
-        String sql= "select i.instrumentid, i.description,i.categoryid, p.holdings, pr.bidprice from SCOTT.cerebros_portfolio p inner join SCOTT.cerebros_instruments i on p.instrumentid= i.instrumentid inner join SCOTT.cerebros_prices pr on p.instrumentId =pr.instrumentId";
+    public List<Portfolio> getPortfolio(String clientId) throws SQLException, ClientNotFoundException {
+        String sql= "select i.instrumentid, i.description,i.categoryid, p.holdings, pr.bidprice from SCOTT.cerebros_portfolio p inner join SCOTT.cerebros_instruments i on p.instrumentid= i.instrumentid inner join SCOTT.cerebros_prices pr on p.instrumentId =pr.instrumentId WHERE p.clientId=? ORDER BY p.holdings DESC";
         List<Portfolio> portfolioList= new ArrayList<>();
         PreparedStatement statement= null;
         Connection conn= dataSource.getConnection();
         try{
             statement = conn.prepareStatement(sql);
+            statement.setString(1,clientId);
             ResultSet rs = statement.executeQuery();
-            while (rs.next()){
-               String instrumentId= rs.getString(1);
+            if (!rs.next()) {
+                // Log client not found and throw custom exception
+                logger.error("Client with ID " + clientId + " not found in the database");
+                throw new ClientNotFoundException("Client with ID " + clientId + " not found");
+            }
+            do {
+                String instrumentId= rs.getString(1);
                 String desc = rs.getString(2);
                 String categoryId= rs.getString(3);
                 BigDecimal holdings= rs.getBigDecimal(4).setScale(2, RoundingMode.HALF_EVEN);
@@ -41,6 +48,9 @@ public class PortfolioDaoImpl implements PortfolioDao{
                 Portfolio portfolio= new Portfolio(instrumentId,desc,categoryId,holdings,price);
                 portfolioList.add(portfolio);
             }
+            while (rs.next());
+            logger.info("Client portfolio successfully retrieved for ID " + clientId);
+
         }catch (SQLException e){
             logger.error("get portfolio failed", e);
             throw new DatabaseException("get Portfolio failed",e);
