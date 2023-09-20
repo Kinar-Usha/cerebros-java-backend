@@ -5,9 +5,9 @@ import com.cerebros.models.Preferences;
 
 public interface ClientDao {
 
-	boolean verifyEmail(String email);
+	boolean emailExists(String email);
 
-	void register(Client client);
+	void register(Client client, String password);
 
 	boolean login(String email, String password);
 
