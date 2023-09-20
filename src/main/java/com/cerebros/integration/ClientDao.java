@@ -17,4 +17,6 @@ public interface ClientDao {
 
 	void updateClientPreferences(Preferences preferences);
 
+	Preferences getClientPreferences(String clientId);
+
 }

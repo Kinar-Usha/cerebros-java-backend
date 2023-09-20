@@ -17,7 +17,6 @@ import com.cerebros.constants.Country;
 import com.cerebros.models.Client;
 import com.cerebros.models.ClientIdentification;
 import com.cerebros.models.Person;
-import com.cerebros.models.Preferences;
 
 class ClientDaoQueryTest {
 
@@ -39,7 +38,7 @@ class ClientDaoQueryTest {
 		clientIdentification1 = new ClientIdentification(ClientIdentificationType.PASSPORT, "B7654321");
 		Set<ClientIdentification> clientIdentifications = new HashSet<ClientIdentification>();
 		clientIdentifications.add(clientIdentification1);
-		Preferences preferenceA = new Preferences("Investment", "High", "Long-term", "High");
+
 		client1 = new Client("YOUR_CLIENTID", person1, clientIdentifications);
 	}
 

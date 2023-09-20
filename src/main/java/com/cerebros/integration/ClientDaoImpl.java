@@ -80,4 +80,10 @@ public class ClientDaoImpl implements ClientDao {
 
 	}
 
+	@Override
+	public Preferences getClientPreferences(String clientId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
