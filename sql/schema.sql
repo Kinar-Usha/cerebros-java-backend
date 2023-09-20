@@ -13,7 +13,7 @@ DROP TABLE Cerebros_Client;
 CREATE TABLE Cerebros_Client (
     clientId VARCHAR(50) PRIMARY KEY,
     name VARCHAR(255),
-    email VARCHAR(255),
+    email VARCHAR(255) UNIQUE,
     dob DATE,
     postalCode VARCHAR(10),
     country VARCHAR(2) CHECK (country IN ('US', 'IE', 'IN'))
@@ -31,7 +31,7 @@ CREATE TABLE Cerebros_ClientPasswords (
 CREATE TABLE Cerebros_ClientIdentifications (
     clientId VARCHAR(50),
     idType VARCHAR(50),
-    idNumber VARCHAR(255),
+    idNumber VARCHAR(255) UNIQUE,
     CONSTRAINT "Cerebros_ClientIdentifications_PK" PRIMARY KEY (CLIENTID, IDTYPE) ENABLE, 
     CONSTRAINT "Cerebros_ClientIdentifications_FK" FOREIGN KEY (CLIENTID) REFERENCES Cerebros_Client (CLIENTID) ENABLE
 );
