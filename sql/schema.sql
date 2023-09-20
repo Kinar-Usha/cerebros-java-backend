@@ -18,8 +18,7 @@ DROP TABLE Cerebros_Client;
 -- Create the Client table
 CREATE TABLE Cerebros_Client (
     clientId VARCHAR(50) PRIMARY KEY,
-    personId VARCHAR(50),
-    preferenceId VARCHAR(50)
+    personId INT
 );
 
 -- Create the Person table
@@ -30,7 +29,7 @@ CREATE TABLE Cerebros_Person (
     email VARCHAR(255),
     dob DATE,
     postalCode VARCHAR(10),
-    country VARCHAR(50)
+    country VARCHAR(2) CHECK (country IN ('US', 'IE', 'IN'))
 );
 
 -- Create the ClientPasswords table
@@ -49,11 +48,11 @@ CREATE TABLE Cerebros_ClientIdentifications (
 
 -- Create the ClientPreferences table
 CREATE TABLE Cerebros_ClientPreferences (
-    clientId VARCHAR(50) PRIMARY KEY,
-    purpose ENUM('Investment', 'Savings', 'Retirement', 'Other'),
-    riskTolerance ENUM('Low', 'Moderate', 'High'),
-    timeHorizon ENUM('Short-term', 'Medium-term', 'Long-term'),
-    incomeBracket ENUM('Low', 'Middle', 'High')
+    clientId VARCHAR2(50) PRIMARY KEY,
+    purpose VARCHAR2(20) CHECK (purpose IN ('Investment', 'Savings', 'Retirement', 'Other')),
+    riskTolerance VARCHAR2(10) CHECK (riskTolerance IN ('Low', 'Moderate', 'High')),
+    timeHorizon VARCHAR2(20) CHECK (timeHorizon IN ('Short-term', 'Medium-term', 'Long-term')),
+    incomeBracket VARCHAR2(10) CHECK (incomeBracket IN ('Low', 'Middle', 'High'))
 );
 
 -- Create the Instruments table
@@ -286,3 +285,8 @@ COMMIT;
 --    ('BUY_ORDER_T67880_1', 'YOUR_CLIENTID', 'T67880', 'B', 800, 1.0596875, '2023-09-19 14:00:00'),
 --    ('BUY_ORDER_T67883_1', 'YOUR_CLIENTID', 'T67883', 'B', 150, 0.9853125, '2023-09-19 14:30:00'),
 --    ('BUY_ORDER_T67878_1', 'YOUR_CLIENTID', 'T67878', 'B', 250, 1162.42, '2023-09-19 15:00:00');
+
+---------------------------------------------------------------------
+
+INSERT INTO CEREBROS_PERSON (PERSONID, CLIENTID, NAME, EMAIL, DOB, POSTALCODE, COUNTRY) VALUES (1, 'YOUR_CLIENTID', 'John Doe', 'john.doe@gmail.com', TO_DATE('2001-09-11', 'YYYY-MM-DD'), '600097', 'IN');
+INSERT INTO CEREBROS_CLIENT (CLIENTID, PERSONID) VALUES ('YOUR_CLIENTID', 1);

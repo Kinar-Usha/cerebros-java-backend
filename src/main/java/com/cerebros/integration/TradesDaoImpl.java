@@ -1,6 +1,7 @@
 package com.cerebros.integration;
 
 import com.cerebros.exceptions.ClientNotFoundException;
+import com.cerebros.models.Order;
 import com.cerebros.models.Portfolio;
 import com.cerebros.models.Trade;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ public class TradesDaoImpl implements TradesDao{
     @Override
     public List<Trade> getTrades(String clientId) throws SQLException, ClientNotFoundException {
 //        return null;
-        String sql= "select t.tradeid, t.quantity, t.executionprice, t.direction , t.cashvalue,t.clientId, t.instrumentid from cerebros_trades t inner join cerebros_instruments i on t.instrumentid= i.instrumentid inner join cerebros_orders o on t.orderid =o.orderid where t.clientID=? ORDER BY t.tradeid FETCH FIRST 100 ROWS ONLY";
+        String sql= "select t.tradeid, t.quantity, t.executionprice, t.direction , t.cashvalue,t.clientId, t.instrumentid, t.orderId, o.quantity, o.targetPrice, o.direction, o.clientId, o.instrumentId from cerebros_trades t inner join cerebros_instruments i on t.instrumentid= i.instrumentid inner join cerebros_orders o on t.orderid =o.orderid where t.clientID=? ORDER BY t.tradeid FETCH FIRST 100 ROWS ONLY";
         List<Trade> Trades= new ArrayList<>();
         PreparedStatement statement= null;
         Connection conn= dataSource.getConnection();
@@ -46,7 +47,12 @@ public class TradesDaoImpl implements TradesDao{
                 BigDecimal cashValue = rs.getBigDecimal(5).setScale(2, RoundingMode.HALF_EVEN);
                 String clientID= rs.getString(6);
                 String instrumentId= rs.getString(7);
-                Trade trade= new Trade(tradeId,quantity,exPrice,direction,cashValue,clientID,instrumentId,null);
+                String orderId= rs.getString(8);
+                BigDecimal orderQuantity= rs.getBigDecimal(9);
+                BigDecimal targetPrice= rs.getBigDecimal(10);
+                String orderDirection= rs.getString(11);
+                Order order= new Order(orderId, orderQuantity, targetPrice, orderDirection, clientID,instrumentId);
+                Trade trade= new Trade(tradeId,quantity,exPrice,direction,cashValue,clientID,instrumentId,order);
                 Trades.add(trade);
             }
             while (rs.next());
@@ -65,6 +71,14 @@ public class TradesDaoImpl implements TradesDao{
             }
         }
         return  Trades;
+    }
+
+    @Override
+    public void addTrade(Trade trade, String clientId) {
+
+
+
+
     }
 
 }

@@ -13,23 +13,19 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PortfolioDaoTest {
-    private SimpleDataSource dataSource;
-    private PortfolioDaoImpl portfolioDao;
-    @Test
-    void smokeTest() {
-        Assertions.assertNotNull(portfolioDao);
-    }
+	private SimpleDataSource dataSource;
+	private PortfolioDaoImpl portfolioDao;
 
-    @BeforeEach
-    void setUp() {
-        dataSource= new SimpleDataSource();
-        portfolioDao= new PortfolioDaoImpl(dataSource);
-    }
+	@BeforeEach
+	void setUp() {
+		dataSource = new SimpleDataSource();
+		portfolioDao = new PortfolioDaoImpl(dataSource);
+	}
 
-    @AfterEach
-    void tearDown() {
-        dataSource.shutdown();
-    }
+	@AfterEach
+	void tearDown() {
+		dataSource.shutdown();
+	}
 
     @Test
     void testGetPortfolio() throws SQLException, ClientNotFoundException {

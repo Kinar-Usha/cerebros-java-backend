@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface TradesDao {
     List<Trade>  getTrades(String clientId) throws SQLException, ClientNotFoundException;
+    void addTrade(Trade trade, String clientId);
 }
