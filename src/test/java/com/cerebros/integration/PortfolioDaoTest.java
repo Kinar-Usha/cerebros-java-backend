@@ -85,6 +85,38 @@ public class PortfolioDaoTest {
     }
 
 
+    @Test
+    void testUpdatePortfolio(){
+        String testClientId= "YOUR_CLIENTID";
+        Portfolio dummyPortfolio = new Portfolio("Q123", "Dummy Portfolio", "Category123", new BigDecimal("190"), new BigDecimal("50.00"));
+        assertDoesNotThrow(()->{
+            portfolioDao.addToPortfolio(dummyPortfolio, testClientId);
+
+        });
+
+    }
+    @Test
+    void testNegativeUpdateInstrument(){
+        String testClientId= "YOUR_CLIENTID";
+        Portfolio dummyPortfolio = new Portfolio("kinar", "Dummy Portfolio", "Category123", new BigDecimal("190"), new BigDecimal("50.00"));
+        assertThrows(DatabaseException.class, ()->{
+            portfolioDao.addToPortfolio(dummyPortfolio, testClientId);
+
+        });
+    }
+
+
+    @Test
+    void testNegativeUpdateClient(){
+        String testClientId= "Invalid";
+        Portfolio dummyPortfolio = new Portfolio("Q123", "Dummy Portfolio", "Category123", new BigDecimal("190"), new BigDecimal("50.00"));
+        assertThrows(DatabaseException.class, ()->{
+            portfolioDao.addToPortfolio(dummyPortfolio, testClientId);
+
+        });
+    }
+
+
 
 
 

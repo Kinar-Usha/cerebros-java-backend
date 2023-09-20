@@ -92,4 +92,39 @@ public class PortfolioDaoImpl implements PortfolioDao{
             }
         }
     }
+
+    @Override
+    public void upDateportfolio(Portfolio portfolio, String clientId) {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+            conn = dataSource.getConnection();
+            String orderSql = "UPDATE Cerebros_Portfolio\n" +
+                    "SET holdings = ?\n" +
+                    "WHERE clientId = ?\n" +
+                    "  AND instrumentId = ?";
+
+            stmt = conn.prepareStatement(orderSql);
+            stmt.setBigDecimal(1, portfolio.getHoldings());
+            stmt.setString(2,clientId);
+            stmt.setString(3, portfolio.getInstrumentId());
+            int rowsUpdated=stmt.executeUpdate();
+            if(rowsUpdated==0){
+                throw new DatabaseException("No row with such client id or instrumentId");
+            }
+        } catch (SQLException e){
+            logger.error("add portfolio failed", e);
+            throw new DatabaseException("add portfolio failed",e);
+        }finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    logger.error("can't close connection", e);
+                }
+            }
+        }
+
+    }
 }
