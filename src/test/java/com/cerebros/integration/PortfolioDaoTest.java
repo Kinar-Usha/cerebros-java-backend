@@ -1,41 +1,41 @@
 package com.cerebros.integration;
 
-import com.cerebros.models.Portfolio;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+import java.sql.SQLException;
+import java.util.List;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.sql.SQLException;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import com.cerebros.models.Portfolio;
 
 public class PortfolioDaoTest {
-    private SimpleDataSource dataSource;
-    private PortfolioDaoImpl portfolioDao;
-    @Test
-    void smokeTest() {
-        Assertions.assertNotNull(portfolioDao);
-    }
+	private SimpleDataSource dataSource;
+	private PortfolioDaoImpl portfolioDao;
 
-    @BeforeEach
-    void setUp() {
-        dataSource= new SimpleDataSource();
-        portfolioDao= new PortfolioDaoImpl(dataSource);
-    }
+	@BeforeEach
+	void setUp() {
+		dataSource = new SimpleDataSource();
+		portfolioDao = new PortfolioDaoImpl(dataSource);
+	}
 
-    @AfterEach
-    void tearDown() {
-        dataSource.shutdown();
-    }
+	@AfterEach
+	void tearDown() {
+		dataSource.shutdown();
+	}
 
-    @Test
-    void testGetPortfolio() throws SQLException {
-        List<Portfolio> portfolioList= portfolioDao.getPortfolio();
-        assertFalse(portfolioList.isEmpty());
-    }
+	@Test
+	void smokeTest() {
+		Assertions.assertNotNull(portfolioDao);
+	}
 
-
+	@Test
+	void testGetPortfolio() throws SQLException {
+		List<Portfolio> portfolioList = portfolioDao.getPortfolio();
+		assertFalse(portfolioList.isEmpty());
+	}
 
 }
