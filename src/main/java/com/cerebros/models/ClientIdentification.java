@@ -1,5 +1,7 @@
 package com.cerebros.models;
 
+import java.util.Objects;
+
 import com.cerebros.constants.ClientIdentificationType;
 
 public class ClientIdentification {
@@ -28,4 +30,20 @@ public class ClientIdentification {
 		this.value = value;
 	}
 
+	@Override
+	public int hashCode() {
+		return Objects.hash(type, value);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ClientIdentification other = (ClientIdentification) obj;
+		return type == other.type && Objects.equals(value, other.value);
+	}
 }

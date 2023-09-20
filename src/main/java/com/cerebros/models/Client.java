@@ -1,5 +1,6 @@
 package com.cerebros.models;
 
+import java.util.Objects;
 import java.util.Set;
 
 public class Client {
@@ -14,6 +15,11 @@ public class Client {
 		setClientIdentifications(clientIdentifications);
 		setClientId(clientId);
 		this.preferences = null;
+	}
+
+	public Client(String clientId, Person person) {
+		setPerson(person);
+		setClientId(clientId);
 	}
 
 	public void setClientId(String clientId) {
@@ -46,6 +52,25 @@ public class Client {
 
 	public void setPreferences(Preferences preferences) {
 		this.preferences = preferences;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(clientId, clientIdentifications, person, preferences);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Client other = (Client) obj;
+		return Objects.equals(clientId, other.clientId)
+				&& Objects.equals(clientIdentifications, other.clientIdentifications)
+				&& Objects.equals(person, other.person) && Objects.equals(preferences, other.preferences);
 	}
 
 }
