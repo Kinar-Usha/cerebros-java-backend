@@ -1,4 +1,3 @@
-
 DROP TABLE Cerebros_Trades;
 DROP TABLE Cerebros_Orders;
 DROP TABLE Cerebros_Prices;
@@ -10,32 +9,22 @@ DROP TABLE Cerebros_Person;
 DROP TABLE Cerebros_INSTRUMENTS;
 DROP TABLE Cerebros_Client;
 
-
-
---ALTER SESSION SET CURRENT_SCHEMA = Scott;
-
-
 -- Create the Client table
 CREATE TABLE Cerebros_Client (
     clientId VARCHAR(50) PRIMARY KEY,
-    personId INT
-);
-
--- Create the Person table
-CREATE TABLE Cerebros_Person (
-    personId INT PRIMARY KEY,
-    clientId VARCHAR(50),
     name VARCHAR(255),
     email VARCHAR(255),
     dob DATE,
     postalCode VARCHAR(10),
     country VARCHAR(2) CHECK (country IN ('US', 'IE', 'IN'))
-);
+) ;
 
 -- Create the ClientPasswords table
 CREATE TABLE Cerebros_ClientPasswords (
-    clientId VARCHAR(50) PRIMARY KEY,
-    passwordHash VARCHAR(255)
+    clientId VARCHAR(50),
+    passwordHash VARCHAR(255),
+    CONSTRAINT "Cerebros_ClientPasswords_PK" PRIMARY KEY (CLIENTID) ENABLE, 
+    CONSTRAINT "Cerebros_ClientPasswords_FK" FOREIGN KEY (CLIENTID) REFERENCES Cerebros_Client (CLIENTID) ENABLE
 );
 
 -- Create the ClientIdentifications table
@@ -43,16 +32,19 @@ CREATE TABLE Cerebros_ClientIdentifications (
     clientId VARCHAR(50),
     idType VARCHAR(50),
     idNumber VARCHAR(255),
-    PRIMARY KEY (clientId, idType)
+    CONSTRAINT "Cerebros_ClientIdentifications_PK" PRIMARY KEY (CLIENTID, IDTYPE) ENABLE, 
+    CONSTRAINT "Cerebros_ClientIdentifications_FK" FOREIGN KEY (CLIENTID) REFERENCES Cerebros_Client (CLIENTID) ENABLE
 );
 
 -- Create the ClientPreferences table
 CREATE TABLE Cerebros_ClientPreferences (
-    clientId VARCHAR2(50) PRIMARY KEY,
+    clientId VARCHAR2(50),
     purpose VARCHAR2(20) CHECK (purpose IN ('Investment', 'Savings', 'Retirement', 'Other')),
     riskTolerance VARCHAR2(10) CHECK (riskTolerance IN ('Low', 'Moderate', 'High')),
     timeHorizon VARCHAR2(20) CHECK (timeHorizon IN ('Short-term', 'Medium-term', 'Long-term')),
-    incomeBracket VARCHAR2(10) CHECK (incomeBracket IN ('Low', 'Middle', 'High'))
+    incomeBracket VARCHAR2(10) CHECK (incomeBracket IN ('Low', 'Middle', 'High')),
+    CONSTRAINT "Cerebros_ClientPreferences_PK" PRIMARY KEY (CLIENTID) ENABLE, 
+    CONSTRAINT "Cerebros_ClientPreferences_FK" FOREIGN KEY (CLIENTID) REFERENCES Cerebros_Client (CLIENTID) ENABLE
 );
 
 -- Create the Instruments table
@@ -69,7 +61,7 @@ CREATE TABLE Cerebros_Instruments (
 -- Create the Portfolio table
 CREATE TABLE Cerebros_Portfolio (
     portfolioId INT PRIMARY KEY,
-    clientId VARCHAR(50),
+    clientId VARCHAR(50) REFERENCES Cerebros_Client(clientId),
     instrumentId VARCHAR(50),
     holdings DECIMAL(10, 2)
 );
@@ -77,7 +69,7 @@ CREATE TABLE Cerebros_Portfolio (
 -- Create the Trades table
 CREATE TABLE Cerebros_Trades (
     tradeId INT PRIMARY KEY,
-    clientId VARCHAR(50),
+    clientId VARCHAR(50) REFERENCES Cerebros_Client(clientId),
     instrumentId VARCHAR(50),
     orderId VARCHAR(50),
     direction varchar(10),
@@ -90,7 +82,7 @@ CREATE TABLE Cerebros_Trades (
 -- Create the Orders table
 CREATE TABLE Cerebros_Orders (
     orderId VARCHAR(50) PRIMARY KEY,
-    clientId VARCHAR(50),
+    clientId VARCHAR(50) REFERENCES Cerebros_Client(clientId),
     instrumentId VARCHAR(50),
     direction VARCHAR(10),
     quantity DECIMAL(10, 2),
@@ -107,6 +99,12 @@ CREATE TABLE Cerebros_Prices (
     timestamp TIMESTAMP
 );
 SET SCAN OFF
+
+------------------------------------------------------------
+
+INSERT INTO CEREBROS_CLIENT (CLIENTID, NAME, EMAIL, DOB, POSTALCODE, COUNTRY) VALUES ('YOUR_CLIENTID', 'John Doe', 'john.doe@gmail.com', TO_DATE('2001-09-11', 'YYYY-MM-DD'), '600097', 'IN');
+INSERT INTO CEREBROS_CLIENTPASSWORDS (CLIENTID, PASSWORDHASH) VALUES ('YOUR_CLIENTID', '1234567890');
+INSERT INTO CEREBROS_CLIENTPREFERENCES (CLIENTID, PURPOSE, RISKTOLERANCE, TIMEHORIZON, INCOMEBRACKET) VALUES ('YOUR_CLIENTID', 'Investment', 'High', 'Long-term', 'High');
 
 ------------------------------------------------------------
 INSERT INTO Cerebros_Instruments (instrumentId, description, externalIdType, externalId, categoryId, minQuantity, maxQuantity)
@@ -279,14 +277,6 @@ VALUES
 INSERT INTO Cerebros_Orders (orderId, clientId, instrumentId, direction, quantity, targetPrice, placedTimestamp)
 VALUES
     ('BUY_ORDER_T67897_1', 'YOUR_CLIENTID', 'T67897', 'B', 200, 0.999375, '21-AUG-19');
+
+
 COMMIT;
-
---    ('BUY_ORDER_T67899_1', 'YOUR_CLIENTID', 'T67899', 'B', 400, 1.00375, '2023-09-19 13:30:00'),
---    ('BUY_ORDER_T67880_1', 'YOUR_CLIENTID', 'T67880', 'B', 800, 1.0596875, '2023-09-19 14:00:00'),
---    ('BUY_ORDER_T67883_1', 'YOUR_CLIENTID', 'T67883', 'B', 150, 0.9853125, '2023-09-19 14:30:00'),
---    ('BUY_ORDER_T67878_1', 'YOUR_CLIENTID', 'T67878', 'B', 250, 1162.42, '2023-09-19 15:00:00');
-
----------------------------------------------------------------------
-
-INSERT INTO CEREBROS_PERSON (PERSONID, CLIENTID, NAME, EMAIL, DOB, POSTALCODE, COUNTRY) VALUES (1, 'YOUR_CLIENTID', 'John Doe', 'john.doe@gmail.com', TO_DATE('2001-09-11', 'YYYY-MM-DD'), '600097', 'IN');
-INSERT INTO CEREBROS_CLIENT (CLIENTID, PERSONID) VALUES ('YOUR_CLIENTID', 1);
