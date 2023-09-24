@@ -1,6 +1,5 @@
 package com.cerebros.models;
 
-import static org.junit.Assert.assertNotNull;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -12,6 +11,8 @@ import org.junit.jupiter.api.Test;
 
 import com.cerebros.constants.ClientIdentificationType;
 import com.cerebros.constants.Country;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class ClientTest {
 

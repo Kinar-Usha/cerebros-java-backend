@@ -10,6 +10,8 @@ public class Portfolio {
     private BigDecimal holdings;
     private BigDecimal price;
 
+    public Portfolio() {
+    }
 
     @Override
     public boolean equals(Object o) {
