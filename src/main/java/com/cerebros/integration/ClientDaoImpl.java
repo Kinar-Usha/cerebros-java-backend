@@ -3,8 +3,11 @@ package com.cerebros.integration;
 
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -60,18 +63,111 @@ public class ClientDaoImpl implements ClientDao {
 
 
 	@Override
-	public void register(Client client, String password) {
-		// Verify Email
-		boolean isEmailUnregistered = !emailExists(client.getPerson().getEmail());
+	public void register(Client client, String password) throws SQLException {
+		// Insert Into Client
 
+		String clientSql = """
+				INSERT INTO
+					CEREBROS_CLIENT (CLIENTID, NAME, EMAIL, DOB, POSTALCODE, COUNTRY)
+				VALUES
+					(?, ?, ?, ?, ?, ?)
+				""";
 
+		String pwdSQl = """
+				INSERT INTO
+					CEREBROS_CLIENTPASSWORDS (CLIENTID, PASSWORDHASH)
+				VALUES
+					(?, ?)
+				""";
 
-		if (!isEmailUnregistered) {
-			throw new ClientAlreadyExistsException("User with this email is already registered");
+		try (Connection conn = dataSource.getConnection();
+				PreparedStatement clientStmt = conn.prepareStatement(clientSql);
+				PreparedStatement pwdStmt = conn.prepareStatement(pwdSQl);) {
+
+			// Insert Client
+			clientStmt.setString(1, client.getClientId());
+			clientStmt.setString(2, client.getPerson().getName());
+			clientStmt.setString(3, client.getPerson().getEmail());
+			clientStmt.setDate(4, Date.valueOf(client.getPerson().getDateofBirth()));
+			clientStmt.setString(5, client.getPerson().getPostalCode());
+			clientStmt.setString(6, client.getPerson().getCountry().getCode());
+
+			int numClientRowsUpdated = clientStmt.executeUpdate();
+			logger.debug("Inserted {} client rows", numClientRowsUpdated);
+
+			// Insert Client Identifications
+			for (ClientIdentification cid : client.getClientIdentifications()) {
+				insertClientIdentification(client.getClientId(), cid);
+			}
+
+			// Insert Into Client_Passwords
+			pwdStmt.setString(1, client.getClientId());
+			pwdStmt.setString(2, password);
+
+			int numPwdRowsUpdated = pwdStmt.executeUpdate();
+			logger.debug("Inserted {} client password rows", numPwdRowsUpdated);
+
+		} catch (SQLIntegrityConstraintViolationException e) {
+			logger.error("Failed to insert row as client email already exists", e);
+			throw new ClientAlreadyExistsException("Client is already registered");
+		} catch (SQLException e) {
+			logger.error("Failed to insert row", e);
+			throw new DatabaseException("Failed to insert row", e);
 		}
 
+	}
 
+	private void insertClientIdentification(String clientId, ClientIdentification clientIdentification)
+			throws SQLIntegrityConstraintViolationException {
+		String idSql = """
+				INSERT INTO
+					CEREBROS_CLIENTIDENTIFICATIONS (CLIENTID, IDTYPE, IDNUMBER)
+				VALUES
+					(?, ?, ?)
+				""";
 
+		try (Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(idSql);) {
+
+			// Insert Client Identification
+			stmt.setString(1, clientId);
+			stmt.setString(2, clientIdentification.getType().getType());
+			stmt.setString(3, clientIdentification.getValue());
+
+			int numRowsUpdated = stmt.executeUpdate();
+			logger.debug("Inserted {} client identification rows", numRowsUpdated);
+
+		} catch (SQLIntegrityConstraintViolationException e) {
+			deleteClientFromClient(clientId);
+			logger.error("Failed to insert row as client identification already exists", e);
+			throw new ClientAlreadyExistsException("Client is already registered");
+		} catch (SQLException e) {
+			logger.error("Failed to insert row in client identification", e);
+			throw new DatabaseException("Failed to insert row in client identification", e);
+		}
+
+	}
+
+	private void deleteClientFromClient(String clientId) {
+		String sql = "DELETE FROM CEREBROS_CLIENT WHERE CLIENTID = ?";
+
+		try (Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql);) {
+
+//			stmt.setString(1, table);
+			stmt.setString(1, clientId);
+
+			int numRowsUpdated = stmt.executeUpdate();
+			logger.debug("Deleted {} row", numRowsUpdated);
+			if (numRowsUpdated != 1) {
+				logger.error("DeleteClient: {} rows were updated. Check whether the row exists.", numRowsUpdated);
+				throw new DatabaseException(
+						String.format("DeleteClient: Only 1 row was supposed to be affected but {} rows were affected",
+								numRowsUpdated));
+			}
+
+		} catch (SQLException e) {
+			logger.error("Failed to delete row", e);
+			throw new DatabaseException("Failed to delete row", e);
+		}
 	}
 
 
