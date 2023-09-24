@@ -20,6 +20,17 @@
         WHERE p.clientId = #{clientId}
         ORDER BY p.holdings DESC
     </select>
+
+    <insert id="addToPortfolio" parameterType="map">
+        INSERT INTO cerebros_portfolio (clientid, instrumentid, holdings)
+        VALUES (#{clientId}, #{portfolio.instrumentId}, #{portfolio.holdings})
+    </insert>
+    <!-- Update an existing portfolio record -->
+    <update id="updatePortfolio" parameterType="com.cerebros.models.Portfolio">
+        UPDATE cerebros_portfolio
+        SET holdings = #{portfolio.holdings}
+        WHERE clientid = #{clientId} AND instrumentid = #{portfolio.instrumentId}
+    </update>
     <!-- Define the resultMap for Employee with Job -->
 
 </mapper>
