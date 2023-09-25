@@ -7,7 +7,11 @@ import java.sql.SQLException;
 
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
+import org.apache.ibatis.type.MappedJdbcTypes;
+import org.apache.ibatis.type.MappedTypes;
 
+@MappedTypes(Country.class)
+@MappedJdbcTypes(JdbcType.VARCHAR)
 public class CountryTypeHandler extends BaseTypeHandler<Country> {
 
 	@Override
