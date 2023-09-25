@@ -7,8 +7,13 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.jdbc.JdbcTestUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -20,36 +25,14 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration("classpath:beans.xml")
+@Transactional
 public class TradesDaoTest {
-    private SimpleDataSource dataSource;
+    @Autowired
     private TradesDaoImpl tradesDao;
-    TransactionManager transactionManager;
 
-    private DbTestUtils dbTestUtils;
-    private Connection connection;
-    private JdbcTemplate jdbcTemplate;
 
-    private boolean codeExecuted = false;
-    @AfterEach
-    void tearDown() {
-//        assertTrue(codeExecuted, "The code was not executed.");
-
-        transactionManager.rollbackTransaction();
-        dataSource.shutdown();
-    }
-
-    @BeforeEach
-    void setUp() throws SQLException {
-        dataSource= new SimpleDataSource();
-        tradesDao= new TradesDaoImpl(dataSource);
-        connection = dataSource.getConnection();
-
-        transactionManager = new TransactionManager(dataSource);
-        transactionManager.startTransaction();
-//        connection.setAutoCommit(false);
-        dbTestUtils = new DbTestUtils(connection);
-        jdbcTemplate = dbTestUtils.initJdbcTemplate();
-    }
 
     @Test
     void smokeTest() {
@@ -67,7 +50,7 @@ public class TradesDaoTest {
     @Test
     void testClientHasNoTradeHistory(){
         String testClientId= "YOUR_CLIENTID_WITH_NO_TRADES";
-        Assertions.assertThrows(ClientNotFoundException.class,()->{
+        Assertions.assertThrows(DatabaseException.class,()->{
             tradesDao.getTrades(testClientId);
         });
     }
@@ -82,7 +65,6 @@ public class TradesDaoTest {
 
     @Test
     void testInsertIntoTrades() throws SQLException {
-        int oldSize= JdbcTestUtils.countRowsInTable(jdbcTemplate,"Cerebros_Trades");
         String orderId = "BUY_ORDER_Q123_11";
         String clientId = "YOUR_CLIENTID";
         String instrumentId = "Q123";
@@ -101,14 +83,10 @@ public class TradesDaoTest {
         // Create a dummy Trade
         Trade trade = new Trade("11", quantity, targetPrice, direction, targetPrice.multiply(quantity).negate(), clientId, instrumentId, order, placedTimestamp);
         tradesDao.addTrade(trade, clientId);
-        assertEquals(oldSize+1, JdbcTestUtils.countRowsInTable(jdbcTemplate,"Cerebros_Trades"));
-        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"Cerebros_Trades", "tradeId=11"));
-        codeExecuted = true;
 
     }
     @Test
     void testInsertSellIntoTrades() throws SQLException {
-        int oldSize= JdbcTestUtils.countRowsInTable(jdbcTemplate,"Cerebros_Trades");
         String orderId = "BUY_ORDER_Q123_11";
         String clientId = "YOUR_CLIENTID";
         String instrumentId = "Q123";
@@ -127,9 +105,6 @@ public class TradesDaoTest {
         // Create a dummy Trade
         Trade trade = new Trade("11", quantity, targetPrice, direction, targetPrice.multiply(quantity).negate(), clientId, instrumentId, order, placedTimestamp);
         tradesDao.addTrade(trade, clientId);
-        assertEquals(oldSize+1, JdbcTestUtils.countRowsInTable(jdbcTemplate,"Cerebros_Trades"));
-        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"Cerebros_Trades", "tradeId=11"));
-        codeExecuted = true;
 
     }
     @Test

@@ -13,6 +13,14 @@ public class Portfolio {
     public Portfolio() {
     }
 
+    public Portfolio(String instrumentId, String description, String categoryId, BigDecimal holdings, BigDecimal price) {
+        this.instrumentId = instrumentId;
+        this.description = description;
+        this.categoryId = categoryId;
+        this.holdings = holdings;
+        this.price = price;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -24,14 +32,6 @@ public class Portfolio {
     @Override
     public int hashCode() {
         return Objects.hash(instrumentId, description, categoryId, holdings, price);
-    }
-
-    public Portfolio(String instrumentId, String description, String categoryId, BigDecimal holdings, BigDecimal price) {
-        this.instrumentId = instrumentId;
-        this.description = description;
-        this.categoryId = categoryId;
-        this.holdings = holdings;
-        this.price = price;
     }
 
     public String getInstrumentId() {

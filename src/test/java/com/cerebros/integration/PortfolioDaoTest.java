@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.jdbc.JdbcTestUtils;
@@ -43,6 +44,7 @@ public class PortfolioDaoTest {
         assertTrue(portfolioList.get(0).getHoldings().compareTo( portfolioList.get(1).getHoldings())>0);
 
     }
+
     @Test
     void testClientNotFoundGetPortfolio(){
         String testClientId= "YOUR_CLIENTID_WITH_NO_PORTFOLIO";
@@ -50,15 +52,14 @@ public class PortfolioDaoTest {
             List<Portfolio> portfolioList= portfolioDao.getPortfolio(testClientId);
         });
     }
+    @Rollback
     @Test
     void testAddToPortfolio(){
         String testClientId= "YOUR_CLIENTID";
         Portfolio dummyPortfolio = new Portfolio("T67878", "Dummy Portfolio", "Category123", new BigDecimal("100"), new BigDecimal("50.00"));
-//        int oldSize= JdbcTestUtils.countRowsInTable(jdbcTemplate,"Cerebros_Portfolio");
-        portfolioDao.addToPortfolio(dummyPortfolio, testClientId);
-//        assertEquals(oldSize+1, JdbcTestUtils.countRowsInTable(jdbcTemplate,"Cerebros_Portfolio"));
-//        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"Cerebros_Portfolio", "instrumentId='T67878'"));
+        assertEquals(1, portfolioDao.addToPortfolio(dummyPortfolio, testClientId));
     }
+
     @Test
     void testAddInvalidInstrument(){
         String testClientId= "YOUR_CLIENTID";

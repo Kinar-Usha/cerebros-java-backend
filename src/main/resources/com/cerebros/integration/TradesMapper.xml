@@ -4,6 +4,33 @@
 
 <mapper namespace="com.cerebros.integration.TradesMapper">
 
+    <select id="getTrades" parameterType="java.lang.String" resultType="com.cerebros.models.Trade">
+
+        <!-- Your SQL query -->
+        <![CDATA[
+        SELECT
+            t.tradeid,
+            t.quantity,
+            t.executionprice,
+            t.direction,
+            t.cashvalue,
+            t.clientId,
+            t.instrumentid,
+            t.orderId,
+            o.quantity AS orderQuantity,
+            o.targetPrice,
+            o.direction AS orderDirection,
+            o.clientId AS orderClientId,
+            o.instrumentId AS orderInstrumentId
+        FROM cerebros_trades t
+        INNER JOIN cerebros_instruments i ON t.instrumentid = i.instrumentid
+        INNER JOIN cerebros_orders o ON t.orderid = o.orderid
+        WHERE t.clientID = #{clientId}
+        ORDER BY t.tradeid
+        FETCH FIRST 100 ROWS ONLY
+        ]]>
+
+    </select>
 </mapper>
         <!-- Enable transaction demarcation with annotations -->
 
