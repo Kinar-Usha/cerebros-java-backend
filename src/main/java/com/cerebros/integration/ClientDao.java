@@ -19,7 +19,7 @@ public interface ClientDao {
 
 	int addClientPreferences(Preferences preferences,String clientId);
 
-	void updateClientPreferences(Preferences preferences,String clientId);
+	int updateClientPreferences(Preferences preferences,String clientId);
 
 	Preferences getClientPreferences(String clientId);
 
