@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+                 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cerebros.integration.PreferencesMapper">
+	<resultMap type="Preferences" id="PreferencesMap">
+		<result property="purpose" column="PURPOSE"/>
+		<result property="risk" column="RISKTOLERANCE"/>
+		<result property="time" column="TIMEHORIZON"/>
+		<result property="income" column="INCOMEBRACKET"/>
+	</resultMap>
+	<select id="getClientPreferecesById" resultMap="PreferencesMap">
+		select purpose,risktolerance,timehorizon,incomebracket from cerebros_clientpreferences where clientid=#{clientId}
+	</select>
+	
+	
+	<insert id="addClientPreferences" parameterType="Preferences">
+		insert into cerebros_clientpreferences(CLIENTID,PURPOSE,RISKTOLERANCE,TIMEHORIZON,INCOMEBRACKET)
+		values (#{clientId},#{preferences.purpose},#{preferences.risk},#{preferences.time},#{preferences.income})
+	</insert>
+	
+	<update id="updateClientPreferences" parameterType="Preferences">
+    update cerebros_clientpreferences set purpose = #{preferences.purpose},risktolerance = #{preferences.risk},timehorizon = #{preferences.time},incomebracket = #{preferences.income} WHERE clientid = #{clientId}
+</update>
+	
+</mapper>
+
+  
