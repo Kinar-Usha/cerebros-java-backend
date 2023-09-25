@@ -9,7 +9,7 @@
 			<result property="email" column="EMAIL" />
 			<result property="name" column="NAME" />
 			<result property="dateofBirth" column="DOB" />
-			<result property="country" column="COUNTRY" typeHandler="com.cerebros.constants.CountryTypeHandler" javaType="com.cerebros.constants.Country" />
+			<result property="country" column="COUNTRY"  />
 			<result property="postalCode" column="POSTALCODE" />
 		</association>
     </resultMap>
@@ -49,9 +49,33 @@
 		FROM
 		    CEREBROS_CLIENTPASSWORDS
 		WHERE
-			clientId = (SELECT clientID FROM CEREBROS_CLIENT WHERE email = #{param1}) AND passwordHash = #{param2}
+			clientId = (SELECT clientID FROM CEREBROS_CLIENT WHERE email = #{email}) AND passwordHash = #{password}
 	</select>
-    
+	
+	<!-- DML Statements -->
+	
+	<insert id="insertClient" parameterType="com.cerebros.models.Client">
+	    INSERT INTO
+	    	CEREBROS_CLIENT (CLIENTID, NAME, EMAIL, DOB, POSTALCODE, COUNTRY)
+	    VALUES
+	    	(#{clientId}, #{person.name}, #{person.email}, #{person.dateofBirth}, #{person.postalCode}, #{person.country})
+	</insert>	
+	
+	<insert id="insertClientIndentification">
+	    INSERT INTO
+	    	CEREBROS_CLIENTIDENTIFICATIONS (CLIENTID, IDTYPE, IDNUMBER)
+	    VALUES
+	    	(#{clientId}, #{cid.type}, #{cid.value})
+	</insert>
+	
+	<insert id="insertClientPassword">
+		INSERT INTO
+			CEREBROS_CLIENTPASSWORDS (CLIENTID, PASSWORDHASH)
+		VALUES
+			(#{clientId}, #{password})
+	</insert>
+	
+	    
 
 </mapper>
         

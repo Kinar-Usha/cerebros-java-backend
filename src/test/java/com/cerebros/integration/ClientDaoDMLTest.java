@@ -3,17 +3,23 @@ package com.cerebros.integration;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.sql.DataSource;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.jdbc.JdbcTestUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.cerebros.constants.ClientIdentificationType;
 import com.cerebros.constants.Country;
@@ -23,14 +29,17 @@ import com.cerebros.models.ClientIdentification;
 import com.cerebros.models.Person;
 import com.cerebros.models.Preferences;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration("classpath:beans.xml")
+@Transactional
 class ClientDaoDMLTest {
 
+	@Autowired
+	private DataSource dataSource;
 	private JdbcTemplate jdbcTemplate;
-	private DbTestUtils dbTestUtils;
-	private SimpleDataSource dataSource;
-	private Connection connection;
-	private ClientDao dao;
-	private TransactionManager txManager;
+
+	@Autowired
+	private ClientDaoImpl dao;
 
 	private Person person2;
 	private Client client2;
@@ -39,20 +48,11 @@ class ClientDaoDMLTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		dataSource = new SimpleDataSource();
-		connection = dataSource.getConnection();
-		txManager = new TransactionManager(dataSource);
 
-		dao = new ClientDaoImpl(dataSource);
-
-		// Start the TX
-		txManager.startTransaction();
-
-		dbTestUtils = new DbTestUtils(connection);
-		jdbcTemplate = dbTestUtils.initJdbcTemplate();
+		jdbcTemplate = new JdbcTemplate(dataSource);
 
 		// sample data
-		person2 = new Person("jane.doe@gmail.com", LocalDate.of(1998, 2, 1), Country.USA, "600097");
+		person2 = new Person("Jane Doe", "jane.doe@gmail.com", LocalDate.of(1998, 2, 1), Country.USA, "600097");
 
 		ClientIdentification clientIdentification2 = new ClientIdentification(ClientIdentificationType.PASSPORT,
 				"A9624421");
@@ -66,11 +66,7 @@ class ClientDaoDMLTest {
 
 	@AfterEach
 	void tearDown() throws Exception {
-		// Rollback the transaction
-		txManager.rollbackTransaction();
 
-		connection.close();
-		dataSource.shutdown();
 	}
 
 	// Client Registration Tests
@@ -90,7 +86,7 @@ class ClientDaoDMLTest {
 
 		client2.setClientIdentifications(clientIdentifications2);
 
-//		assertThrows(ClientAlreadyExistsException.class, () -> dao.register(client2, "123456"));
+		assertThrows(ClientAlreadyExistsException.class, () -> dao.register(client2, "123456"));
 	}
 
 	@Test
@@ -146,4 +142,5 @@ class ClientDaoDMLTest {
 				"clientId = 'JANE_ID' AND passwordHash = '123456'"));
 	}
 
+	// TODO Delete Client Test
 }

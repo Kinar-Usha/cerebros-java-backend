@@ -41,6 +41,7 @@
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="datasource" />
         <property name="typeAliasesPackage" value="com.cerebros.models" />
+        <property name="typeHandlersPackage" value="com.cerebros.constants" />
         <property name="mapperLocations" value="classpath:com/cerebros/**/*.xml" />
         <property name="configurationProperties">
             <props>
