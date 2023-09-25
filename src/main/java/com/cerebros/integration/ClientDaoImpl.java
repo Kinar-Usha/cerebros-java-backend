@@ -11,6 +11,7 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import com.cerebros.exceptions.ClientAlreadyExistsException;
@@ -19,8 +20,12 @@ import com.cerebros.models.Client;
 import com.cerebros.models.ClientIdentification;
 import com.cerebros.models.Preferences;
 
-@Repository("clientDaoImpl")
+@Repository
+@Primary
 public class ClientDaoImpl implements ClientDao {
+	
+	@Autowired
+	private PreferencesMapper preferenceMapper;
 
 	private DataSource dataSource;
 	private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -204,21 +209,44 @@ public class ClientDaoImpl implements ClientDao {
 	}
 
 	@Override
-	public void addClientPreferences(Preferences preferences) {
-		// TODO Auto-generated method stub
+	public int addClientPreferences(Preferences preferences,String clientId) {
+		if(preferences==null) {
+			throw new NullPointerException("Prferences cannot be null");
+		}
+		if(clientId=="") {
+			throw new IllegalArgumentException("Client ID cannot be null");
+		}
+		int result=0;
+		
+		result= preferenceMapper.addClientPreferences(preferences,clientId);
+		if(result==0) {
+			throw new DatabaseException("Insert failed");
+		}
+		return result;
+
 
 	}
+
+
 
 	@Override
-	public void updateClientPreferences(Preferences preferences) {
-		// TODO Auto-generated method stub
+	public void updateClientPreferences(Preferences preferences,String clientId) {
+		if(preferences==null) {
+			throw new NullPointerException("Prferences cannot be null");
+		}
+		if(clientId=="") {
+			throw new IllegalArgumentException("Client ID cannot be null");
+		}
+		preferenceMapper.updateClientPreferences(preferences,clientId);
+
+
 
 	}
-
+	
 	@Override
 	public Preferences getClientPreferences(String clientId) {
-		// TODO Auto-generated method stub
-		return null;
+		return preferenceMapper.getClientPreferecesById(clientId);
 	}
 
+	
 }

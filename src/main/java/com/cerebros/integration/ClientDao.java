@@ -17,9 +17,9 @@ public interface ClientDao {
 
 	Client getClientByEmail(String email);
 
-	void addClientPreferences(Preferences preferences);
+	int addClientPreferences(Preferences preferences,String clientId);
 
-	void updateClientPreferences(Preferences preferences);
+	void updateClientPreferences(Preferences preferences,String clientId);
 
 	Preferences getClientPreferences(String clientId);
 
