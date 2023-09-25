@@ -13,6 +13,9 @@ public class Person {
 	private Country country;
 	private String postalCode;
 
+	public Person() {
+	}
+
 	public Person(String email, LocalDate dateofBirth, Country country, String postalCode) {
 		this.setEmail(email);
 		this.setDateofBirth(dateofBirth);
