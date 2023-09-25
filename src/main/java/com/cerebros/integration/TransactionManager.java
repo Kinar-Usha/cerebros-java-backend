@@ -1,6 +1,8 @@
 package com.cerebros.integration;
 
 
+import com.cerebros.exceptions.DatabaseException;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;

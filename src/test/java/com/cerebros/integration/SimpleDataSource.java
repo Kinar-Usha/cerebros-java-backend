@@ -14,6 +14,7 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import com.cerebros.exceptions.DatabaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,18 +1,13 @@
 package com.cerebros.integration;
 
 import com.cerebros.exceptions.ClientNotFoundException;
+import com.cerebros.exceptions.DatabaseException;
 import com.cerebros.models.Order;
-import com.cerebros.models.Portfolio;
 import com.cerebros.models.Trade;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import javax.sql.DataSource;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Repository("tradesDaoImpl")

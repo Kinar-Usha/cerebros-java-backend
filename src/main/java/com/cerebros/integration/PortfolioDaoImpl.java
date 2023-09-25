@@ -1,6 +1,7 @@
 package com.cerebros.integration;
 
 import com.cerebros.exceptions.ClientNotFoundException;
+import com.cerebros.exceptions.DatabaseException;
 import com.cerebros.models.Portfolio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

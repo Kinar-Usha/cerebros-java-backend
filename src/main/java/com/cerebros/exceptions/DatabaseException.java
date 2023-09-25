@@ -1,4 +1,4 @@
-package com.cerebros.integration;
+package com.cerebros.exceptions;
 
 public class DatabaseException extends RuntimeException{
 
