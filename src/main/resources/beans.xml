@@ -43,10 +43,16 @@
         <property name="typeAliasesPackage" value="com.cerebros.models" />
         <property name="typeHandlersPackage" value="com.cerebros.constants" />
         <property name="mapperLocations" value="classpath:com/cerebros/**/*.xml" />
+        <property name="configurationProperties">
+            <props>
+                <prop key="log4j.configuration">classpath:log4j2.properties</prop>
+            </props>
+        </property>
     </bean>
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="basePackage" value="com.cerebros.integration" />
     </bean>
+
 
 
 
