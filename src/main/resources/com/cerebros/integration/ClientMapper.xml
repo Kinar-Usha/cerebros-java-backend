@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cerebros.integration.ClientMapper">
+
+    <resultMap id="clientResultMap" type="com.cerebros.models.Client">
+        <id property="clientId" column="clientId"/>
+        <association property="person" javaType="com.cerebros.models.Person">
+			<result property="email" column="EMAIL" />
+			<result property="name" column="NAME" />
+			<result property="dateofBirth" column="DOB" />
+			<result property="country" column="COUNTRY" typeHandler="com.cerebros.constants.CountryTypeHandler" javaType="com.cerebros.constants.Country" />
+			<result property="postalCode" column="POSTALCODE" />
+		</association>
+    </resultMap>
+
+    <!-- Query Statements -->
+    <select id="getClientByEmail" resultMap="clientResultMap">
+        SELECT
+			CLIENTID ,
+			EMAIL ,
+		    NAME ,
+		    DOB ,
+		    POSTALCODE ,
+		    COUNTRY
+		FROM
+		    CEREBROS_CLIENT
+		WHERE
+			EMAIL = #{email}
+    </select>
+    
+    <select id="getClient" resultMap="clientResultMap">
+        SELECT
+        	CLIENTID, 
+			EMAIL ,
+		    NAME ,
+		    DOB ,
+		    POSTALCODE ,
+		    COUNTRY
+		FROM
+		    CEREBROS_CLIENT
+		WHERE
+			CLIENTID = #{clientId}
+    </select>
+    
+    <select id="checkLoginCreds" resultType="Integer">
+		SELECT
+			COUNT(*) IS_CRED_VALID
+		FROM
+		    CEREBROS_CLIENTPASSWORDS
+		WHERE
+			clientId = (SELECT clientID FROM CEREBROS_CLIENT WHERE email = #{param1}) AND passwordHash = #{param2}
+	</select>
+    
+
+</mapper>
+        
+

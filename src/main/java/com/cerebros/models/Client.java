@@ -10,6 +10,9 @@ public class Client {
 	private Preferences preferences;
 	private Set<ClientIdentification> clientIdentifications;
 
+	public Client() {
+	}
+
 	public Client(String clientId, Person person, Set<ClientIdentification> clientIdentifications) {
 		setPerson(person);
 		setClientIdentifications(clientIdentifications);
@@ -31,7 +34,7 @@ public class Client {
 	}
 
 	public Person getPerson() {
-		return person;
+		return this.person;
 	}
 
 	public void setPerson(Person person) {
