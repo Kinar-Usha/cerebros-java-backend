@@ -63,6 +63,16 @@
       <version>${slf4j.version}</version>
     </dependency>
 
+    <!-- Logback for logging -->
+    <!-- Includes slf4j-api -->
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.4.7</version>
+    </dependency>
+
+
+
     <dependency>
       <groupId>org.mybatis</groupId>
       <artifactId>mybatis</artifactId>
