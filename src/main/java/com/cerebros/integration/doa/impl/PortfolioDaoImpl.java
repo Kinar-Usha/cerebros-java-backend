@@ -1,7 +1,9 @@
-package com.cerebros.integration;
+package com.cerebros.integration.doa.impl;
 
 import com.cerebros.exceptions.ClientNotFoundException;
 import com.cerebros.exceptions.DatabaseException;
+import com.cerebros.integration.mapper.PortfolioMapper;
+import com.cerebros.integration.doa.PortfolioDao;
 import com.cerebros.models.Portfolio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -12,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @Repository("portfolioDaoImpl")
-public class PortfolioDaoImpl implements PortfolioDao{
+public class PortfolioDaoImpl implements PortfolioDao {
 
     @Autowired
     private PortfolioMapper mapper;

@@ -2,6 +2,7 @@ package com.cerebros.integration;
 
 import com.cerebros.exceptions.ClientNotFoundException;
 import com.cerebros.exceptions.DatabaseException;
+import com.cerebros.integration.doa.impl.PortfolioDaoImpl;
 import com.cerebros.models.Portfolio;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

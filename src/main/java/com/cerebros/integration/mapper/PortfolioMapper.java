@@ -1,4 +1,4 @@
-package com.cerebros.integration;
+package com.cerebros.integration.mapper;
 
 import com.cerebros.models.Portfolio;
 
