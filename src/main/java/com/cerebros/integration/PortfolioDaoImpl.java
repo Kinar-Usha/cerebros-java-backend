@@ -53,13 +53,10 @@ public class PortfolioDaoImpl implements PortfolioDao{
             Map<String, Object> paramMap = new HashMap<>();
             paramMap.put("clientId", clientId);
             paramMap.put("portfolio", portfolio);
-            // Call the MyBatis mapper method to insert the portfolio
            rowsUpdated= mapper.updatePortfolio(paramMap);
 
         } catch (Exception e) {
-            // Handle the database exception, log it, or rethrow as needed
             throw new DatabaseException("update failed",e);
-            // Example: throw new DatabaseException("Failed to add portfolio", e);
         }
         return rowsUpdated;
 

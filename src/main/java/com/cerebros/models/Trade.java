@@ -1,12 +1,8 @@
 package com.cerebros.models;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
-
-import com.cerebros.services.TradeService;
 
 public class Trade {
     private String tradeId;
@@ -17,12 +13,36 @@ public class Trade {
     private String clientid;
     private String instrumentId;
     private Order order;
+    private Date executedTime;
 
-    public Date getExecutedTime() {
-        return executedTime;
+
+
+
+    public Trade() {
     }
 
-    private Date executedTime;
+    public Trade(String tradeId, BigDecimal quantity, BigDecimal executionPrice, String direction, BigDecimal cashValue, String clientid, String instrumentId, Order order, Date executedTime) {
+        this.tradeId = tradeId;
+        this.quantity = quantity;
+        this.executionPrice = executionPrice;
+        this.direction = direction;
+        this.cashValue = cashValue;
+        this.clientid = clientid;
+        this.instrumentId = instrumentId;
+        this.order = order;
+        this.executedTime = executedTime;
+    }
+
+    public Trade(String tradeId, BigDecimal quantity, BigDecimal executionPrice, String direction, BigDecimal cashValue, String clientid, String instrumentId, Order order) {
+        this.tradeId = tradeId;
+        this.quantity = quantity;
+        this.executionPrice = executionPrice;
+        this.direction = direction;
+        this.cashValue = cashValue;
+        this.clientid = clientid;
+        this.instrumentId = instrumentId;
+        this.order = order;
+    }
 
     public String getTradeId() {
         return tradeId;
@@ -55,30 +75,46 @@ public class Trade {
     public Order getOrder() {
         return order;
     }
-    
+    public Date getExecutedTime() {
+        return executedTime;
+    }
 
-    public Trade(String tradeId, BigDecimal quantity, BigDecimal executionPrice, String direction, BigDecimal cashValue, String clientid, String instrumentId, Order order) {
+    public void setTradeId(String tradeId) {
         this.tradeId = tradeId;
+    }
+
+    public void setQuantity(BigDecimal quantity) {
         this.quantity = quantity;
+    }
+
+    public void setExecutionPrice(BigDecimal executionPrice) {
         this.executionPrice = executionPrice;
+    }
+
+    public void setDirection(String direction) {
         this.direction = direction;
+    }
+
+    public void setCashValue(BigDecimal cashValue) {
         this.cashValue = cashValue;
+    }
+
+    public void setClientid(String clientid) {
         this.clientid = clientid;
+    }
+
+    public void setInstrumentId(String instrumentId) {
         this.instrumentId = instrumentId;
+    }
+
+    public void setOrder(Order order) {
         this.order = order;
     }
 
-    public Trade(String tradeId, BigDecimal quantity, BigDecimal executionPrice, String direction, BigDecimal cashValue, String clientid, String instrumentId, Order order, Date executedTime) {
-        this.tradeId = tradeId;
-        this.quantity = quantity;
-        this.executionPrice = executionPrice;
-        this.direction = direction;
-        this.cashValue = cashValue;
-        this.clientid = clientid;
-        this.instrumentId = instrumentId;
-        this.order = order;
+    public void setExecutedTime(Date executedTime) {
         this.executedTime = executedTime;
     }
+
 
     @Override
     public boolean equals(Object o) {
