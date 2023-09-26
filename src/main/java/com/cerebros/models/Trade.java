@@ -10,7 +10,7 @@ public class Trade {
     private BigDecimal executionPrice;
     private String direction;
     private BigDecimal cashValue;
-    private String clientid;
+    private String clientId;
     private String instrumentId;
     private Order order;
     private Date executedTime;
@@ -27,7 +27,7 @@ public class Trade {
         this.executionPrice = executionPrice;
         this.direction = direction;
         this.cashValue = cashValue;
-        this.clientid = clientid;
+        this.clientId = clientid;
         this.instrumentId = instrumentId;
         this.order = order;
         this.executedTime = executedTime;
@@ -39,7 +39,7 @@ public class Trade {
         this.executionPrice = executionPrice;
         this.direction = direction;
         this.cashValue = cashValue;
-        this.clientid = clientid;
+        this.clientId = clientid;
         this.instrumentId = instrumentId;
         this.order = order;
     }
@@ -65,7 +65,7 @@ public class Trade {
     }
 
     public String getClientid() {
-        return clientid;
+        return clientId;
     }
 
     public String getInstrumentId() {
@@ -100,7 +100,7 @@ public class Trade {
     }
 
     public void setClientid(String clientid) {
-        this.clientid = clientid;
+        this.clientId = clientid;
     }
 
     public void setInstrumentId(String instrumentId) {
@@ -126,14 +126,14 @@ public class Trade {
                 Objects.equals(executionPrice, trade.executionPrice) &&
                 Objects.equals(direction, trade.direction) &&
                 Objects.equals(cashValue, trade.cashValue) &&
-                Objects.equals(clientid, trade.clientid) &&
+                Objects.equals(clientId, trade.clientId) &&
                 Objects.equals(instrumentId, trade.instrumentId) &&
                 Objects.equals(order, trade.order);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(tradeId, quantity, executionPrice, direction, cashValue, clientid, instrumentId, order);
+        return Objects.hash(tradeId, quantity, executionPrice, direction, cashValue, clientId, instrumentId, order);
     }
 
 }
