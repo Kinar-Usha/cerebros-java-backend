@@ -151,14 +151,19 @@ public class ClientDaoImpl implements ClientDao {
 	}
 
 	@Override
-	public void updateClientPreferences(Preferences preferences, String clientId) {
-		if (preferences == null) {
+	public int updateClientPreferences(Preferences preferences,String clientId) {
+		if(preferences==null) {
 			throw new NullPointerException("Prferences cannot be null");
 		}
-		if (clientId == "") {
+		if(clientId=="") {
 			throw new IllegalArgumentException("Client ID cannot be null");
 		}
-		preferenceMapper.updateClientPreferences(preferences, clientId);
+		int result= preferenceMapper.updateClientPreferences(preferences,clientId);
+		if(result==0) {
+			throw new DatabaseException("Client Preference Update failed");
+		}
+		
+		return result;
 
 	}
 
