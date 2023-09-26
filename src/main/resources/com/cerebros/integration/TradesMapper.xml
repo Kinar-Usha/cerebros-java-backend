@@ -38,8 +38,8 @@
 </insert>
 
     <insert id="insertTrade" parameterType="com.cerebros.models.Trade">
-    INSERT INTO Cerebros_Trades (tradeId, clientId, instrumentId, orderId, direction, quantity, executionPrice, cashValue, executedTimestamp)
-    VALUES (#{tradeId}, #{clientId}, #{instrumentId}, #{order.orderId}, #{direction}, #{quantity}, #{executionPrice}, #{cashValue}, #{executedTime})
+    INSERT INTO Cerebros_Trades ( clientId, instrumentId, orderId, direction, quantity, executionPrice, cashValue, executedTimestamp)
+    VALUES ( #{clientId}, #{instrumentId}, #{order.orderId}, #{direction}, #{quantity}, #{executionPrice}, #{cashValue}, #{executedTime})
 </insert>
 </mapper>
         <!-- Enable transaction demarcation with annotations -->
