@@ -128,7 +128,7 @@ class ClientDaoQueryTest {
 	
 	@Test
 	void testGetPreferencesByIdEqualsPurposes() {
-		Preferences pref = new Preferences("Savings","High","Long-term","High");
+		Preferences pref = new Preferences("Investment","High","Long-term","High");
 		assertEquals(pref.getPurpose(),dao.getClientPreferences("YOUR_CLIENTID").getPurpose());
 	}
 	
