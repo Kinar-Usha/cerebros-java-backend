@@ -1,4 +1,4 @@
-package com.cerebros.integration;
+package com.cerebros.integration.mapper;
 
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;

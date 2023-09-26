@@ -11,6 +11,7 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
+import com.cerebros.integration.doa.impl.ClientDaoImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -189,7 +190,7 @@ class ClientDaoDMLTest {
 		preferences.setIncome("High");
 
 		// Call the updateClientPreferences method to perform the update
-		dao.updateClientPreferences(preferences, "YOUR_CLIENTID");
+		assertEquals(1,dao.updateClientPreferences(preferences, "YOUR_CLIENTID"));
 
 		// Retrieve the updated preferences from the database
 		Preferences updatedPreferences = dao.getClientPreferences("YOUR_CLIENTID"); // Implement getClientPreferences to

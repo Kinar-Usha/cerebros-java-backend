@@ -2,6 +2,7 @@ package com.cerebros.integration;
 
 import com.cerebros.exceptions.ClientNotFoundException;
 import com.cerebros.exceptions.DatabaseException;
+import com.cerebros.integration.doa.impl.TradesDaoImpl;
 import com.cerebros.models.Order;
 import com.cerebros.models.Trade;
 import org.junit.jupiter.api.Assertions;

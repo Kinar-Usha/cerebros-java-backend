@@ -1,4 +1,4 @@
-package com.cerebros.integration;
+package com.cerebros.integration.doa;
 
 import java.sql.SQLException;
 
@@ -22,5 +22,7 @@ public interface ClientDao {
 	int updateClientPreferences(Preferences preferences,String clientId);
 
 	Preferences getClientPreferences(String clientId);
+
+
 
 }

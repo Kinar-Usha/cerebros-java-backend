@@ -1,4 +1,4 @@
-package com.cerebros.integration;
+package com.cerebros.integration.doa;
 
 import com.cerebros.exceptions.ClientNotFoundException;
 import com.cerebros.models.Trade;

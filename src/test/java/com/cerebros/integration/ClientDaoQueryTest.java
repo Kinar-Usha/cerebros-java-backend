@@ -11,16 +11,14 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.cerebros.integration.doa.impl.ClientDaoImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.cerebros.constants.ClientIdentificationType;
 import com.cerebros.constants.Country;

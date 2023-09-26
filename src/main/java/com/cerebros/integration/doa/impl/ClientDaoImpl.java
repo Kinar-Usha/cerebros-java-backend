@@ -1,10 +1,13 @@
-package com.cerebros.integration;
+package com.cerebros.integration.doa.impl;
 
 import java.sql.SQLIntegrityConstraintViolationException;
 
 import javax.sql.DataSource;
 
 import com.cerebros.exceptions.DatabaseException;
+import com.cerebros.integration.mapper.ClientMapper;
+import com.cerebros.integration.mapper.PreferencesMapper;
+import com.cerebros.integration.doa.ClientDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
