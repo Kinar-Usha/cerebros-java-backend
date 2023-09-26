@@ -18,11 +18,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.jdbc.JdbcTestUtils;
-
+import org.springframework.transaction.annotation.Transactional;
 
 import com.cerebros.constants.ClientIdentificationType;
 import com.cerebros.constants.Country;
@@ -35,6 +34,7 @@ import com.cerebros.models.Preferences;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration("classpath:beans.xml")
+@Transactional
 class ClientDaoDMLTest {
 
 	@Autowired
@@ -146,104 +146,91 @@ class ClientDaoDMLTest {
 	}
 
 	// TODO Delete Client Test
-	
-	
-	
-	 @Rollback
-	 @Test
-	 void testAddPreference() {
-		Preferences pref = new Preferences("Investment","High","Long-term","High");
-	    assertNotNull(dao.addClientPreferences(pref, "YOUR_CLIENTID2"));
-	      
-	  }
-	 
-	 
-	 @Test
-	 @Rollback
-	 void testInsertExistingClientPreference(){
-		Preferences pref = new Preferences("Investment","High","Long-term","High");
-	    assertThrows(DuplicateKeyException.class,()->{
-	      dao.addClientPreferences(pref, "YOUR_CLIENTID");
-	    });
-	  }
-	 
-	 @Test
-	 @Rollback
-	 void testInsertClientPreferenceWithNullObject(){
-		assertThrows(NullPointerException.class,()->{
-	      dao.addClientPreferences(null, "YOUR_CLIENTID");
-	    });
-	  }
-	 
-	 @Test
-	 @Rollback
-	 void testInsertClientPreferenceWithEmptyString(){
-		Preferences pref = new Preferences("Investment","High","Long-term","High");
-		assertThrows(IllegalArgumentException.class,()->{
-	      dao.addClientPreferences(pref, "");
-	    });
-	  }
-	 
-	 @Test
-	 @Rollback
-	 public void testUpdateClientPreferences() {
-	        // Create a Preferences object with updated values
-	        Preferences preferences = new Preferences();
-	        // Set the appropriate client ID
-	        preferences.setPurpose("Savings");
-	        preferences.setRisk("Moderate");
-	        preferences.setTime("Long-term");
-	        preferences.setIncome("High");
 
-	        // Call the updateClientPreferences method to perform the update
-	        dao.updateClientPreferences(preferences,"YOUR_CLIENTID");
+	@Test
+	void testAddPreference() throws SQLException {
+		Preferences pref = new Preferences("Investment", "High", "Long-term", "High");
+		dao.register(client2, "123");
+		assertNotNull(dao.addClientPreferences(pref, client2.getClientId()));
 
-	        // Retrieve the updated preferences from the database
-	        Preferences updatedPreferences = dao.getClientPreferences("YOUR_CLIENTID"); // Implement getClientPreferences to retrieve preferences by client ID
+	}
 
-	        // Assert that the update was successful by checking if the values match
-	        assertEquals("Savings", updatedPreferences.getPurpose());
-	        assertEquals("Moderate", updatedPreferences.getRisk());
-	        assertEquals("Long-term", updatedPreferences.getTime());
-	        assertEquals("High", updatedPreferences.getIncome());
-	    }
-	 
-	 
-	  @Test
-	  @Rollback
-	  void testUpdateClientPreferenceWithNullObject(){
-		assertThrows(NullPointerException.class,()->{
-	      dao.updateClientPreferences(null, "YOUR_CLIENTID");
-	    });
-	  }
-	 
-	 @Test
-	 @Rollback
-	 void testUpdateClientPreferenceWithEmptyString(){
-		 Preferences pref = new Preferences("Investment","High","Long-term","High");
-		assertThrows(IllegalArgumentException.class,()->{
-	      dao.updateClientPreferences(pref, "");
-	    });
-	  }
-	 
-	 
-	 @Test
-	 @Rollback
-	 public void testUpdateClientPreferencesInvalidClientId() {
-	        // Create a Preferences object with updated values
-	        Preferences preferences = new Preferences();
-	        // Set the appropriate client ID
-	        preferences.setPurpose("Savings");
-	        preferences.setRisk("Moderate");
-	        preferences.setTime("Long-term");
-	        preferences.setIncome("High");
+	@Test
+	void testInsertExistingClientPreference() {
+		Preferences pref = new Preferences("Investment", "High", "Long-term", "High");
+		assertThrows(DuplicateKeyException.class, () -> {
+			dao.addClientPreferences(pref, "YOUR_CLIENTID");
+		});
+	}
 
-	       assertThrows(DatabaseException.class,()->{
-	    	   dao.updateClientPreferences(preferences,"YOUR_CLIENTID12333");
-	       });
+	@Test
+	void testInsertClientPreferenceWithNullObject() {
+		assertThrows(NullPointerException.class, () -> {
+			dao.addClientPreferences(null, "YOUR_CLIENTID");
+		});
+	}
 
-	    }
+	@Test
+	void testInsertClientPreferenceWithEmptyString() {
+		Preferences pref = new Preferences("Investment", "High", "Long-term", "High");
+		assertThrows(IllegalArgumentException.class, () -> {
+			dao.addClientPreferences(pref, "");
+		});
+	}
 
-	
-	
+	@Test
+	public void testUpdateClientPreferences() {
+		// Create a Preferences object with updated values
+		Preferences preferences = new Preferences();
+		// Set the appropriate client ID
+		preferences.setPurpose("Savings");
+		preferences.setRisk("Moderate");
+		preferences.setTime("Long-term");
+		preferences.setIncome("High");
+
+		// Call the updateClientPreferences method to perform the update
+		dao.updateClientPreferences(preferences, "YOUR_CLIENTID");
+
+		// Retrieve the updated preferences from the database
+		Preferences updatedPreferences = dao.getClientPreferences("YOUR_CLIENTID"); // Implement getClientPreferences to
+																					// retrieve preferences by client ID
+
+		// Assert that the update was successful by checking if the values match
+		assertEquals("Savings", updatedPreferences.getPurpose());
+		assertEquals("Moderate", updatedPreferences.getRisk());
+		assertEquals("Long-term", updatedPreferences.getTime());
+		assertEquals("High", updatedPreferences.getIncome());
+	}
+
+	@Test
+	void testUpdateClientPreferenceWithNullObject() {
+		assertThrows(NullPointerException.class, () -> {
+			dao.updateClientPreferences(null, "YOUR_CLIENTID");
+		});
+	}
+
+	@Test
+	void testUpdateClientPreferenceWithEmptyString() {
+		Preferences pref = new Preferences("Investment", "High", "Long-term", "High");
+		assertThrows(IllegalArgumentException.class, () -> {
+			dao.updateClientPreferences(pref, "");
+		});
+	}
+
+	@Test
+	public void testUpdateClientPreferencesInvalidClientId() {
+		// Create a Preferences object with updated values
+		Preferences preferences = new Preferences();
+		// Set the appropriate client ID
+		preferences.setPurpose("Savings");
+		preferences.setRisk("Moderate");
+		preferences.setTime("Long-term");
+		preferences.setIncome("High");
+
+		assertThrows(DatabaseException.class, () -> {
+			dao.updateClientPreferences(preferences, "YOUR_CLIENTID12333");
+		});
+
+	}
+
 }
