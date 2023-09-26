@@ -9,7 +9,7 @@ public class Order {
     private BigDecimal targetPrice;
     private String direction;
     private String clientId;
-    private String insturmentId;
+    private String instrumentId;
 
     public Date getPlacedTime() {
         return placedTime;
@@ -38,25 +38,25 @@ public class Order {
     }
 
     public String getInsturmentId() {
-        return insturmentId;
+        return instrumentId;
     }
 
-    public Order(String orderId, BigDecimal quantity, BigDecimal targetPrice, String direction, String clientId, String insturmentId, Date placedTime) {
+    public Order(String orderId, BigDecimal quantity, BigDecimal targetPrice, String direction, String clientId, String instrumentId, Date placedTime) {
         this.orderId = orderId;
         this.quantity = quantity;
         this.targetPrice = targetPrice;
         this.direction = direction;
         this.clientId = clientId;
-        this.insturmentId = insturmentId;
+        this.instrumentId = instrumentId;
         this.placedTime = placedTime;
     }
 
-    public Order(String orderId, BigDecimal quantity, BigDecimal targetPrice, String direction, String clientId, String insturmentId) {
+    public Order(String orderId, BigDecimal quantity, BigDecimal targetPrice, String direction, String clientId, String instrumentId) {
         this.orderId = orderId;
         this.quantity = quantity;
         this.targetPrice = targetPrice;
         this.direction = direction;
         this.clientId = clientId;
-        this.insturmentId = insturmentId;
+        this.instrumentId = instrumentId;
     }
 }

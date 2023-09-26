@@ -167,7 +167,7 @@ public class TradesDaoTest {
 
         // Create a dummy Trade
         Trade trade = new Trade("11", quantity, targetPrice, direction, targetPrice.multiply(quantity).negate(), clientId, instrumentId,null, placedTimestamp);
-        assertThrows(NullPointerException.class,()->{
+        assertThrows(DatabaseException.class,()->{
             tradesDao.addTrade(trade, clientId);
         });
 
