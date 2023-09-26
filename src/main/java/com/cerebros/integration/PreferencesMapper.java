@@ -9,7 +9,7 @@ public interface PreferencesMapper {
 
 	int addClientPreferences(@Param("preferences")Preferences preferences, @Param("clientId") String clientId);
 
-	void updateClientPreferences(@Param("preferences")Preferences preferences,@Param("clientId") String clientId);
+	int updateClientPreferences(@Param("preferences")Preferences preferences,@Param("clientId") String clientId);
 	
 
 }

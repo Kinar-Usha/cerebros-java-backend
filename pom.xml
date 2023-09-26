@@ -22,7 +22,7 @@
     <slf4j.version>1.7.25</slf4j.version>
 
     <!-- Spring -->
-    <spring-framework.version>5.0.8.RELEASE</spring-framework.version>
+    <spring-framework.version>5.3.0</spring-framework.version>
 
   </properties>
   <dependencies>
@@ -122,6 +122,8 @@
 <!--    </dependency>-->
 
   </dependencies>
+
+
 
   <!-- This section lets us add Bill Of Materials (bom) style poms. These
       define all version dependencies within a suite (in the case of JUnit, for

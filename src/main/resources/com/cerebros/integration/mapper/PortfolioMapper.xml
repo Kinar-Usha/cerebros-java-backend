@@ -23,7 +23,7 @@
         ORDER BY p.holdings DESC
     </select>
 
-    <insert id="addToPortfolio" parameterType="map">
+    <insert id="addToPortfolio" parameterType="map" useGeneratedKeys="true" keyProperty="">
         INSERT INTO cerebros_portfolio (clientid, instrumentid, holdings)
         VALUES (#{clientId}, #{portfolio.instrumentId}, #{portfolio.holdings})
     </insert>
