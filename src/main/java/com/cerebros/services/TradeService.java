@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class TradeService {
@@ -62,11 +63,12 @@ public Trade executeSellTrade(Order order) throws Exception{
     	}
     	PortfolioService portfolioService = new PortfolioService();
     	ClientService clientService = new ClientService();
+
 //    	Price price= mockfmts.getPrice().stream().
 //                filter(trade -> trade.getInstrument().equals(clientId))
     	List<Portfolio> portfolio = portfolioService.getPortfolio(clientService.getClient(order.getClientId()).getPerson().getEmail());
     	for(Portfolio p : portfolio) {
-    		if(order.getInsturmentId() == p.getInstrumentId() ) {
+    		if(Objects.equals(order.getInsturmentId(), p.getInstrumentId())) {
     			if(order.getQuantity().compareTo( p.getHoldings())<=0) {
     				Trade newTrade= new Trade("tradeid_",new BigDecimal("10"), new BigDecimal("100.0"),"B",new BigDecimal("100.0"),"clientID","instrument", order);
     				return newTrade;

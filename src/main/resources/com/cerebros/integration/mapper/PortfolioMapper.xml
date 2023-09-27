@@ -10,27 +10,26 @@
         <result property="description" column="description"/>
         <result property="categoryId" column="categoryid"/>
         <result property="holdings" column="holdings"/>
-        <result property="bidPrice" column="bidprice"/>
+        <result property="price" column="price"/>
     </resultMap>
 
     <!-- Define the SQL query -->
     <select id="getPortfolio" resultMap="portfolioResultMap">
-        SELECT i.instrumentid, i.description, i.categoryid, p.holdings, pr.bidprice as price
+        SELECT p.instrumentid, p.description, p.categoryid, p.holdings, p.price as price
         FROM SCOTT.cerebros_portfolio p
-        INNER JOIN SCOTT.cerebros_instruments i ON p.instrumentid = i.instrumentid
-        INNER JOIN SCOTT.cerebros_prices pr ON p.instrumentId = pr.instrumentId
         WHERE p.clientId = #{clientId}
         ORDER BY p.holdings DESC
     </select>
 
     <insert id="addToPortfolio" parameterType="map" useGeneratedKeys="true" keyProperty="">
-        INSERT INTO cerebros_portfolio (clientid, instrumentid, holdings)
-        VALUES (#{clientId}, #{portfolio.instrumentId}, #{portfolio.holdings})
+        INSERT INTO cerebros_portfolio (clientid, instrumentid,description, categoryId, holdings, price)
+        VALUES (#{clientId}, #{portfolio.instrumentId},#{portfolio.description}, #{portfolio.categoryId}, #{portfolio.holdings}, #{portfolio.price})
     </insert>
     <!-- Update an existing portfolio record -->
     <update id="updatePortfolio" parameterType="com.cerebros.models.Portfolio">
         UPDATE cerebros_portfolio
-        SET holdings = #{portfolio.holdings}
+        SET holdings = #{portfolio.holdings},
+        price=${portfolio.price}
         WHERE clientid = #{clientId} AND instrumentid = #{portfolio.instrumentId}
     </update>
     <!-- Define the resultMap for Employee with Job -->

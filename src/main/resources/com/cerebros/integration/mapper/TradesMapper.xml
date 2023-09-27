@@ -23,7 +23,6 @@
             o.clientId AS orderClientId,
             o.instrumentId AS orderInstrumentId
         FROM cerebros_trades t
-        INNER JOIN cerebros_instruments i ON t.instrumentid = i.instrumentid
         INNER JOIN cerebros_orders o ON t.orderid = o.orderid
         WHERE t.clientID = #{clientId}
         ORDER BY t.tradeid
