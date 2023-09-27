@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
@@ -153,6 +154,15 @@ class ClientDaoDMLTest {
 		Preferences pref = new Preferences("Investment", "High", "Long-term", "High");
 		dao.register(client2, "123");
 		assertNotNull(dao.addClientPreferences(pref, client2.getClientId()));
+
+	}
+	
+	@Test
+	void testAddPreferenceWithInvalidId() throws SQLException {
+		Preferences pref = new Preferences("Investment", "High", "Long-term", "High");
+		assertThrows(DataIntegrityViolationException.class, () -> {
+			dao.addClientPreferences(pref, "YOUR_CLIENTID1234444");
+		});
 
 	}
 

@@ -23,6 +23,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.cerebros.constants.ClientIdentificationType;
 import com.cerebros.constants.Country;
 import com.cerebros.exceptions.ClientNotFoundException;
+import com.cerebros.exceptions.DatabaseException;
 import com.cerebros.models.Client;
 import com.cerebros.models.ClientIdentification;
 import com.cerebros.models.Person;
@@ -128,6 +129,20 @@ class ClientDaoQueryTest {
 	void testGetPreferencesByIdEqualsPurposes() {
 		Preferences pref = new Preferences("Investment","High","Long-term","High");
 		assertEquals(pref.getPurpose(),dao.getClientPreferences("YOUR_CLIENTID").getPurpose());
+	}
+	
+	@Test
+	void testGetPreferencesByEmptyString() {
+		assertThrows(IllegalArgumentException.class, () -> {
+			dao.getClientPreferences("");
+		});
+	}
+	
+	@Test
+	void testGetPreferencesByInvalidId() {
+		assertThrows(DatabaseException.class, () -> {
+			dao.getClientPreferences("YOUR_CLIENTID123444");
+		});
 	}
 	
 	 
