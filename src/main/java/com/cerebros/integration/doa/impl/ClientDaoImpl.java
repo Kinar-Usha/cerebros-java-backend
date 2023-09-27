@@ -172,7 +172,15 @@ public class ClientDaoImpl implements ClientDao {
 
 	@Override
 	public Preferences getClientPreferences(String clientId) {
-		return preferenceMapper.getClientPreferecesById(clientId);
+		if(clientId=="") {
+			throw new IllegalArgumentException("Client ID cannot be null");
+		}
+		Preferences pref=null;
+		pref=preferenceMapper.getClientPreferecesById(clientId);
+		if(pref==null) {
+			throw new DatabaseException("Client not found");
+		}
+		return pref;
 	}
 
 }
