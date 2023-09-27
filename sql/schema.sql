@@ -1,12 +1,12 @@
 DROP TABLE Cerebros_Trades;
 DROP TABLE Cerebros_Orders;
-DROP TABLE Cerebros_Prices;
+--DROP TABLE Cerebros_Prices;
 DROP TABLE Cerebros_Portfolio;
 DROP TABLE Cerebros_ClientIdentifications;
 DROP TABLE Cerebros_ClientPreferences;
 DROP TABLE Cerebros_ClientPasswords;
 --DROP TABLE Cerebros_Person;
-DROP TABLE Cerebros_INSTRUMENTS;
+--DROP TABLE Cerebros_INSTRUMENTS;
 DROP TABLE Cerebros_Client;
 
 -- Create the Client table
@@ -32,7 +32,7 @@ CREATE TABLE Cerebros_ClientIdentifications (
     clientId VARCHAR(50),
     idType VARCHAR(50) CHECK (idType IN ('SSN', 'ADH', 'PSP')),
     idNumber VARCHAR(255) UNIQUE,
-    CONSTRAINT "Cerebros_ClientIdentifications_PK" PRIMARY KEY (CLIENTID, IDTYPE) ENABLE, 
+    CONSTRAINT "Cerebros_ClientIdentifications_PK" PRIMARY KEY (CLIENTID, IDTYPE) ENABLE,
     CONSTRAINT "Cerebros_ClientIdentifications_FK" FOREIGN KEY (CLIENTID) REFERENCES Cerebros_Client (CLIENTID) ENABLE
 );
 
@@ -64,7 +64,7 @@ CREATE TABLE Cerebros_Portfolio (
     clientId VARCHAR(50) REFERENCES Cerebros_Client(clientId),
     instrumentId VARCHAR(50),
     description VARCHAR(50),
-    categoryId VARCHAR(50)
+    categoryId VARCHAR(50),
     holdings DECIMAL(10, 2),
     price DECIMAL(10,2)
 );

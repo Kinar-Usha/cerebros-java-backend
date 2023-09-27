@@ -4,6 +4,7 @@ import com.cerebros.exceptions.NoTradeHistoryFoundException;
 import com.cerebros.models.Order;
 import com.cerebros.models.Portfolio;
 import com.cerebros.models.Trade;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Service
 public class TradeService {
 
     private List<Trade> allTrades;
