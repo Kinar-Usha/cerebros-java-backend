@@ -37,7 +37,7 @@ public class TradesDaoTest {
     }
 
     @Test
-    void testGetTradeHistory() throws ClientNotFoundException, SQLException {
+    void testGetTradeHistory() {
         String testClientId= "YOUR_CLIENTID";
         List<Trade> trades= tradesDao.getTrades(testClientId);
         Assertions.assertFalse(trades.isEmpty());
@@ -52,7 +52,7 @@ public class TradesDaoTest {
         });
     }
     @Test
-    void testTradeHistoryLessThan100() throws ClientNotFoundException, SQLException {
+    void testTradeHistoryLessThan100() throws ClientNotFoundException {
         String testClientId= "YOUR_CLIENTID";
         List<Trade> trades= tradesDao.getTrades(testClientId);
         assertTrue(trades.size()<=100);
@@ -61,7 +61,7 @@ public class TradesDaoTest {
 
 
     @Test
-    void testInsertIntoTrades() throws SQLException {
+    void testInsertIntoTrades()   {
         String orderId = "BUY_ORDER_Q123_11";
         String clientId = "YOUR_CLIENTID";
         String instrumentId = "Q123";
@@ -83,7 +83,7 @@ public class TradesDaoTest {
 
     }
     @Test
-    void testInsertSellIntoTrades() throws SQLException {
+    void testInsertSellIntoTrades()   {
         String orderId = "BUY_ORDER_Q123_11";
         String clientId = "YOUR_CLIENTID";
         String instrumentId = "Q123";
@@ -101,7 +101,8 @@ public class TradesDaoTest {
 
         // Create a dummy Trade
         Trade trade = new Trade("11", quantity, targetPrice, direction, targetPrice.multiply(quantity).negate(), clientId, instrumentId, order, placedTimestamp);
-        tradesDao.addTrade(trade, clientId);
+        int rows = tradesDao.addTrade(trade, clientId);
+        assertEquals(1, rows);
 
     }
 //    @Test

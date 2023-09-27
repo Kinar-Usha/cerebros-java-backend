@@ -2,13 +2,12 @@ package com.cerebros.integration.doa.impl;
 
 import com.cerebros.exceptions.ClientNotFoundException;
 import com.cerebros.exceptions.DatabaseException;
-import com.cerebros.integration.mapper.PortfolioMapper;
 import com.cerebros.integration.doa.PortfolioDao;
+import com.cerebros.integration.mapper.PortfolioMapper;
 import com.cerebros.models.Portfolio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.sql.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +21,7 @@ public class PortfolioDaoImpl implements PortfolioDao {
 
 
     @Override
-    public List<Portfolio> getPortfolio(String clientId) throws SQLException, ClientNotFoundException {
+    public List<Portfolio> getPortfolio(String clientId) throws ClientNotFoundException {
         List<Portfolio> portfolioList= mapper.getPortfolio(clientId);
         if(portfolioList.isEmpty()){
             throw new ClientNotFoundException("Client Invalid");
@@ -49,7 +48,7 @@ public class PortfolioDaoImpl implements PortfolioDao {
     }
 
     @Override
-    public int updateportfolio(Portfolio portfolio, String clientId) {
+    public int updatePortfolio(Portfolio portfolio, String clientId) {
 
         int rowsUpdated=0;
         try {

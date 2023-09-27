@@ -8,5 +8,5 @@ import java.util.List;
 public interface TradesMapper {
     List<Trade> getTrades(String clientId);
     void insertOrder(Order order);
-    void insertTrade(Trade trade);
+    int insertTrade(Trade trade);
 }

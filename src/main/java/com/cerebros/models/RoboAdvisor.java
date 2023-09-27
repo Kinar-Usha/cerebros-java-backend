@@ -1,5 +1,6 @@
 package com.cerebros.models;
 
+import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -19,10 +20,10 @@ public class RoboAdvisor {
 	        this.tradeService = tradeService;
 	    }
 
-	    public List<Trade> recommendTrades(String clientId, Preferences preferences) throws NoTradeHistoryFoundException {
+	    public List<Trade> recommendTrades(String clientId, Preferences preferences) throws NoTradeHistoryFoundException, SQLException {
 
 	        Comparator<Trade> sortCriteria = Comparator.comparing(Trade::getExecutionPrice);
-	        List<Trade> clientTradeHistory = tradeService.getClientTradeHistory(clientId, sortCriteria);
+	        List<Trade> clientTradeHistory = tradeService.getClientTradeHistory(clientId);
 
 
 	        List<Trade> buyTrades = new ArrayList<>();

@@ -15,8 +15,18 @@ public class Trade {
     private Order order;
     private Date executedTime;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Trade trade = (Trade) o;
+        return Objects.equals(tradeId, trade.tradeId) && Objects.equals(quantity, trade.quantity) && Objects.equals(executionPrice, trade.executionPrice) && Objects.equals(direction, trade.direction) && Objects.equals(cashValue, trade.cashValue) && Objects.equals(clientId, trade.clientId) && Objects.equals(instrumentId, trade.instrumentId) && Objects.equals(order, trade.order) && Objects.equals(executedTime, trade.executedTime);
+    }
 
-
+    @Override
+    public int hashCode() {
+        return Objects.hash(tradeId, quantity, executionPrice, direction, cashValue, clientId, instrumentId, order, executedTime);
+    }
 
     public Trade() {
     }
@@ -115,25 +125,5 @@ public class Trade {
         this.executedTime = executedTime;
     }
 
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Trade trade = (Trade) o;
-        return Objects.equals(tradeId, trade.tradeId) &&
-                Objects.equals(quantity, trade.quantity) &&
-                Objects.equals(executionPrice, trade.executionPrice) &&
-                Objects.equals(direction, trade.direction) &&
-                Objects.equals(cashValue, trade.cashValue) &&
-                Objects.equals(clientId, trade.clientId) &&
-                Objects.equals(instrumentId, trade.instrumentId) &&
-                Objects.equals(order, trade.order);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(tradeId, quantity, executionPrice, direction, cashValue, clientId, instrumentId, order);
-    }
 
 }

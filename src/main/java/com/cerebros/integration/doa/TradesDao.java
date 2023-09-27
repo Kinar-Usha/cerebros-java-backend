@@ -7,6 +7,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 public interface TradesDao {
-    List<Trade>  getTrades(String clientId) throws SQLException, ClientNotFoundException;
-    void addTrade(Trade trade, String clientId);
+    List<Trade>  getTrades(String clientId) throws  ClientNotFoundException;
+    int addTrade(Trade trade, String clientId);
 }

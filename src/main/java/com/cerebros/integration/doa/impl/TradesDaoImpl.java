@@ -1,14 +1,12 @@
 package com.cerebros.integration.doa.impl;
 
-import com.cerebros.exceptions.ClientNotFoundException;
 import com.cerebros.exceptions.DatabaseException;
-import com.cerebros.integration.mapper.TradesMapper;
 import com.cerebros.integration.doa.TradesDao;
+import com.cerebros.integration.mapper.TradesMapper;
 import com.cerebros.models.Trade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.sql.*;
 import java.util.List;
 
 @Repository("tradesDaoImpl")
@@ -20,7 +18,8 @@ public class TradesDaoImpl implements TradesDao {
     }
 
     @Override
-    public List<Trade> getTrades(String clientId) throws SQLException, ClientNotFoundException {
+    public List<Trade> getTrades(String clientId) {
+
         List<Trade> Trades= mapper.getTrades(clientId);
         if(Trades.isEmpty()){
             throw new DatabaseException("Client Invalid or no Trade history");
@@ -29,13 +28,15 @@ public class TradesDaoImpl implements TradesDao {
 
     }
     @Override
-    public void addTrade(Trade trade, String clientId) {
+    public int addTrade(Trade trade, String clientId) {
+        int rows;
         try {
             mapper.insertOrder(trade.getOrder());
-            mapper.insertTrade(trade);
+            rows = mapper.insertTrade(trade);
         } catch (Exception e) {
             throw new DatabaseException("Failed to add trade", e);
         }
+        return rows;
     }
 
 }
