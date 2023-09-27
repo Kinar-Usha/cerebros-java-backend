@@ -52,7 +52,7 @@ public class ClientDaoImpl implements ClientDao {
 	}
 
 	@Override
-	public void register(Client client, String password) throws SQLIntegrityConstraintViolationException {
+	public void register(Client client, String password) {
 		// Insert Into Client
 		try {
 			int numClientRowsUpdated = mapper.insertClient(client);
@@ -71,7 +71,23 @@ public class ClientDaoImpl implements ClientDao {
 
 		// Insert Client Identifications
 		for (ClientIdentification cid : client.getClientIdentifications()) {
-			insertClientIdentification(client.getClientId(), cid);
+			// insertClientIdentification(client.getClientId(), cid);
+			try {
+				int numClientIdRowsUpdated = mapper.insertClientIndentification(client.getClientId(), cid);
+				logger.debug("Inserted {} client identification rows", numClientIdRowsUpdated);
+			} catch (Exception e) {
+				try {
+					throw e.getCause();
+				} catch (SQLIntegrityConstraintViolationException e1) {
+					mapper.deleteClientFromClient(client.getClientId());
+					logger.error("Failed to insert row as client identification already exists", e1);
+					throw new ClientAlreadyExistsException("Client is already registered");
+				} catch (Throwable e2) {
+					logger.error("Failed to insert row in client identification", e2);
+					throw new DatabaseException("Failed to insert row in client identification", e2);
+				}
+			}
+			;
 		}
 
 		// Insert Into Client_Passwords
@@ -89,27 +105,6 @@ public class ClientDaoImpl implements ClientDao {
 			}
 		}
 		;
-	}
-
-	private void insertClientIdentification(String clientId, ClientIdentification clientIdentification)
-			throws SQLIntegrityConstraintViolationException {
-		try {
-			int numClientIdRowsUpdated = mapper.insertClientIndentification(clientId, clientIdentification);
-			logger.debug("Inserted {} client identification rows", numClientIdRowsUpdated);
-		} catch (Exception e) {
-			try {
-				throw e.getCause();
-			} catch (SQLIntegrityConstraintViolationException e1) {
-				mapper.deleteClientFromClient(clientId);
-				logger.error("Failed to insert row as client identification already exists", e1);
-				throw new ClientAlreadyExistsException("Client is already registered");
-			} catch (Throwable e2) {
-				logger.error("Failed to insert row in client identification", e2);
-				throw new DatabaseException("Failed to insert row in client identification", e2);
-			}
-		}
-		;
-
 	}
 
 	@Override
@@ -154,30 +149,30 @@ public class ClientDaoImpl implements ClientDao {
 	}
 
 	@Override
-	public int updateClientPreferences(Preferences preferences,String clientId) {
-		if(preferences==null) {
+	public int updateClientPreferences(Preferences preferences, String clientId) {
+		if (preferences == null) {
 			throw new NullPointerException("Prferences cannot be null");
 		}
-		if(clientId=="") {
+		if (clientId == "") {
 			throw new IllegalArgumentException("Client ID cannot be null");
 		}
-		int result= preferenceMapper.updateClientPreferences(preferences,clientId);
-		if(result==0) {
+		int result = preferenceMapper.updateClientPreferences(preferences, clientId);
+		if (result == 0) {
 			throw new DatabaseException("Client Preference Update failed");
 		}
-		
+
 		return result;
 
 	}
 
 	@Override
 	public Preferences getClientPreferences(String clientId) {
-		if(clientId=="") {
+		if (clientId == "") {
 			throw new IllegalArgumentException("Client ID cannot be null");
 		}
-		Preferences pref=null;
-		pref=preferenceMapper.getClientPreferecesById(clientId);
-		if(pref==null) {
+		Preferences pref = null;
+		pref = preferenceMapper.getClientPreferecesById(clientId);
+		if (pref == null) {
 			throw new DatabaseException("Client not found");
 		}
 		return pref;
