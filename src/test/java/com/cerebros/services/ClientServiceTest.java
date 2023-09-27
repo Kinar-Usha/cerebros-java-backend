@@ -42,15 +42,32 @@ class ClientServiceTest {
 	@InjectMocks
 	private ClientService clientService;
 
+	private Person person;
+	private ClientIdentification clientIdentification;
+	private Set<ClientIdentification> clientIdentifications;
+	private Client client;
+	private Preferences preferences;
+
 	@BeforeEach
 	void setUp() throws Exception {
 		MockitoAnnotations.openMocks(this);
+
+		// Sample client data
+		person = new Person("bhavesh@gmail.com", LocalDate.of(2001, 9, 6), Country.INDIA, "201014");
+
+		clientIdentification = new ClientIdentification(ClientIdentificationType.SSN,
+				"333-22-4444");
+		clientIdentifications = new HashSet<ClientIdentification>();
+		clientIdentifications.add(clientIdentification);
+
+		preferences = new Preferences("Retirement", "Low", "1-3 years", "Less than $50,000");
+
+		client = new Client("123", person, clientIdentifications);
 
 	}
 
 	@AfterEach
 	void tearDown() throws Exception {
-		clientService = null;
 	}
 
 	@ParameterizedTest
@@ -85,11 +102,7 @@ class ClientServiceTest {
 
 	@Test
 	void registerInvalidClientIdentification() {
-		Person person = new Person("bhavesh@gmail.com", LocalDate.of(2001, 9, 6), Country.USA, "201014");
-
-		ClientIdentification clientIdentification = new ClientIdentification(ClientIdentificationType.SSN,
-				"333-22-44544");
-		Set<ClientIdentification> clientIdentifications = new HashSet<ClientIdentification>();
+		clientIdentification.setValue("333-22-44544");
 		clientIdentifications.add(clientIdentification);
 
 		assertThrows(IllegalArgumentException.class,
@@ -98,27 +111,14 @@ class ClientServiceTest {
 
 	@Test
 	void registerValidClient() throws SQLException {
-		Person person = new Person("vishku@gmail.com", LocalDate.of(2001, 9, 6), Country.INDIA, "201014");
-		ClientIdentification clientIdentification = new ClientIdentification(ClientIdentificationType.SSN,
-				"333-12-4444");
-		Set<ClientIdentification> clientIdentifications = new HashSet<ClientIdentification>();
-		clientIdentifications.add(clientIdentification);
-		String password = "123456";
 
 		Mockito.doNothing().when(clientDao).register(Mockito.any(Client.class), Mockito.anyString());
 
-		assertDoesNotThrow(() -> clientService.registerClient(person, clientIdentifications, password));
+		assertDoesNotThrow(() -> clientService.registerClient(person, clientIdentifications, "123456"));
 	}
 
 	@Test
 	void registrationFailsOnExistingClientEmail() {
-
-		Person person = new Person("bhavesh@gmail.com", LocalDate.of(2001, 9, 6), Country.INDIA, "201014");
-
-		ClientIdentification clientIdentification = new ClientIdentification(ClientIdentificationType.SSN,
-				"333-22-4444");
-		Set<ClientIdentification> clientIdentifications = new HashSet<ClientIdentification>();
-		clientIdentifications.add(clientIdentification);
 
 		Mockito.when(clientDao.emailExists(person.getEmail())).thenReturn(true);
 
@@ -129,13 +129,6 @@ class ClientServiceTest {
 	@Test
 	void registrationAddsExistingClientWithNewEmail() {
 
-		Person person = new Person("bhavesh2@gmail.com", LocalDate.of(2001, 9, 6), Country.INDIA, "201014");
-
-		ClientIdentification clientIdentification = new ClientIdentification(ClientIdentificationType.SSN,
-				"333-22-4444");
-		Set<ClientIdentification> clientIdentifications = new HashSet<ClientIdentification>();
-		clientIdentifications.add(clientIdentification);
-
 		Mockito.doThrow(ClientAlreadyExistsException.class).when(clientDao).register(Mockito.any(Client.class),
 				Mockito.anyString());
 
@@ -145,23 +138,18 @@ class ClientServiceTest {
 
 	@Test
 	void testAddPreference() throws Exception {
-		Person personA = new Person("client@gmail.com", LocalDate.of(2001, 9, 6), Country.INDIA, "201014");
-		ClientIdentification clientIdentificationA = new ClientIdentification(ClientIdentificationType.SSN,
-				"333-22-4444");
-		Set<ClientIdentification> clientIdentificationsA = new HashSet<ClientIdentification>();
-		clientIdentificationsA.add(clientIdentificationA);
-		Preferences preferenceA = new Preferences("Retirement", "Low", "1-3 years", "Less than $50,000");
-		Client clientA = new Client("123", personA, clientIdentificationsA);
 
-		HashMap<String, Client> clients = clientService.getAllClients();
-		clients.put("client@gmail.com", clientA);
-		clientService.addPreferences("client@gmail.com", preferenceA, true);
-		assertEquals(preferenceA, clientA.getPreferences());
+		Mockito.when(clientDao.getClient(client.getClientId())).thenReturn(client);
+		Mockito.when(clientDao.addClientPreferences(preferences,
+				client.getClientId())).thenReturn(1);
 
+		assertDoesNotThrow(() -> clientService.addPreferences(client.getClientId(), preferences, true));
 	}
 
 	@Test
 	public void testAddPreferencesWithNullPreference() {
+		Mockito.doThrow(NullPointerException.class).when(clientDao).addClientPreferences(null,
+				"123");
 		assertThrows(NullPointerException.class, () -> clientService.addPreferences("123", null, true));
 	}
 
@@ -175,36 +163,20 @@ class ClientServiceTest {
 	@Test
 	public void testUpdatePreferenceWithExistingPreference() throws Exception {
 
-		// Person personA = new Person("client@gmail.com", LocalDate.of(2001, 9, 6),
-		// Country.INDIA, "201014");
-		// ClientIdentification clientIdentificationA = new
-		// ClientIdentification(ClientIdentificationType.SSN,
-		// "333-22-4444");
-		// Set<ClientIdentification> clientIdentificationsA = new
-		// HashSet<ClientIdentification>();
-		// clientIdentificationsA.add(clientIdentificationA);
-		//
-		// Preferences preferenceA = new Preferences("Retirement", "Low", "1-3 years",
-		// "Less than $50,000");
-		//
-		// Client clientA = new Client("A1234", personA, clientIdentificationsA);
-		// clientService.getAllClients().put("A1234", clientA);
-		// clientService.getEmailToClientId().put("client@gmail.com", "A1234");
-		// clientService.addPreferences("A1234", preferenceA, true);
-
-		Client client = clientService.getClient("123");
-
 		Preferences newPreference = new Preferences("Retirement", "High", "1-3 years", "Less than $50,000");
 
-		clientService.updatePreferences("123", newPreference);
+		Mockito.when(clientDao.updateClientPreferences(newPreference, "123")).thenReturn(1);
 
-		assertEquals(newPreference, client.getPreferences());
+		assertDoesNotThrow(() -> clientService.updatePreferences("123", newPreference));
 	}
 
 	@Test
 	public void testUpdatePreferenceWithNullPreference() {
+
+		Mockito.doThrow(NullPointerException.class).when(clientDao).updateClientPreferences(null, "123");
+
 		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-				() -> clientService.updatePreferences("abc@gmail.com", null));
+				() -> clientService.updatePreferences("123", null));
 		assertEquals("Preference cannot be null", exception.getMessage());
 	}
 

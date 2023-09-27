@@ -52,6 +52,16 @@ public class ClientDaoImpl implements ClientDao {
 	}
 
 	@Override
+	public boolean clientIdExists(String clientId) {
+		// Return true if clientId exists in DB
+		if (getClient(clientId) != null) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
 	public void register(Client client, String password) {
 		// Insert Into Client
 		try {

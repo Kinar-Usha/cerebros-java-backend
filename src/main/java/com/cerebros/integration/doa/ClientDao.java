@@ -7,6 +7,8 @@ public interface ClientDao {
 
 	boolean emailExists(String email);
 
+	boolean clientIdExists(String clientId);
+
 	void register(Client client, String password);
 
 	boolean login(String email, String password);

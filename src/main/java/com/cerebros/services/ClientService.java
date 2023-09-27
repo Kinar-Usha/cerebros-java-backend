@@ -30,39 +30,39 @@ public class ClientService {
 	private static final String EMAIL_PATTERN = "^[A-Za-z0-9+_.-]+@(.+)$";
 
 	// ========== Fields and their Getters/Setters ==========
-	private HashMap<String, Client> clients;
+	// private HashMap<String, Client> clients;
 
 	boolean roboAdvisorTermsAccept = false;
 
-	public HashMap<String, Client> getAllClients() {
-		return clients;
-	}
+	// public HashMap<String, Client> getAllClients() {
+	// return clients;
+	// }
 
-	public void setAllClients(HashMap<String, Client> clients) {
-		this.clients = clients;
-	}
+	// public void setAllClients(HashMap<String, Client> clients) {
+	// this.clients = clients;
+	// }
 
-	public Client getClient(String clientId) {
-		Client client = clients.get(clientId);
-		if (client == null)
-			throw new NullPointerException("Client doesn't exists");
-		return client;
-	}
+	// public Client getClient(String clientId) {
+	// Client client = clients.get(clientId);
+	// if (client == null)
+	// throw new NullPointerException("Client doesn't exists");
+	// return client;
+	// }
 
-	public Client getClientFromEmail(String email) {
-		String clientId = emailToClientId.get(email);
-		return getClient(clientId);
-	}
+	// public Client getClientFromEmail(String email) {
+	// String clientId = emailToClientId.get(email);
+	// return getClient(clientId);
+	// }
 
-	private HashMap<String, String> emailToClientId;
+	// private HashMap<String, String> emailToClientId;
 
-	public HashMap<String, String> getEmailToClientId() {
-		return emailToClientId;
-	}
+	// public HashMap<String, String> getEmailToClientId() {
+	// return emailToClientId;
+	// }
 
-	public void setEmailToClientId(HashMap<String, String> emailToClientId) {
-		this.emailToClientId = emailToClientId;
-	}
+	// public void setEmailToClientId(HashMap<String, String> emailToClientId) {
+	// this.emailToClientId = emailToClientId;
+	// }
 
 	// ===================== Constructors =====================
 	@Autowired
@@ -70,12 +70,21 @@ public class ClientService {
 
 	public ClientService() {
 		super();
-		setAllClients(new HashMap<String, Client>());
-		setEmailToClientId(new HashMap<String, String>());
+		// setAllClients(new HashMap<String, Client>());
+		// setEmailToClientId(new HashMap<String, String>());
 
 	}
 
 	// ======================== Methods =======================
+
+	public Client getClient(String clientId) {
+		return dao.getClient(clientId);
+	}
+
+	public Client getClientFromEmail(String email) {
+		return dao.getClientByEmail(email);
+	}
+
 	public boolean verifyEmailAddress(String email) {
 		// Return false if email exists in DB
 
@@ -120,67 +129,19 @@ public class ClientService {
 		String clientId;
 		do {
 			clientId = UUID.randomUUID().toString();
-		} while (clients.containsKey(clientId));
+		} while (dao.clientIdExists(clientId));
 		return clientId;
-	}
-
-	// Mock Method (To Be Removed in future)
-	public void setupMockClients() {
-
-		// Client A bhavesh@gmail.com john.doe@gmail.com
-		Person personA = new Person("bhavesh@gmail.com", LocalDate.of(2001, 9, 6), Country.INDIA, "201014");
-		ClientIdentification clientIdentificationA = new ClientIdentification(ClientIdentificationType.SSN,
-				"333-22-4444");
-		Set<ClientIdentification> clientIdentificationsA = new HashSet<ClientIdentification>();
-		clientIdentificationsA.add(clientIdentificationA);
-		Preferences preferenceA = new Preferences("Retirement", "Low", "1-3 years", "Less than $50,000");
-		Client clientA = new Client("123", personA, clientIdentificationsA);
-
-		// Client B
-		Person personB = new Person("john.doe@gmail.com", LocalDate.of(1990, 5, 15), Country.USA, "90210");
-		ClientIdentification clientIdentificationB = new ClientIdentification(ClientIdentificationType.PASSPORT,
-				"A1234567");
-		Set<ClientIdentification> clientIdentificationsB = new HashSet<ClientIdentification>();
-		clientIdentificationsB.add(clientIdentificationB);
-		Preferences preferenceB = new Preferences("Retirement", "Low", "1-3 years", "Less than $50,000");
-		Client clientB = new Client("456", personB, clientIdentificationsB);
-
-		// Client C
-		Person personC = new Person("jane.doe@gmail.com", LocalDate.of(1995, 2, 28), Country.IRELAND, "M5V 2L7");
-		ClientIdentification clientIdentificationC1 = new ClientIdentification(ClientIdentificationType.SSN,
-				"333-21-4444");
-		ClientIdentification clientIdentificationC2 = new ClientIdentification(ClientIdentificationType.PASSPORT,
-				"B7654321");
-		Set<ClientIdentification> clientIdentificationsC = new HashSet<ClientIdentification>();
-		clientIdentificationsC.add(clientIdentificationC1);
-		clientIdentificationsC.add(clientIdentificationC2);
-		Preferences preferenceC = new Preferences("Retirement", "Low", "1-3 years", "Less than $50,000");
-		Client clientC = new Client("789", personC, clientIdentificationsC);
-
-		// Add to clients
-		clients.put("123", clientA);
-		clients.put("456", clientB);
-		clients.put("789", clientC);
-
-		emailToClientId.put("bhavesh@gmail.com", "123");
-		emailToClientId.put("john.doe@gmail.com", "456");
-		emailToClientId.put("jane.doe@gmail.com", "789");
-
-		// Add preferences
-		addPreferences("123", preferenceA, true);
-		addPreferences("456", preferenceB, true);
-		addPreferences("789", preferenceC, true);
-
 	}
 
 	public void addPreferences(String clientId, Preferences preferences, Boolean roboAdvisorTermsAccept) {
 
 		if (roboAdvisorTermsAccept) {
-			if (preferences == null) {
-				throw new NullPointerException("Preference cannot be null");
+
+			Client client = dao.getClient(clientId);
+			int added = dao.addClientPreferences(preferences, clientId);
+			if (added == 0) {
+				throw new RuntimeException("Failed to add preferences");
 			}
-			Client client = getClient(clientId);
-			client.setPreferences(preferences);
 
 		} else {
 			throw new RuntimeException("Accept RoboAdvisor-Terms and Conditions");
@@ -192,8 +153,12 @@ public class ClientService {
 		if (preference == null) {
 			throw new IllegalArgumentException("Preference cannot be null");
 		}
-		Client client = getClient(clientId);
-		client.setPreferences(preference);
+		Client client = dao.getClient(clientId);
+
+		int updated = dao.updateClientPreferences(preference, clientId);
+		if (updated == 0) {
+			throw new RuntimeException("Failed to update preferences");
+		}
 
 	}
 
@@ -240,6 +205,55 @@ public class ClientService {
 		}
 
 		return false;
+	}
+
+	// Mock Method (To Be Removed in future)
+	public void setupMockClients() {
+
+		// Client A bhavesh@gmail.com john.doe@gmail.com
+		Person personA = new Person("bhavesh@gmail.com", LocalDate.of(2001, 9, 6), Country.INDIA, "201014");
+		ClientIdentification clientIdentificationA = new ClientIdentification(ClientIdentificationType.SSN,
+				"333-22-4444");
+		Set<ClientIdentification> clientIdentificationsA = new HashSet<ClientIdentification>();
+		clientIdentificationsA.add(clientIdentificationA);
+		Preferences preferenceA = new Preferences("Retirement", "Low", "1-3 years", "Less than $50,000");
+		Client clientA = new Client("123", personA, clientIdentificationsA);
+
+		// Client B
+		Person personB = new Person("john.doe@gmail.com", LocalDate.of(1990, 5, 15), Country.USA, "90210");
+		ClientIdentification clientIdentificationB = new ClientIdentification(ClientIdentificationType.PASSPORT,
+				"A1234567");
+		Set<ClientIdentification> clientIdentificationsB = new HashSet<ClientIdentification>();
+		clientIdentificationsB.add(clientIdentificationB);
+		Preferences preferenceB = new Preferences("Retirement", "Low", "1-3 years", "Less than $50,000");
+		Client clientB = new Client("456", personB, clientIdentificationsB);
+
+		// Client C
+		Person personC = new Person("jane.doe@gmail.com", LocalDate.of(1995, 2, 28), Country.IRELAND, "M5V 2L7");
+		ClientIdentification clientIdentificationC1 = new ClientIdentification(ClientIdentificationType.SSN,
+				"333-21-4444");
+		ClientIdentification clientIdentificationC2 = new ClientIdentification(ClientIdentificationType.PASSPORT,
+				"B7654321");
+		Set<ClientIdentification> clientIdentificationsC = new HashSet<ClientIdentification>();
+		clientIdentificationsC.add(clientIdentificationC1);
+		clientIdentificationsC.add(clientIdentificationC2);
+		Preferences preferenceC = new Preferences("Retirement", "Low", "1-3 years", "Less than $50,000");
+		Client clientC = new Client("789", personC, clientIdentificationsC);
+
+		// // Add to clients
+		// clients.put("123", clientA);
+		// clients.put("456", clientB);
+		// clients.put("789", clientC);
+
+		// emailToClientId.put("bhavesh@gmail.com", "123");
+		// emailToClientId.put("john.doe@gmail.com", "456");
+		// emailToClientId.put("jane.doe@gmail.com", "789");
+
+		// // Add preferences
+		// addPreferences("123", preferenceA, true);
+		// addPreferences("456", preferenceB, true);
+		// addPreferences("789", preferenceC, true);
+
 	}
 
 }
