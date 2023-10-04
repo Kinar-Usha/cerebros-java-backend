@@ -97,7 +97,7 @@ public class ClientService {
 		return !dao.emailExists(email);
 	}
 
-	public void registerClient(Person person, Set<ClientIdentification> clientIdentifications, String password) {
+	public int registerClient(Person person, Set<ClientIdentification> clientIdentifications, String password) {
 
 		// Verify Identification with Regex
 		boolean isIdentificationValid = true;
@@ -121,7 +121,7 @@ public class ClientService {
 		Client client = new Client(clientId, person, clientIdentifications);
 
 		// Insert into DB
-		dao.register(client, password);
+		return dao.register(client, password);
 
 	}
 
