@@ -118,9 +118,9 @@ CREATE TABLE Cerebros_Orders (
 --ADD FOREIGN KEY (instrumentId)
 --REFERENCES Cerebros_Instruments (instrumentId);
 
-ALTER TABLE Cerebros_Trades
-ADD FOREIGN KEY (orderId)
-REFERENCES Cerebros_Orders (orderId);
+--ALTER TABLE Cerebros_Trades
+--ADD FOREIGN KEY (orderId)
+--REFERENCES Cerebros_Orders (orderId);
 
 
 

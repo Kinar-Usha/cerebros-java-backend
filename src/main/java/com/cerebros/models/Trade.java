@@ -122,6 +122,11 @@ public class Trade {
     }
 
     public void setExecutedTime(Date executedTime) {
+        if(executedTime==null){
+            executedTime=new Date("20-1-2022");
+        }
+
+
         this.executedTime = executedTime;
     }
 

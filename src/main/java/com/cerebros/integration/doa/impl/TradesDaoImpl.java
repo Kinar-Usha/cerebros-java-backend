@@ -31,7 +31,10 @@ public class TradesDaoImpl implements TradesDao {
     public int addTrade(Trade trade, String clientId) {
         int rows;
         try {
-            mapper.insertOrder(trade.getOrder());
+            if(trade.getOrder()!=null){
+                mapper.insertOrder(trade.getOrder());
+            }
+
             rows = mapper.insertTrade(trade);
         } catch (Exception e) {
             throw new DatabaseException("Failed to add trade", e);
