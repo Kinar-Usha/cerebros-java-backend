@@ -62,10 +62,12 @@ public class ClientDaoImpl implements ClientDao {
 	}
 
 	@Override
-	public void register(Client client, String password) {
+	public int register(Client client, String password) {
+		int numClientRowsUpdated = 0;
+
 		// Insert Into Client
 		try {
-			int numClientRowsUpdated = mapper.insertClient(client);
+			numClientRowsUpdated = mapper.insertClient(client);
 			logger.debug("Inserted {} client rows", numClientRowsUpdated);
 		} catch (Exception e) {
 			try {
@@ -115,6 +117,8 @@ public class ClientDaoImpl implements ClientDao {
 			}
 		}
 		;
+
+		return numClientRowsUpdated;
 	}
 
 	@Override

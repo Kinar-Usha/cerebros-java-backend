@@ -9,7 +9,7 @@ public interface ClientDao {
 
 	boolean clientIdExists(String clientId);
 
-	void register(Client client, String password);
+	int register(Client client, String password);
 
 	boolean login(String email, String password);
 
