@@ -62,7 +62,10 @@ public void updatePortfolio(Trade trade) {
                 .findFirst()
                 .orElse(null);
     }
-
+/**
+ * NOTE Portfolio needs Description and categoryID
+ *
+ * **/
     private void updateExistingPortfolioItem(Trade trade, Portfolio portfolioItem) {
         BigDecimal totalValueBeforeTrade = portfolioItem.getHoldings().multiply(portfolioItem.getPrice());
         BigDecimal totalTradeValue = trade.getQuantity().multiply(trade.getExecutionPrice());

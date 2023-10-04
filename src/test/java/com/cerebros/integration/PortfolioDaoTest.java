@@ -32,7 +32,8 @@ public class PortfolioDaoTest {
     }
 
     @Test
-    void testGetPortfolio() throws ClientNotFoundException {
+    void testGetPortfolio() throws
+            ClientNotFoundException {
         String testClientId = "YOUR_CLIENTID";
         List<Portfolio> portfolioList = portfolioDao.getPortfolio(testClientId);
         assertFalse(portfolioList.isEmpty());
