@@ -8,6 +8,7 @@ import com.cerebros.models.ClientIdentification;
 import com.cerebros.models.Person;
 import com.cerebros.models.Preferences;
 import com.cerebros.services.ClientService;
+import com.cerebros.services.PortfolioService;
 import com.cerebros.services.TradeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -17,30 +18,28 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import com.cerebros.models.Trade;
+import com.cerebros.exceptions.ClientNotFoundException;
+import com.cerebros.models.Portfolio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.mybatis.spring.boot.test.autoconfigure.AutoConfigureMybatis;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @AutoConfigureMybatis
@@ -51,6 +50,9 @@ public class CerebrosWebMVCTest {
 
     @MockBean
     private TradeService mockTradeService;
+
+    @MockBean
+    private PortfolioService mockPortfolioService;
 
     @MockBean
     private ClientService mockClientService;
@@ -84,15 +86,6 @@ public class CerebrosWebMVCTest {
 
     @AfterEach
     void tearDown() throws Exception {
-    }
-
-    @Test
-    public void testTrades() throws Exception {
-        when(mockTradeService.getClientTradeHistory("YOUR_CLIENTID"))
-                .thenReturn(new ArrayList<>());
-
-        mockMvc.perform(get("/tradehistory/YOUR_CLIENTID"))
-                .andExpect(status().isNoContent());
     }
 
     // ------------------ Test for ClientService ------------------
@@ -197,4 +190,43 @@ public class CerebrosWebMVCTest {
                 .andExpect(status().isConflict());
     }
 
+    // ------------------ Test for TradeService -------------------
+
+    @Test
+    public void testTrades() throws Exception {
+        when(mockTradeService.getClientTradeHistory("YOUR_CLIENTID"))
+                .thenReturn(new ArrayList<>());
+
+        mockMvc.perform(get("/tradehistory/YOUR_CLIENTID"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void testQueryTradeHistory() throws Exception {
+
+        List<Trade> tradeList = new ArrayList<>();
+        when(mockTradeService.getClientTradeHistory("YOUR_CLIENTID")).thenReturn(tradeList);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/tradehistory/YOUR_CLIENTID"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    public void testGetPortfolio() throws Exception {
+
+        List<Portfolio> portfolioList = new ArrayList<>();
+        when(mockPortfolioService.getPortfolio("YOUR_CLIENTID")).thenReturn(portfolioList);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/portfolio/YOUR_CLIENTID"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    public void testGetPortfolio_ClientNotFound() throws Exception {
+        when(mockPortfolioService.getPortfolio("INVALID_CLIENT")).thenThrow(new ClientNotFoundException("Client Invalid"));
+        mockMvc.perform(MockMvcRequestBuilders.get("/portfolio/INVALID_CLIENT"))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
 }

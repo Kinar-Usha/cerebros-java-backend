@@ -5,6 +5,11 @@ import com.cerebros.exceptions.DatabaseException;
 import com.cerebros.models.Client;
 import com.cerebros.models.Trade;
 import com.cerebros.services.ClientService;
+import com.cerebros.exceptions.ClientNotFoundException;
+import com.cerebros.exceptions.DatabaseException;
+import com.cerebros.models.Portfolio;
+import com.cerebros.models.Trade;
+import com.cerebros.services.PortfolioService;
 import com.cerebros.services.TradeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +28,9 @@ public class CerebrosController {
 
     @Autowired
     private ClientService clientService;
+
+    @Autowired
+    private PortfolioService portfolioService;
 
     @GetMapping(value = "/ping", produces = MediaType.ALL_VALUE)
     public String ping() {
@@ -144,4 +152,34 @@ public class CerebrosController {
         return response;
     }
 
+    @GetMapping(value = "/portfolio/{clientId}")
+    public ResponseEntity<List<Portfolio>> getPortfolio(@PathVariable String clientId) {
+        try {
+            if (clientId.isEmpty()) {
+                return ResponseEntity.badRequest().build();
+            }
+            List<Portfolio> portfolioList = portfolioService.getPortfolio(clientId);
+
+            return ResponseEntity.ok(portfolioList);
+        } catch (ClientNotFoundException ex) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/portfolio/update")
+    public ResponseEntity<DatabaseRequestResult> updatePortfolio(@RequestBody Trade trade) {
+        ResponseEntity<DatabaseRequestResult> response;
+        try {
+            if (trade == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+            portfolioService.updatePortfolio(trade);
+            response = ResponseEntity.status(HttpStatus.OK).body(new DatabaseRequestResult(1));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+        return response;
+    }
 }
