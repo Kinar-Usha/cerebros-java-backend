@@ -32,13 +32,13 @@
     </select>
     
 <insert id="insertOrder" parameterType="com.cerebros.models.Order">
-    INSERT INTO Cerebros_Orders (orderId, clientId, instrumentId, direction, quantity, targetPrice, placedTimestamp)
-    VALUES (#{orderId}, #{clientId}, #{instrumentId}, #{direction}, #{quantity}, #{targetPrice}, #{placedTime})
+    INSERT INTO Cerebros_Orders (orderId, clientId, instrumentId, direction, quantity, targetPrice)
+    VALUES (#{orderId}, #{clientId}, #{instrumentId}, #{direction}, #{quantity}, #{targetPrice})
 </insert>
 
     <insert id="insertTrade" parameterType="com.cerebros.models.Trade">
-    INSERT INTO Cerebros_Trades ( clientId, instrumentId, direction, quantity, executionPrice, cashValue, executedTimestamp)
-    VALUES ( #{clientId}, #{instrumentId}, #{direction}, #{quantity}, #{executionPrice}, #{cashValue}, #{executedTime})
+    INSERT INTO Cerebros_Trades ( clientId, instrumentId, direction, quantity, executionPrice, cashValue)
+    VALUES ( #{clientId}, #{instrumentId}, #{direction}, #{quantity}, #{executionPrice}, #{cashValue} )
 </insert>
 </mapper>
         <!-- Enable transaction demarcation with annotations -->

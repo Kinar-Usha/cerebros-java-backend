@@ -10,6 +10,47 @@ public class Order {
     private String direction;
     private String clientId;
     private String instrumentId;
+    private String token;
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
+
+    public void setQuantity(BigDecimal quantity) {
+        this.quantity = quantity;
+    }
+
+    public void setTargetPrice(BigDecimal targetPrice) {
+        this.targetPrice = targetPrice;
+    }
+
+    public void setDirection(String direction) {
+        this.direction = direction;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    public String getInstrumentId() {
+        return instrumentId;
+    }
+
+    public void setInstrumentId(String instrumentId) {
+        this.instrumentId = instrumentId;
+    }
+
+    public void setPlacedTime(Date placedTime) {
+        this.placedTime = placedTime;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 
     public Date getPlacedTime() {
         return placedTime;
@@ -58,5 +99,33 @@ public class Order {
         this.direction = direction;
         this.clientId = clientId;
         this.instrumentId = instrumentId;
+    }
+
+    public Order() {
+    }
+
+    public Order(String orderId, BigDecimal quantity, BigDecimal targetPrice, String direction, String clientId, String instrumentId, String token, Date placedTime) {
+        this.orderId = orderId;
+        this.quantity = quantity;
+        this.targetPrice = targetPrice;
+        this.direction = direction;
+        this.clientId = clientId;
+        this.instrumentId = instrumentId;
+        this.token = token;
+        this.placedTime = placedTime;
+    }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "orderId='" + orderId + '\'' +
+                ", quantity=" + quantity +
+                ", targetPrice=" + targetPrice +
+                ", direction='" + direction + '\'' +
+                ", clientId='" + clientId + '\'' +
+                ", instrumentId='" + instrumentId + '\'' +
+                ", token='" + token + '\'' +
+                ", placedTime=" + placedTime +
+                '}';
     }
 }

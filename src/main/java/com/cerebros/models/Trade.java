@@ -31,6 +31,14 @@ public class Trade {
     public Trade() {
     }
 
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
     public Trade(String tradeId, BigDecimal quantity, BigDecimal executionPrice, String direction, BigDecimal cashValue, String clientid, String instrumentId, Order order, Date executedTime) {
         this.tradeId = tradeId;
         this.quantity = quantity;
@@ -130,5 +138,18 @@ public class Trade {
         this.executedTime = executedTime;
     }
 
-
+    @Override
+    public String toString() {
+        return "Trade{" +
+                "tradeId='" + tradeId + '\'' +
+                ", quantity=" + quantity +
+                ", executionPrice=" + executionPrice +
+                ", direction='" + direction + '\'' +
+                ", cashValue=" + cashValue +
+                ", clientId='" + clientId + '\'' +
+                ", instrumentId='" + instrumentId + '\'' +
+                ", order=" + order +
+                ", executedTime=" + executedTime +
+                '}';
+    }
 }
