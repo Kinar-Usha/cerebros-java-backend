@@ -33,24 +33,25 @@ public class FMTSService {
         return Arrays.asList(pricesArray);
     }
     public ResponseEntity<ClientRequest> getClientToken(ClientRequest request) {
-        String apiUrl = fmtsApiUrl + "/fmts/client";
+        String apiUrl = fmtsApiUrl + "fmts/client";
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<ClientRequest> requestEntity = new HttpEntity<>(request, headers);
 
-        ResponseEntity<String> responseEntity =
-                restTemplate.exchange(apiUrl, HttpMethod.POST, requestEntity, String.class);
+        ResponseEntity<ClientRequest> responseEntity =
+                restTemplate.exchange(apiUrl, HttpMethod.POST, requestEntity, ClientRequest.class);
         if (responseEntity.getStatusCode() == HttpStatus.OK) {
-            String responseBody = responseEntity.getBody();
+            ClientRequest responseBody = responseEntity.getBody();
             ObjectMapper objectMapper = new ObjectMapper();
-            try {
-                ClientRequest clientRequest = objectMapper.readValue(responseBody, ClientRequest.class);
-                System.out.println(clientRequest);
-                return new ResponseEntity<>(clientRequest, HttpStatus.OK);
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to deserialize response: " + e.getMessage());
-            }
+//            try {
+//                ClientRequest clientRequest = objectMapper.readValue(responseBody, ClientRequest.class);
+                System.out.println(responseBody);
+                return new ResponseEntity<>(responseBody, HttpStatus.OK);
+//            } catch (IOException e) {
+//                throw new RuntimeException("Failed to deserialize response: " + e.getMessage());
+//            }
         } else {
             throw new RuntimeException("Failed to get client token. HTTP status code: " + responseEntity.getStatusCode());
         }
@@ -60,21 +61,22 @@ public class FMTSService {
         HttpHeaders headers = new HttpHeaders();
         System.out.println(order);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<Order> requestEntity = new HttpEntity<>(order, headers);
 
-        ResponseEntity<String> responseEntity =
-                restTemplate.exchange(apiUrl, HttpMethod.POST, requestEntity, String.class);
+        ResponseEntity<Trade> responseEntity =
+                restTemplate.exchange(apiUrl, HttpMethod.POST, requestEntity, Trade.class);
         if (responseEntity.getStatusCode() == HttpStatus.OK) {
-            String responseBody = responseEntity.getBody();
+            Trade responseBody = responseEntity.getBody();
             System.out.println(responseBody);
-            ObjectMapper objectMapper = new ObjectMapper();
-            try {
-                Trade trade = objectMapper.readValue(responseBody, Trade.class);
-                System.out.println(trade);
-                return new ResponseEntity<>(trade, HttpStatus.OK);
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to deserialize response: " + e.getMessage());
-            }
+//            ObjectMapper objectMapper = new ObjectMapper();
+//            try {
+//                Trade trade = objectMapper.readValue(responseBody, Trade.class);
+//                System.out.println(trade);
+                return new ResponseEntity<>(responseBody, HttpStatus.OK);
+//            } catch (IOException e) {
+//                throw new RuntimeException("Failed to deserialize response: " + e.getMessage());
+//            }
         } else {
             throw new RuntimeException("Failed to get client token. HTTP status code: " + responseEntity.getStatusCode());
         }

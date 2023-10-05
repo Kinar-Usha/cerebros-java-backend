@@ -21,9 +21,11 @@ import org.junit.jupiter.params.provider.ValueSource;
 import com.cerebros.models.Trade;
 import com.cerebros.exceptions.ClientNotFoundException;
 import com.cerebros.models.Portfolio;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -33,6 +35,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.mybatis.spring.boot.test.autoconfigure.AutoConfigureMybatis;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -42,12 +45,15 @@ import java.util.List;
 
 import static org.mockito.Mockito.when;
 
+
 @AutoConfigureMybatis
 @WebMvcTest
+@Import(TestRestTemplateConfig.class)
 public class CerebrosWebMVCTest {
     @Autowired
     private MockMvc mockMvc;
-
+    @Autowired
+    private RestTemplate restTemplate;
     @MockBean
     private TradeService mockTradeService;
 

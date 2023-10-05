@@ -78,12 +78,13 @@ public class FMTSServiceTest {
 void getClientToken_shouldReturnClientRequest()  {
     // Create a mock response body
     String responseBody = "{\"clientId\": \"12345\", \"email\": \"Test Client\",\"token\": \"1234\"}";
+    ClientRequest clientRequest= new ClientRequest("Test Client", "12345", "1234");
 
     // Mock the HTTP response
-    ResponseEntity<String> mockResponseEntity = new ResponseEntity<>(responseBody, HttpStatus.OK);
+    ResponseEntity<ClientRequest> mockResponseEntity = new ResponseEntity<>(clientRequest, HttpStatus.OK);
 
     // Mock the restTemplate.exchange method
-    when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
+    when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(ClientRequest.class)))
             .thenReturn(mockResponseEntity);
 
     // Create a ClientRequest object for the request
@@ -93,7 +94,7 @@ void getClientToken_shouldReturnClientRequest()  {
     ResponseEntity<ClientRequest> result = fmtsService.getClientToken(request);
 
     // Verify that restTemplate.exchange was called with the correct arguments
-    verify(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class));
+    verify(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(ClientRequest.class));
 
     // Verify that the result contains the expected ClientRequest
     assertEquals(HttpStatus.OK, result.getStatusCode());

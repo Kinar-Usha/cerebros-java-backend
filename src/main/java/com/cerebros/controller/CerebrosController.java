@@ -16,6 +16,7 @@ import com.cerebros.services.ClientService;
 import com.cerebros.services.FMTSService;
 import com.cerebros.services.PortfolioService;
 import com.cerebros.services.TradeService;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,6 +37,8 @@ public class CerebrosController {
     @Autowired
     private ClientService clientService;
 
+    @Autowired
+    private Logger logger;
 
 
     @Autowired
@@ -144,7 +147,8 @@ public class CerebrosController {
     @PostMapping("/trade")
     public ResponseEntity<DatabaseRequestResult> addTrade(@RequestBody Order order){
         ResponseEntity<DatabaseRequestResult> response;
-        int count=0;
+        int tradeCount=0;
+        int portfolioCount=0;
         try{
             if(order==null){
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -152,18 +156,24 @@ public class CerebrosController {
             String clientId= order.getClientId();
             Client client= clientService.getClient(clientId);
             ClientRequest clientRequest= new ClientRequest(client.getPerson().getEmail(),"","");
+            System.out.println(clientRequest);
             ClientRequest clientResponse=fmtsService.getClientToken(clientRequest).getBody();
+
             order.setToken(clientResponse.getToken());
             Trade trade= fmtsService.executeTrade(order).getBody();
             System.out.println(trade);
             trade.setOrder(order);
-            count= tradeService.updateClientTradeHistory(trade);
+            tradeCount= tradeService.updateClientTradeHistory(trade);
+            if(tradeCount!=0){
+               portfolioCount= portfolioService.updatePortfolio(trade);
+            }
         }catch (RuntimeException e){
+            logger.error("runtime exception", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 
         }
-        if(count!=0) {
-            response=ResponseEntity.status(HttpStatus.OK).body(new DatabaseRequestResult(count));
+        if(tradeCount!=0 && portfolioCount!=0) {
+            response=ResponseEntity.status(HttpStatus.OK).body(new DatabaseRequestResult(tradeCount));
         }
         else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -187,20 +197,6 @@ public class CerebrosController {
         }
     }
 
-    @PostMapping("/portfolio/update")
-    public ResponseEntity<DatabaseRequestResult> updatePortfolio(@RequestBody Trade trade) {
-        ResponseEntity<DatabaseRequestResult> response;
-        try {
-            if (trade == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-            }
-            portfolioService.updatePortfolio(trade);
-            response = ResponseEntity.status(HttpStatus.OK).body(new DatabaseRequestResult(1));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-        return response;
-    }
 
 
 
@@ -220,6 +216,7 @@ public class CerebrosController {
         }catch (DatabaseException e){
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }catch (RuntimeException e){
+            logger.error("error",e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 
         }

@@ -36,17 +36,17 @@ public class PortfolioService {
         }
 
 	}
-public void updatePortfolio(Trade trade) {
+public int updatePortfolio(Trade trade) {
     String clientId = trade.getClientid();
     String instrumentId = trade.getInstrumentId();
-
+    int rows=0;
     List<Portfolio> portfolioList = portfolioDao.getPortfolio(clientId);
 
     Portfolio portfolioItem = findPortfolioItemByInstrumentId(portfolioList, instrumentId);
 
     if (portfolioItem != null) {
         updateExistingPortfolioItem(trade, portfolioItem);
-        portfolioDao.updatePortfolio(portfolioItem, clientId);
+         rows=portfolioDao.updatePortfolio(portfolioItem, clientId);
     } else {
         if ("B".equals(trade.getDirection())) {
             createNewPortfolioItem(trade, clientId);
@@ -54,6 +54,7 @@ public void updatePortfolio(Trade trade) {
             throw new RuntimeException("No Item in Portfolio to Sell");
         }
     }
+    return  rows;
 }
 
     private Portfolio findPortfolioItemByInstrumentId(List<Portfolio> portfolioList, String instrumentId) {
