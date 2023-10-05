@@ -27,13 +27,13 @@ public class FMTSService {
         this.restTemplate = restTemplate;
     }
     public List<Price> getTradesPrices() {
-        String apiUrl = fmtsApiUrl + "fmts/trades/prices";
+        String apiUrl = fmtsApiUrl + "/fmts/trades/prices";
         Price[] pricesArray = restTemplate.getForObject(apiUrl, Price[].class);
         System.out.print(pricesArray);
         return Arrays.asList(pricesArray);
     }
     public ResponseEntity<ClientRequest> getClientToken(ClientRequest request) {
-        String apiUrl = fmtsApiUrl + "fmts/client";
+        String apiUrl = fmtsApiUrl + "/fmts/client";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));

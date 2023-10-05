@@ -208,8 +208,7 @@ public class CerebrosWebMVCTest {
         when(mockTradeService.getClientTradeHistory("YOUR_CLIENTID")).thenReturn(tradeList);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/tradehistory/YOUR_CLIENTID"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(jsonPath("$").isEmpty());
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 
     @Test

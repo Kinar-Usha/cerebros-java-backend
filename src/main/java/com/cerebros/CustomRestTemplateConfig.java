@@ -10,6 +10,10 @@ import java.time.Duration;
 public class CustomRestTemplateConfig {
 
     @Bean
+    public RestTemplateBuilder restTemplateBuilder() {
+        return new RestTemplateBuilder();
+    }
+    @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
         // Customize the RestTemplate instance if needed
         return builder

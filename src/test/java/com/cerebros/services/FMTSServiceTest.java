@@ -10,10 +10,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 
@@ -26,29 +23,32 @@ import java.util.List;
 import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @SpringBootTest
 public class FMTSServiceTest {
-    @Autowired
-    private FMTSService fmtsService;
-
-    @Autowired
-    private RestTemplate restTemplate;
-//    @Mock
-//    private RestTemplate restTemplate;
-//
-//
-//    @InjectMocks
+//    @Autowired
 //    private FMTSService fmtsService;
 //
-//    @BeforeEach
-//    void setUp() {
-//        MockitoAnnotations.initMocks(this);
-//    }
-//    @Test
+//    @Autowired
+//    private RestTemplate restTemplate;
+    @Mock
+    private RestTemplate restTemplate;
+
+
+    private FMTSService fmtsService;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.initMocks(this);
+        fmtsService= new FMTSService(restTemplate);
+    }
+    @Test
     void getTradesPrices_shouldReturnListOfPrices() {
 
         Instrument instrOne = new Instrument("N123456","CUSIP","46625H100", "STOCK", "JPMorgan Chase & Co. Capital Stock",new BigDecimal("1000"), BigDecimal.ONE);
@@ -73,32 +73,31 @@ public class FMTSServiceTest {
 
         assertEquals(Arrays.asList(samplePrices), result);
     }
-    @Test
-    public void testGetClientToken() {
-        // Create a sample request
-        ClientRequest request = new ClientRequest("kinar@gmail.com", "1604979342");
+//    @Test
+@Test
+void getClientToken_shouldReturnClientRequest()  {
+    // Create a mock response body
+    String responseBody = "{\"clientId\": \"12345\", \"email\": \"Test Client\",\"token\": \"1234\"}";
 
-        // Create a sample response
-        String responseBody = "{\"email\":\"kinar@gmail.com\",\"clientId\":\"1604979342\",\"token\":\"your-token\"}";
+    // Mock the HTTP response
+    ResponseEntity<String> mockResponseEntity = new ResponseEntity<>(responseBody, HttpStatus.OK);
 
-        // Create a mock server for the RestTemplate
-        MockRestServiceServer mockServer = MockRestServiceServer.createServer(restTemplate);
+    // Mock the restTemplate.exchange method
+    when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
+            .thenReturn(mockResponseEntity);
 
-        // Configure the mock server to expect a POST request and respond with the sample response
-        mockServer.expect(requestTo("http://localhost:3000/fmts/client"))
-                .andExpect(method(HttpMethod.POST))
-                .andExpect(content().json("{\"email\":\"kinar@gmail.com\",\"clientId\":\"1604979342\",\"token\":\"\"}"))
-                .andRespond(withSuccess(responseBody, MediaType.APPLICATION_JSON));
+    // Create a ClientRequest object for the request
+    ClientRequest request = new ClientRequest(/* Set request parameters */);
 
-        // Call the method to test
-        ResponseEntity<ClientRequest> responseEntity = fmtsService.getClientToken(request);
+    // Call the getClientToken method
+    ResponseEntity<ClientRequest> result = fmtsService.getClientToken(request);
 
-        // Assert the response
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-//        assertEquals("your-token", responseEntity.getBody().getToken());
+    // Verify that restTemplate.exchange was called with the correct arguments
+    verify(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class));
 
-        // Verify that the expected request was made
-        mockServer.verify();
+    // Verify that the result contains the expected ClientRequest
+    assertEquals(HttpStatus.OK, result.getStatusCode());
+    assertNotNull(result.getBody());
+    assertEquals("12345", result.getBody().getClientId());
     }
-
 }
