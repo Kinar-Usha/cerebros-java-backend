@@ -103,7 +103,7 @@ public class ClientService {
 		boolean isIdentificationValid = true;
 		for (ClientIdentification cid : clientIdentifications) {
 			isIdentificationValid = verifyClientIdentification(cid);
-			if (isIdentificationValid == false)
+			if (!isIdentificationValid)
 				throw new IllegalArgumentException("Cannot register client with invalid client identification");
 		}
 

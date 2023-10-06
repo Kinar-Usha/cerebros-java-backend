@@ -1,4 +1,4 @@
-package com.cerebros;
+package com.cerebros.utility;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -15,10 +15,10 @@ public class CustomRestTemplateConfig {
     @Bean
     public RestTemplateBuilder restTemplateBuilder() {
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-        converter.setSupportedMediaTypes(Collections.singletonList(MediaType.ALL));
+        converter.setSupportedMediaTypes(Collections.singletonList(MediaType.APPLICATION_JSON));
         return new RestTemplateBuilder()
                 .setConnectTimeout(Duration.ofSeconds(20))
-                .messageConverters(converter)
+//                .messageConverters(converter)
                 .setReadTimeout(Duration.ofSeconds(20));
     }
 

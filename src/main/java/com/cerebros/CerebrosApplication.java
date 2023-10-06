@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Scope;
 
 @SpringBootApplication
 @MapperScan(basePackages="com.cerebros.integration.mapper")
-@ComponentScan(basePackages = {"com.cerebros.services","com.cerebros.integration", "com.cerebros.controller","com.cerebros"})
+@ComponentScan(basePackages = {"com.cerebros.services","com.cerebros.integration", "com.cerebros.controller","com.cerebros.utility"})
 
 public class CerebrosApplication {
     public static void main(String[] args) {

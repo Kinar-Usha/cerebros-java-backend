@@ -1,6 +1,7 @@
 package com.cerebros.models;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 public class Instrument {
 
@@ -21,6 +22,35 @@ public class Instrument {
 		this.instrumentDescription = instrumentDescription;
 		this.minQuantity = minQuantity;
 		this.maxQuantity = maxQuantity;
+	}
+
+	@Override
+	public String toString() {
+		return "Instrument{" +
+				"instrumentId='" + instrumentId + '\'' +
+				", externalIdType='" + externalIdType + '\'' +
+				", externalId='" + externalId + '\'' +
+				", categoryId='" + categoryId + '\'' +
+				", instrumentDescription='" + instrumentDescription + '\'' +
+				", minQuantity=" + minQuantity +
+				", maxQuantity=" + maxQuantity +
+				'}';
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Instrument that = (Instrument) o;
+		return Objects.equals(instrumentId, that.instrumentId) && Objects.equals(externalIdType, that.externalIdType) && Objects.equals(externalId, that.externalId) && Objects.equals(categoryId, that.categoryId) && Objects.equals(instrumentDescription, that.instrumentDescription) && Objects.equals(minQuantity, that.minQuantity) && Objects.equals(maxQuantity, that.maxQuantity);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(instrumentId, externalIdType, externalId, categoryId, instrumentDescription, minQuantity, maxQuantity);
+	}
+
+	public Instrument() {
 	}
 
 	public String getInstrumentId() {

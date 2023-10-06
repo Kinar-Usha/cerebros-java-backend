@@ -3,6 +3,8 @@ package com.cerebros.services;
 import com.cerebros.models.ClientRequest;
 import com.cerebros.models.Instrument;
 import com.cerebros.models.Price;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -49,31 +51,35 @@ public class FMTSServiceTest {
         fmtsService= new FMTSService(restTemplate);
     }
     @Test
-    void getTradesPrices_shouldReturnListOfPrices() {
+    void getTradesPrices_shouldReturnListOfPrices() throws JsonProcessingException {
 
         Instrument instrOne = new Instrument("N123456","CUSIP","46625H100", "STOCK", "JPMorgan Chase & Co. Capital Stock",new BigDecimal("1000"), BigDecimal.ONE);
-        Instrument instrTwo = new Instrument("T67890","CUSIP","9128285M8","GOVT","USA, Note 3.125 15nov2028 10Y",new BigDecimal("10000"),BigDecimal.ONE);
-        DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-                .parseCaseInsensitive()
-                .appendPattern("dd-MMM-yy hh.mm.ss.SSSSSSSSS a 'GMT'")
-                .toFormatter(Locale.US);
+        List<Price> samplePrices = getSamplePrices(instrOne);
+        ObjectMapper objectMapper = new ObjectMapper();
 
-        // Parse the string to a LocalDateTime
-        Price[] samplePrices = new Price[]{
-                new Price(new BigDecimal("104.75"), new BigDecimal("104.25"),  LocalDateTime.parse("21-AUG-19 10.00.01.042000000 AM GMT", formatter), instrOne),
-                new Price(new BigDecimal("1.03375"),new BigDecimal("1.03325") , LocalDateTime.parse("21-AUG-19 10.00.01.042000000 AM GMT", formatter), instrTwo)
-        };
+        // Convert the list of Price objects to a JSON string
+        String json = objectMapper.writeValueAsString(samplePrices);
+
         String apiUrl = "http://localhost:3000/fmts/trades/prices";
-        when(restTemplate.getForObject(apiUrl, Price[].class)).thenReturn(samplePrices);
+
+        when(restTemplate.getForObject(apiUrl, String.class)).thenReturn(json);
 
         List<Price> result = fmtsService.getTradesPrices();
         System.out.println(result);
 
 
 
-        assertEquals(Arrays.asList(samplePrices), result);
+        assertEquals(samplePrices, result);
     }
-//    @Test
+
+    private static List<Price> getSamplePrices(Instrument instrOne) {
+        Instrument instrTwo = new Instrument("T67890","CUSIP","9128285M8","GOVT","USA, Note 3.125 15nov2028 10Y",new BigDecimal("10000"),BigDecimal.ONE);
+        List<Price> samplePrices = List.of(new Price(new BigDecimal("104.75"), new BigDecimal("104.25"),  "21-AUG-19 10.00.01.042000000 AM GMT", instrOne),
+                new Price(new BigDecimal("1.03375"),new BigDecimal("1.03325") , "21-AUG-19 10.00.01.042000000 AM GMT", instrTwo));
+        return samplePrices;
+    }
+
+    //    @Test
 @Test
 void getClientToken_shouldReturnClientRequest()  {
     // Create a mock response body

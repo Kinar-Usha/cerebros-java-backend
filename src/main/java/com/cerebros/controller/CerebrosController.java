@@ -2,15 +2,11 @@ package com.cerebros.controller;
 
 import com.cerebros.exceptions.ClientAlreadyExistsException;
 import com.cerebros.exceptions.DatabaseException;
-import com.cerebros.models.Client;
-import com.cerebros.models.Trade;
+import com.cerebros.models.*;
 import com.cerebros.services.ClientService;
 import com.cerebros.exceptions.ClientNotFoundException;
 import com.cerebros.exceptions.DatabaseException;
 import com.cerebros.models.Client;
-import com.cerebros.models.ClientRequest;
-import com.cerebros.models.Order;
-import com.cerebros.models.Portfolio;
 import com.cerebros.models.Trade;
 import com.cerebros.services.ClientService;
 import com.cerebros.services.FMTSService;
@@ -61,6 +57,7 @@ public class CerebrosController {
     public ResponseEntity<?> verifyEmailAddress(@RequestBody String email) {
         try {
             if (email.isEmpty()) {
+
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
             boolean result = clientService.verifyEmailAddress(email);
@@ -70,6 +67,7 @@ public class CerebrosController {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
             }
         } catch (IllegalArgumentException e) {
+            logger.error("Illegal arg",e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -90,7 +88,12 @@ public class CerebrosController {
             } else {
                 return ResponseEntity.status(HttpStatus.OK).body(client);
             }
-        } catch (RuntimeException e) {
+        }catch (ClientNotFoundException e){
+            logger.error("Client Not found");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        catch (RuntimeException e) {
+            logger.error("client run time error",e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 
         }
@@ -111,6 +114,7 @@ public class CerebrosController {
         } catch (ClientAlreadyExistsException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         } catch (Exception e) {
+            logger.error("internal error",e);
             return ResponseEntity.internalServerError().build();
         }
         if (count != 0) {
@@ -119,6 +123,24 @@ public class CerebrosController {
             return ResponseEntity.internalServerError().build();
         }
         return response;
+    }
+
+    @GetMapping(value = "/prices")
+    public ResponseEntity<List<Price>> queryPrices(){
+        try{
+            List<Price> prices= fmtsService.getTradesPrices();
+            if(prices!=null){
+                return ResponseEntity.status(HttpStatus.OK).body(prices);
+            }
+            else{
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            }
+        }catch (RuntimeException e){
+            logger.error("runTime",e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+
+
+        }
     }
 
     // ------------------ Test for TradeService -------------------
@@ -167,7 +189,13 @@ public class CerebrosController {
             if(tradeCount!=0){
                portfolioCount= portfolioService.updatePortfolio(trade);
             }
-        }catch (RuntimeException e){
+        }catch (DatabaseException e){
+            logger.error("unique key constraint exception");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+
+
+        }
+        catch (RuntimeException e){
             logger.error("runtime exception", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 

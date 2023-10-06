@@ -24,7 +24,7 @@ class PriceTest {
 
 	@Test
 	void test() {
-		Price price= new Price( BigDecimal.TEN,BigDecimal.TEN,LocalDateTime.now(),null);
+		Price price= new Price( BigDecimal.TEN,BigDecimal.TEN, (LocalDateTime.now()).toString(),null);
 		assertNotNull(price);
 	}
 
