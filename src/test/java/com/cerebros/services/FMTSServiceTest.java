@@ -81,26 +81,30 @@ public class FMTSServiceTest {
 
     //    @Test
 @Test
-void getClientToken_shouldReturnClientRequest()  {
+void getClientToken_shouldReturnClientRequest() throws JsonProcessingException {
     // Create a mock response body
     String responseBody = "{\"clientId\": \"12345\", \"email\": \"Test Client\",\"token\": \"1234\"}";
     ClientRequest clientRequest= new ClientRequest("Test Client", "12345", "1234");
+    ObjectMapper objectMapper = new ObjectMapper();
+
+    // Convert the list of Price objects to a JSON string
+    String json = objectMapper.writeValueAsString(clientRequest);
 
     // Mock the HTTP response
-    ResponseEntity<ClientRequest> mockResponseEntity = new ResponseEntity<>(clientRequest, HttpStatus.OK);
+    ResponseEntity<String > mockResponseEntity = new ResponseEntity<>(json, HttpStatus.OK);
 
     // Mock the restTemplate.exchange method
-    when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(ClientRequest.class)))
+    when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
             .thenReturn(mockResponseEntity);
 
     // Create a ClientRequest object for the request
-    ClientRequest request = new ClientRequest(/* Set request parameters */);
+    ClientRequest request = clientRequest;
 
     // Call the getClientToken method
     ResponseEntity<ClientRequest> result = fmtsService.getClientToken(request);
 
     // Verify that restTemplate.exchange was called with the correct arguments
-    verify(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(ClientRequest.class));
+    verify(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class));
 
     // Verify that the result contains the expected ClientRequest
     assertEquals(HttpStatus.OK, result.getStatusCode());

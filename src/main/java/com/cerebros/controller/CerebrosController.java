@@ -171,8 +171,14 @@ public class CerebrosController {
         ResponseEntity<DatabaseRequestResult> response;
         int tradeCount=0;
         int portfolioCount=0;
+        System.out.println(order);
         try{
-            if(order==null){
+            if(order==null || order.getOrderId() == null ||
+                    order.getQuantity() == null ||
+                    order.getTargetPrice() == null ||
+                    order.getDirection() == null ||
+                    order.getClientId() == null ||
+                    order.getInstrumentId() == null ){
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
             String clientId= order.getClientId();

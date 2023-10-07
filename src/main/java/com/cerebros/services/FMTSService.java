@@ -50,7 +50,7 @@ public class FMTSService {
         }
     }
     public ResponseEntity<ClientRequest> getClientToken(ClientRequest request) {
-        String apiUrl = fmtsApiUrl + "fmts/client";
+        String apiUrl = fmtsApiUrl + "/fmts/client";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));

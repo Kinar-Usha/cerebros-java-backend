@@ -3,11 +3,9 @@ package com.cerebros.controller;
 import com.cerebros.constants.ClientIdentificationType;
 import com.cerebros.constants.Country;
 import com.cerebros.exceptions.ClientAlreadyExistsException;
-import com.cerebros.models.Client;
-import com.cerebros.models.ClientIdentification;
-import com.cerebros.models.Person;
-import com.cerebros.models.Preferences;
+import com.cerebros.models.*;
 import com.cerebros.services.ClientService;
+import com.cerebros.services.FMTSService;
 import com.cerebros.services.PortfolioService;
 import com.cerebros.services.TradeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,25 +16,29 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import com.cerebros.models.Trade;
 import com.cerebros.exceptions.ClientNotFoundException;
-import com.cerebros.models.Portfolio;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.internal.matchers.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.mybatis.spring.boot.test.autoconfigure.AutoConfigureMybatis;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -58,6 +60,9 @@ public class CerebrosWebMVCTest {
     private TradeService mockTradeService;
 
     @MockBean
+    private FMTSService fmtsService;
+
+    @MockBean
     private PortfolioService mockPortfolioService;
 
     @MockBean
@@ -70,6 +75,7 @@ public class CerebrosWebMVCTest {
     private Preferences preferences;
 
     private ObjectMapper jsonMapper;
+
 
     @BeforeEach
     void setUp() throws Exception {
@@ -199,13 +205,14 @@ public class CerebrosWebMVCTest {
     // ------------------ Test for TradeService -------------------
 
     @Test
-    public void testTrades() throws Exception {
+    public void testTradeHistory() throws Exception {
         when(mockTradeService.getClientTradeHistory("YOUR_CLIENTID"))
                 .thenReturn(new ArrayList<>());
 
         mockMvc.perform(get("/tradehistory/YOUR_CLIENTID"))
                 .andExpect(status().isNoContent());
     }
+
 
     @Test
     public void testQueryTradeHistory() throws Exception {
@@ -234,4 +241,71 @@ public class CerebrosWebMVCTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/portfolio/INVALID_CLIENT"))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
+    @Test
+    public void testExxecuteTrade() throws Exception {
+        Order order = new Order("PQR1045", new BigDecimal("30.0"), new BigDecimal("104.25"), "B", "YOUR_CLIENTID", "N123456");
+        ClientRequest clientRequest = new ClientRequest("test@example.com", "YOUR_CLIENTID", "test-token");
+        Person person= new Person();
+        person.setEmail("test@example.com");
+        // Mock the clientService.getClient method
+        when(mockClientService.getClient(Mockito.anyString())).thenReturn(new Client( "YOUR_CLIENTID",person));
+
+        // Mock the fmtsService.getClientToken method
+        when(fmtsService.getClientToken(Mockito.any(ClientRequest.class))).thenReturn(ResponseEntity.ok(clientRequest));
+
+        // Mock the fmtsService.executeTrade method
+        Trade trade = new Trade();
+        when(fmtsService.executeTrade(Mockito.any(Order.class))).thenReturn(ResponseEntity.ok(trade));
+
+        // Mock the tradeService.updateClientTradeHistory method
+        when(mockTradeService.updateClientTradeHistory(Mockito.any(Trade.class))).thenReturn(1);
+
+        // Mock the portfolioService.updatePortfolio method
+        when(mockPortfolioService.updatePortfolio(Mockito.any(Trade.class))).thenReturn(1);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/trade")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\n" +
+                                "    \"orderId\": \"PQR\",\n" +
+                                "    \"quantity\": 10.0,\n" +
+                                "    \"targetPrice\": 104.25,\n" +
+                                "    \"direction\": \"B\",\n" +
+                                "    \"clientId\": \"1\",\n" +
+                                "    \"instrumentId\": \"N123456\",\n" +
+                                "\t\"token\":739859208\n" +
+                                "}")
+                )
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+    @Test
+    public void testAddTradeWithNullOrder() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/trade")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}") // Sending an empty JSON object to simulate a null order
+                )
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+    @Test
+    public void testAddTradeWithTradeExecutionException() throws Exception {
+        // Mock the fmtsService.executeTrade method to throw an exception
+        Mockito.when(fmtsService.executeTrade(Mockito.any(Order.class))).thenThrow(new RuntimeException("Trade execution failed"));
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/trade")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\n" +
+                                "    \"orderId\": \"PQR\",\n" +
+                                "    \"quantity\": 10.0,\n" +
+                                "    \"targetPrice\": 104.25,\n" +
+                                "    \"direction\": \"B\",\n" +
+                                "    \"clientId\": \"1\",\n" +
+                                "    \"instrumentId\": \"N123456\",\n" +
+                                "\t\"token\":739859208\n" +
+                                "}")
+                )
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
+    }
+
 }
