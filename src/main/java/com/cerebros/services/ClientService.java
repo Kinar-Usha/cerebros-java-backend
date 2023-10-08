@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import com.cerebros.constants.ClientIdentificationType;
 import com.cerebros.constants.Country;
@@ -115,6 +116,13 @@ public class ClientService {
 		}
 
 		// Register client
+		// Make call to http://localhost:3000/fmts/client with email and clientId = 0 to
+		// get the clientId
+		// if 406 is returned, throw IllegalArgumentException
+		// if 200 is returned, get the clientId from the response and use it to register
+		// the client
+		// if 500 is returned, throw RuntimeException
+
 		String clientId = generateClientUID();
 		System.out.println(clientId);
 

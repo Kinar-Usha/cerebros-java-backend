@@ -112,9 +112,9 @@ class ClientServiceTest {
 	@Test
 	void registerValidClient() throws SQLException {
 
-		Mockito.doNothing().when(clientDao).register(Mockito.any(Client.class), Mockito.anyString());
+		Mockito.when(clientDao.register(client, "1234")).thenReturn(1);
 
-		assertDoesNotThrow(() -> clientService.registerClient(person, clientIdentifications, "123456"));
+		assertEquals(1, clientService.registerClient(person, clientIdentifications, "1234"));
 	}
 
 	@Test
