@@ -141,32 +141,25 @@ public class ClientService {
 		return clientId;
 	}
 
-	public void addPreferences(String clientId, Preferences preferences, Boolean roboAdvisorTermsAccept) {
-
-		if (roboAdvisorTermsAccept) {
-
-			Client client = dao.getClient(clientId);
+	public int addPreferences(String clientId, Preferences preferences) {
 			int added = dao.addClientPreferences(preferences, clientId);
 			if (added == 0) {
 				throw new RuntimeException("Failed to add preferences");
 			}
-
-		} else {
-			throw new RuntimeException("Accept RoboAdvisor-Terms and Conditions");
-		}
+			
+			return added;
 	}
 
-	public void updatePreferences(String clientId, Preferences preference) {
-
+	public int updatePreferences(String clientId, Preferences preference) {
 		if (preference == null) {
 			throw new IllegalArgumentException("Preference cannot be null");
 		}
-		Client client = dao.getClient(clientId);
-
-		int updated = dao.updateClientPreferences(preference, clientId);
-		if (updated == 0) {
+		
+		int updatedRows = dao.updateClientPreferences(preference, clientId);
+		if (updatedRows == 0) {
 			throw new RuntimeException("Failed to update preferences");
 		}
+		return updatedRows;
 
 	}
 
@@ -262,6 +255,13 @@ public class ClientService {
 		// addPreferences("456", preferenceB, true);
 		// addPreferences("789", preferenceC, true);
 
+	}
+
+	public Preferences getPreferences(String clientId) {
+		if(clientId=="") {
+			throw new IllegalArgumentException();
+		}
+		return dao.getClientPreferences(clientId);
 	}
 
 }
