@@ -10,6 +10,21 @@ import com.cerebros.services.PortfolioService;
 import com.cerebros.services.TradeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +35,7 @@ import com.cerebros.exceptions.ClientNotFoundException;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.internal.matchers.Or;
+import org.mybatis.spring.boot.test.autoconfigure.AutoConfigureMybatis;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -38,6 +54,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.mybatis.spring.boot.test.autoconfigure.AutoConfigureMybatis;
 import org.springframework.web.client.RestTemplate;
 
+import com.cerebros.constants.ClientIdentificationType;
+import com.cerebros.constants.Country;
+import com.cerebros.exceptions.ClientAlreadyExistsException;
+import com.cerebros.exceptions.ClientNotFoundException;
+import com.cerebros.models.Client;
+import com.cerebros.models.ClientIdentification;
+import com.cerebros.models.Person;
+import com.cerebros.models.Portfolio;
+import com.cerebros.models.Preferences;
+import com.cerebros.models.Trade;
+import com.cerebros.services.ClientService;
+import com.cerebros.services.PortfolioService;
+import com.cerebros.services.TradeService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -307,5 +338,164 @@ public class CerebrosWebMVCTest {
                 )
                 .andExpect(MockMvcResultMatchers.status().isInternalServerError());
     }
+
+
+
+
+	  @Test
+	  public  void testGetPreferenceById() throws Exception {
+		Preferences preference = new Preferences("Investment","High","Long-term","High");
+
+	    when(mockClientService.getPreferences("YOUR_CLIENTID")).thenReturn(preference);
+	    mockMvc.perform(get("/client/preferences/YOUR_CLIENTID"))
+	      .andDo(print())
+	      .andExpect(status().isOk());
+
+	  }
+
+	  @Test
+	  public void testGetPreferencesReturnsEmptyList() throws Exception {
+	    when(mockClientService.getPreferences(null))
+	      .thenReturn(new Preferences());
+
+	    mockMvc.perform(get("/client/preferences/null"))
+	      .andDo(print())
+	      .andExpect(status().isOk());
+	  }
+
+	  @Test
+		public void testGetPreferenceThrowsException() throws Exception {
+
+			when(mockClientService.getPreferences("YOUR_CLIENTID1")).
+			thenThrow(new ClientNotFoundException("Client not found"));
+
+			mockMvc.perform(get("/client/preferences/YOUR_CLIENTID1"))
+			.andExpect(status().isNotFound());
+
+		}
+
+
+	  @Test
+	    public void testAddPreferencesWithValidInput() throws Exception {
+	        String clientId = "YOUR_CLIENTID1";
+	        Preferences preference = new Preferences("Investment","High","Long-term","High");
+
+	        when(mockClientService.addPreferences(clientId, preferences)).thenReturn(1);
+
+	        mockMvc.perform(post("/client/add/preferences/{clientId}", clientId)
+	                .contentType("application/json")
+	                .content(new ObjectMapper().writeValueAsString(preferences)))
+	                .andExpect(status().isOk());
+
+
+	        verify(mockClientService, times(1)).addPreferences(clientId, preferences);
+	    }
+
+
+	  @Test
+	    public void testAddPreferencesWithNullPreferences() throws Exception {
+		  String clientId = "YOUR_CLIENTID1";
+	        Preferences preferences = null;
+
+	        mockMvc.perform(post("/client/add/preferences/{clientId}", clientId)
+	                .contentType("application/json")
+	                .content(new ObjectMapper().writeValueAsString(preferences)))
+	                .andExpect(status().isBadRequest());
+
+	    }
+
+	  @Test
+	    public void testAddPreferencesWithIllegalArgumentException() throws Exception {
+		  String clientId = "YOUR_CLIENTID";
+		  Preferences preference = new Preferences("Investment","High","Long-term","High");
+
+	        when(mockClientService.addPreferences(clientId, preferences))
+	                .thenThrow(new IllegalArgumentException("Invalid input"));
+
+	        mockMvc.perform(post("/client/add/preferences/{clientId}", clientId)
+	                .contentType("application/json")
+	                .content(new ObjectMapper().writeValueAsString(preferences)))
+	                .andExpect(status().isBadRequest());
+
+	        verify(mockClientService, times(1)).addPreferences(clientId, preferences);
+	    }
+
+
+	  @Test
+	    public void testAddPreferencesWithInternalServerError() throws Exception {
+		  String clientId = "YOUR_CLIENTID1";
+		  Preferences preference = new Preferences("Investment","High","Long-term","High");
+	        when(mockClientService.addPreferences(clientId, preferences))
+	                .thenThrow(new RuntimeException());
+
+	        mockMvc.perform(post("/client/add/preferences/{clientId}", clientId)
+	                .contentType("application/json")
+	                .content(new ObjectMapper().writeValueAsString(preferences)))
+	                .andExpect(status().isInternalServerError());
+
+	        verify(mockClientService, times(1)).addPreferences(clientId, preferences);
+	    }
+
+
+	  @Test
+	    public void testUpdatePreferencesWithValidInput() throws Exception {
+		  String clientId = "YOUR_CLIENTID";
+		  Preferences preference = new Preferences("Investment","High","Long-term","High");
+
+	        when(mockClientService.updatePreferences(clientId, preferences)).thenReturn(1);
+
+	        mockMvc.perform(put("/client/update/preferences/{clientId}", clientId)
+	                .contentType("application/json")
+	                .content(new ObjectMapper().writeValueAsString(preferences)))
+	                .andExpect(status().isOk());
+
+	        verify(mockClientService, times(1)).updatePreferences(clientId, preferences);
+	    }
+
+	  @Test
+	    public void testUpdatePreferencesWithNullPreferences() throws Exception {
+		  String clientId = "YOUR_CLIENTID";
+	        Preferences preferences = null;
+
+	        mockMvc.perform(put("/client/update/preferences/{clientId}", clientId)
+	                .contentType("application/json")
+	                .content(new ObjectMapper().writeValueAsString(preferences)))
+	                .andExpect(status().isBadRequest());
+
+	    }
+
+	  @Test
+	    public void testUpdatePreferencesWithIllegalArgumentException() throws Exception {
+		  String clientId = "YOUR_CLIENTID";
+		  Preferences preference = new Preferences("Investment","High","Long-term","High");
+
+	        when(mockClientService.updatePreferences(clientId, preferences))
+	                .thenThrow(new IllegalArgumentException("Invalid input"));
+
+	        mockMvc.perform(put("/client/update/preferences/{clientId}", clientId)
+	                .contentType("application/json")
+	                .content(new ObjectMapper().writeValueAsString(preferences)))
+	                .andExpect(status().isBadRequest());
+
+	        verify(mockClientService, times(1)).updatePreferences(clientId, preferences);
+	    }
+
+
+	  @Test
+	    public void testUpdatePreferencesWithInternalServerError() throws Exception {
+		  String clientId = "YOUR_CLIENTID1";
+		  Preferences preference = new Preferences("Investment","High","Long-term","High");
+
+	        when(mockClientService.updatePreferences(clientId, preferences))
+	                .thenThrow(new RuntimeException("Internal Server Error"));
+
+	        mockMvc.perform(put("/client/update/preferences/{clientId}", clientId)
+	                .contentType("application/json")
+	                .content(new ObjectMapper().writeValueAsString(preferences)))
+	                .andExpect(status().isInternalServerError());
+
+	        verify(mockClientService, times(1)).updatePreferences(clientId, preferences);
+	    }
+
 
 }

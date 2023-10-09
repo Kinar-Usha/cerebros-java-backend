@@ -2,10 +2,12 @@ package com.cerebros.services;
 
 import com.cerebros.exceptions.DatabaseException;
 import com.cerebros.integration.doa.TradesDao;
+import com.cerebros.models.Preferences;
 import com.cerebros.models.Trade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.List;
@@ -37,8 +39,36 @@ public class TradeService {
         }
 
     }
+    public List<Trade> getTopBuyAndSellTrades(Preferences preferences, String clientId) {
+        List<Trade> allTrades = tradesDao.getTrades(clientId); 
+        return calculateTopTradesBasedOnPreferences(allTrades, preferences);
+        }
+        private List<Trade> calculateTopTradesBasedOnPreferences(List<Trade> trades, Preferences preferences) {
+            String riskTolerance = preferences.getRisk();
+            String timeHorizon = preferences.getTime();
+            String incomeBracket = preferences.getIncome();
 
-//
+            return trades.stream()
+                    .filter(trade -> isTradeSuitable(trade, riskTolerance, timeHorizon, incomeBracket))
+                    .sorted(Comparator.comparing(Trade::getExecutionPrice))
+                    .limit(5) // Get the top 5 trades
+                    .collect(Collectors.toList());
+        }
+
+        private boolean isTradeSuitable(Trade trade, String riskTolerance, String timeHorizon, String incomeBracket) {
+        	 BigDecimal bidPrice = trade.getExecutionPrice();
+             if ("HIGH".equalsIgnoreCase(riskTolerance) &&
+                     "HIGH".equalsIgnoreCase(timeHorizon) &&
+                     "HIGH".equalsIgnoreCase(incomeBracket)) {
+                 // High bid price stock
+                 return bidPrice.compareTo(BigDecimal.valueOf(100.0)) > 0;
+             } else if ("LOW".equalsIgnoreCase(riskTolerance) &&
+                     "HIGH".equalsIgnoreCase(timeHorizon)) {
+                 // Lower bid price stock
+                 return bidPrice.compareTo(BigDecimal.valueOf(50.0)) <= 0;
+             }
+             return false;
+        }
 //public Trade executeSellTrade(Order order) throws Exception{
 //
 //

@@ -13,12 +13,14 @@ import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import com.cerebros.constants.ClientIdentificationType;
 import com.cerebros.constants.Country;
 import com.cerebros.exceptions.ClientAlreadyExistsException;
 import com.cerebros.exceptions.InvalidCredentialsException;
 import com.cerebros.integration.doa.ClientDao;
+import com.cerebros.models.ActivityReport;
 import com.cerebros.models.Client;
 import com.cerebros.models.ClientIdentification;
 import com.cerebros.models.Person;
@@ -115,6 +117,13 @@ public class ClientService {
 		}
 
 		// Register client
+		// Make call to http://localhost:3000/fmts/client with email and clientId = 0 to
+		// get the clientId
+		// if 406 is returned, throw IllegalArgumentException
+		// if 200 is returned, get the clientId from the response and use it to register
+		// the client
+		// if 500 is returned, throw RuntimeException
+
 		String clientId = generateClientUID();
 		System.out.println(clientId);
 
@@ -133,32 +142,25 @@ public class ClientService {
 		return clientId;
 	}
 
-	public void addPreferences(String clientId, Preferences preferences, Boolean roboAdvisorTermsAccept) {
-
-		if (roboAdvisorTermsAccept) {
-
-			Client client = dao.getClient(clientId);
+	public int addPreferences(String clientId, Preferences preferences) {
 			int added = dao.addClientPreferences(preferences, clientId);
 			if (added == 0) {
 				throw new RuntimeException("Failed to add preferences");
 			}
-
-		} else {
-			throw new RuntimeException("Accept RoboAdvisor-Terms and Conditions");
-		}
+			
+			return added;
 	}
 
-	public void updatePreferences(String clientId, Preferences preference) {
-
+	public int updatePreferences(String clientId, Preferences preference) {
 		if (preference == null) {
 			throw new IllegalArgumentException("Preference cannot be null");
 		}
-		Client client = dao.getClient(clientId);
-
-		int updated = dao.updateClientPreferences(preference, clientId);
-		if (updated == 0) {
+		
+		int updatedRows = dao.updateClientPreferences(preference, clientId);
+		if (updatedRows == 0) {
 			throw new RuntimeException("Failed to update preferences");
 		}
+		return updatedRows;
 
 	}
 
@@ -255,5 +257,13 @@ public class ClientService {
 		// addPreferences("789", preferenceC, true);
 
 	}
+
+	public Preferences getPreferences(String clientId) {
+		if(clientId=="") {
+			throw new IllegalArgumentException();
+		}
+		return dao.getClientPreferences(clientId);
+	}
+
 
 }
