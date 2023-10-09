@@ -1,5 +1,6 @@
 package com.cerebros.services;
 
+import com.cerebros.exceptions.OrderInvalidException;
 import com.cerebros.models.ClientRequest;
 import com.cerebros.models.Order;
 import com.cerebros.models.Price;
@@ -73,7 +74,7 @@ public class FMTSService {
             throw new RuntimeException("Failed to get client token. HTTP status code: " + responseEntity.getStatusCode());
         }
     }
-    public ResponseEntity<Trade> executeTrade(Order order){
+    public ResponseEntity<Trade> executeTrade(Order order) throws OrderInvalidException {
         String apiUrl = fmtsApiUrl + "fmts/trades/trade";
         HttpHeaders headers = new HttpHeaders();
         System.out.println(order);
@@ -93,7 +94,10 @@ public class FMTSService {
             } catch (IOException e) {
                 throw new RuntimeException("Failed to deserialize response: " + e.getMessage());
             }
-        } else {
+        }else if (responseEntity.getStatusCode().value()==HttpStatus.CONFLICT.value()){
+            throw new OrderInvalidException("49 error");
+        }
+        else {
             throw new RuntimeException("Failed to get client token. HTTP status code: " + responseEntity.getStatusCode());
         }
 

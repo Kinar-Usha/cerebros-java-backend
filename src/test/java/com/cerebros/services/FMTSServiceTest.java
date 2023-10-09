@@ -1,14 +1,14 @@
 package com.cerebros.services;
 
-import com.cerebros.models.ClientRequest;
-import com.cerebros.models.Instrument;
-import com.cerebros.models.Price;
+import com.cerebros.exceptions.OrderInvalidException;
+import com.cerebros.models.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +16,7 @@ import org.springframework.http.*;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -24,8 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -111,4 +111,54 @@ void getClientToken_shouldReturnClientRequest() throws JsonProcessingException {
     assertNotNull(result.getBody());
     assertEquals("12345", result.getBody().getClientId());
     }
+    @Test
+    public void testExecuteTrade() throws IOException, OrderInvalidException {
+        // Create a sample Order
+        Order order = new Order();
+        order.setOrderId("PQR18");
+        order.setQuantity(BigDecimal.TEN);
+        order.setTargetPrice(BigDecimal.TEN);
+        order.setDirection("B");
+        order.setClientId("YOUR_CLIENTID");
+        order.setInstrumentId("N123456");
+        order.setToken("739859208");
+
+        // Create a sample response JSON
+        String responseJson = "{\"instrumentId\":\"N123456\",\"quantity\":10,\"executionPrice\":104.75,\"direction\":\"B\",\"clientId\":\"1\",\"order\":{\"instrumentId\":\"N123456\",\"quantity\":10,\"targetPrice\":104.25,\"direction\":\"B\",\"clientId\":\"1\",\"token\":739859208},\"tradeId\":\"91r5tx04jw-qjxnkpoii5i-1yptk38ab1m\",\"cashValue\":1057.975}";
+
+        // Mock the restTemplate.exchange method to return a successful response
+        ResponseEntity<String> responseEntity = new ResponseEntity<>(responseJson, HttpStatus.OK);
+        when(restTemplate.exchange(Mockito.anyString(), Mockito.eq(HttpMethod.POST), Mockito.any(HttpEntity.class), Mockito.eq(String.class)))
+                .thenReturn(responseEntity);
+
+        // Call the executeTrade method
+        ResponseEntity<Trade> result = fmtsService.executeTrade(order);
+
+        // Verify that the result is as expected
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        Trade trade = result.getBody();
+        assertEquals("91r5tx04jw-qjxnkpoii5i-1yptk38ab1m", trade.getTradeId());
+    }
+    @Test
+    public void testExecuteTradeNegative()  {
+        // Create a sample Order
+        Order order = new Order();
+        order.setOrderId("PQR18");
+        order.setQuantity(BigDecimal.TEN);
+        order.setTargetPrice(BigDecimal.TEN);
+        order.setDirection("B");
+        order.setClientId("YOUR_CLIENTID");
+        order.setInstrumentId("N123456");
+        order.setToken("739859208");
+
+
+        when(restTemplate.exchange(Mockito.anyString(), Mockito.eq(HttpMethod.POST), Mockito.any(HttpEntity.class), Mockito.eq(String.class)))
+                .thenReturn(ResponseEntity.status(HttpStatus.CONFLICT).build());
+
+        assertThrows(OrderInvalidException.class,()->{
+            ResponseEntity<Trade> result = fmtsService.executeTrade(order);
+        });
+    }
+
+
 }
