@@ -163,7 +163,9 @@ public class CerebrosController {
             HashMap<String, String> response = new HashMap<>();
             response.put("clientId", clientId);
 
-            return ResponseEntity.ok(response);
+            Client client = clientService.getClient(clientId);
+
+            return ResponseEntity.ok(client);
 
         } catch (InvalidCredentialsException e) {
 

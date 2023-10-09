@@ -242,6 +242,7 @@ public class CerebrosWebMVCTest {
 
                 when(mockClientService.login(loginRequest.getEmail(), loginRequest.getPassword())).thenReturn(true);
                 when(mockClientService.getClientFromEmail(loginRequest.getEmail())).thenReturn(client);
+                when(mockClientService.getClient(client.getClientId())).thenReturn(client);
 
                 mockMvc.perform(post("/client/login")
                                 .contentType(MediaType.APPLICATION_JSON)
