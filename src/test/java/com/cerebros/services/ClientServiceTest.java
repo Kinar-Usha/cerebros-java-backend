@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -27,6 +28,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 
 import com.cerebros.constants.ClientIdentificationType;
 import com.cerebros.constants.Country;
@@ -35,6 +37,7 @@ import com.cerebros.exceptions.InvalidCredentialsException;
 import com.cerebros.integration.doa.ClientDao;
 import com.cerebros.models.Client;
 import com.cerebros.models.ClientIdentification;
+import com.cerebros.models.ClientRequest;
 import com.cerebros.models.Person;
 import com.cerebros.models.Preferences;
 
@@ -42,6 +45,9 @@ class ClientServiceTest {
 
 	@Mock
 	ClientDao clientDao;
+
+	@Mock
+	FMTSService fmtsService;
 
 	@Autowired
 	@InjectMocks
@@ -67,7 +73,7 @@ class ClientServiceTest {
 
 		preferences = new Preferences("Retirement", "Low", "1-3 years", "Less than $50,000");
 
-		client = new Client("123", person, clientIdentifications);
+		client = new Client("1234", person, clientIdentifications);
 
 	}
 
@@ -119,11 +125,15 @@ class ClientServiceTest {
 
 		Mockito.when(clientDao.register(client, "1234")).thenReturn(1);
 
+		Mockito.when(fmtsService.getClientToken(new ClientRequest(person.getEmail(), "", ""))).thenReturn(ResponseEntity.ok(new ClientRequest(person.getEmail(), "1234")));
+
 		assertEquals(1, clientService.registerClient(person, clientIdentifications, "1234"));
 	}
 
 	@Test
 	void registrationFailsOnExistingClientEmail() {
+
+		Mockito.when(fmtsService.getClientToken(new ClientRequest(person.getEmail(), "", ""))).thenReturn(ResponseEntity.ok(new ClientRequest(person.getEmail(), "1234")));
 
 		Mockito.when(clientDao.emailExists(person.getEmail())).thenReturn(true);
 
@@ -133,6 +143,8 @@ class ClientServiceTest {
 
 	@Test
 	void registrationAddsExistingClientWithNewEmail() {
+
+		Mockito.when(fmtsService.getClientToken(new ClientRequest(person.getEmail(), "", ""))).thenReturn(ResponseEntity.ok(new ClientRequest(person.getEmail(), "1234")));
 
 		Mockito.doThrow(ClientAlreadyExistsException.class).when(clientDao).register(Mockito.any(Client.class),
 				Mockito.anyString());

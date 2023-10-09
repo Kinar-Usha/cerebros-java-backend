@@ -9,10 +9,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Scope;
+import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
-@MapperScan(basePackages="com.cerebros.integration.mapper")
-@ComponentScan(basePackages = {"com.cerebros.services","com.cerebros.integration", "com.cerebros.controller","com.cerebros.utility"})
+@MapperScan(basePackages = "com.cerebros.integration.mapper")
+@ComponentScan(basePackages = { "com.cerebros.services", "com.cerebros.integration", "com.cerebros.controller",
+        "com.cerebros.utility" })
 
 public class CerebrosApplication {
     public static void main(String[] args) {
@@ -21,13 +23,26 @@ public class CerebrosApplication {
 
     /**
      * This method creates a Logger that can be autowired in other classes:{@code
-     *    @Autowired
-     *    private Logger logger;
-    }*/
+     * @Autowired
+     * private Logger logger;
+     * }
+     */
     @Bean
     @Scope("prototype")
     Logger createLogger(InjectionPoint ip) {
         Class<?> classThatWantsALogger = ip.getField().getDeclaringClass();
         return LoggerFactory.getLogger(classThatWantsALogger);
+    }
+
+    /**
+     * This method creates a RestTemplate that can be autowired in other
+     * classes:{@code
+     * @Autowired
+     * private RestTemplate restTemplate;
+     * }
+     */
+    @Bean
+    RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 }
