@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cerebros.exceptions.ClientAlreadyExistsException;
 import com.cerebros.exceptions.ClientNotFoundException;
 import com.cerebros.exceptions.DatabaseException;
+import com.cerebros.models.ActivityReport;
 import com.cerebros.models.Client;
 import com.cerebros.models.ClientRequest;
 import com.cerebros.models.Order;
@@ -29,6 +30,7 @@ import com.cerebros.models.Trade;
 import com.cerebros.services.ClientService;
 import com.cerebros.services.FMTSService;
 import com.cerebros.services.PortfolioService;
+import com.cerebros.services.ReportService;
 import com.cerebros.services.TradeService;
 
 @RestController
@@ -42,6 +44,9 @@ public class CerebrosController {
     @Autowired
     private ClientService clientService;
 
+    @Autowired
+    private ReportService reportService;
+    
     @Autowired
     private Logger logger;
 
@@ -233,6 +238,38 @@ public class CerebrosController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    @GetMapping(value = "/client/activity/{clientId}")
+    public ResponseEntity<List<String>> getClientActivity(@PathVariable String clientId) {
+        try {
+            if (clientId.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+            List<String> report = reportService.generateClientActivityReport(clientId);
+            if (report == null) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            } else {
+                return ResponseEntity.status(HttpStatus.OK).body(report);
+            }
+        } catch (ClientNotFoundException e) {
+            logger.error("Client Report Not found");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (RuntimeException e) {
+            logger.error("Client runtime error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    @GetMapping(value = "/roboadvisor/{clientId}")
+    public ResponseEntity<List<Trade>> getRoboAdvisorStocks(@RequestBody Preferences preferences,@PathVariable String clientId) {
+        try {
+            List<Trade> topBuyAndSellTrades = tradeService.getTopBuyAndSellTrades(preferences, clientId);
+
+            return ResponseEntity.ok(topBuyAndSellTrades.subList(0, Math.min(topBuyAndSellTrades.size(), 5))); // Return the top 5 trades
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
     
     
     @GetMapping(value = "/client/preferences/{clientId}")

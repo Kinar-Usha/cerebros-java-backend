@@ -20,6 +20,7 @@ import com.cerebros.constants.Country;
 import com.cerebros.exceptions.ClientAlreadyExistsException;
 import com.cerebros.exceptions.InvalidCredentialsException;
 import com.cerebros.integration.doa.ClientDao;
+import com.cerebros.models.ActivityReport;
 import com.cerebros.models.Client;
 import com.cerebros.models.ClientIdentification;
 import com.cerebros.models.Person;
@@ -263,5 +264,6 @@ public class ClientService {
 		}
 		return dao.getClientPreferences(clientId);
 	}
+
 
 }

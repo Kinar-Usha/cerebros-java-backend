@@ -13,7 +13,7 @@ public class ActivityReport {
 	        return clientId;
 	    }
 
-	    public String getReportContent() {
+	    public String getReportContent(String clientId) {
 	        return reportContent;
 	    }
 }
