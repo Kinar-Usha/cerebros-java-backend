@@ -133,6 +133,8 @@ class ClientServiceTest {
 	@Test
 	void registrationFailsOnExistingClientEmail() {
 
+		Mockito.when(fmtsService.getClientToken(new ClientRequest(person.getEmail(), "", ""))).thenReturn(ResponseEntity.ok(new ClientRequest(person.getEmail(), "1234")));
+
 		Mockito.when(clientDao.emailExists(person.getEmail())).thenReturn(true);
 
 		assertThrows(ClientAlreadyExistsException.class,
@@ -141,6 +143,8 @@ class ClientServiceTest {
 
 	@Test
 	void registrationAddsExistingClientWithNewEmail() {
+
+		Mockito.when(fmtsService.getClientToken(new ClientRequest(person.getEmail(), "", ""))).thenReturn(ResponseEntity.ok(new ClientRequest(person.getEmail(), "1234")));
 
 		Mockito.doThrow(ClientAlreadyExistsException.class).when(clientDao).register(Mockito.any(Client.class),
 				Mockito.anyString());
