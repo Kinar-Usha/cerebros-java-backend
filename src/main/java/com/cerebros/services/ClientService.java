@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -23,8 +24,11 @@ import com.cerebros.integration.doa.ClientDao;
 import com.cerebros.models.ActivityReport;
 import com.cerebros.models.Client;
 import com.cerebros.models.ClientIdentification;
+import com.cerebros.models.ClientRequest;
 import com.cerebros.models.Person;
 import com.cerebros.models.Preferences;
+
+import io.micrometer.core.ipc.http.HttpSender.Response;
 
 @Service
 public class ClientService {
@@ -36,44 +40,19 @@ public class ClientService {
 
 	boolean roboAdvisorTermsAccept = false;
 
-	// public HashMap<String, Client> getAllClients() {
-	// return clients;
-	// }
-
-	// public void setAllClients(HashMap<String, Client> clients) {
-	// this.clients = clients;
-	// }
-
-	// public Client getClient(String clientId) {
-	// Client client = clients.get(clientId);
-	// if (client == null)
-	// throw new NullPointerException("Client doesn't exists");
-	// return client;
-	// }
-
-	// public Client getClientFromEmail(String email) {
-	// String clientId = emailToClientId.get(email);
-	// return getClient(clientId);
-	// }
-
-	// private HashMap<String, String> emailToClientId;
-
-	// public HashMap<String, String> getEmailToClientId() {
-	// return emailToClientId;
-	// }
-
-	// public void setEmailToClientId(HashMap<String, String> emailToClientId) {
-	// this.emailToClientId = emailToClientId;
-	// }
-
 	// ===================== Constructors =====================
 	@Autowired
 	private ClientDao dao;
+
+	// @Autowired
+	private FMTSService fmtsService;
 
 	public ClientService() {
 		super();
 		// setAllClients(new HashMap<String, Client>());
 		// setEmailToClientId(new HashMap<String, String>());
+		// this.restTemplate = new RestTemplate();
+		this.fmtsService = new FMTSService(new RestTemplate());
 
 	}
 
@@ -124,7 +103,7 @@ public class ClientService {
 		// the client
 		// if 500 is returned, throw RuntimeException
 
-		String clientId = generateClientUID();
+		String clientId = generateClientUID(person.getEmail());
 		System.out.println(clientId);
 
 		Client client = new Client(clientId, person, clientIdentifications);
@@ -134,28 +113,34 @@ public class ClientService {
 
 	}
 
-	private String generateClientUID() {
-		String clientId;
-		do {
-			clientId = UUID.randomUUID().toString();
-		} while (dao.clientIdExists(clientId));
+	private String generateClientUID(String email) {
+		// String clientId;
+		// do {
+		// clientId = UUID.randomUUID().toString();
+		// } while (dao.clientIdExists(clientId));
+
+		ResponseEntity<ClientRequest> response = fmtsService.getClientToken(new ClientRequest(email, "", ""));
+		String clientId = response.getBody().getClientId();
+		System.out.println(clientId);
+
 		return clientId;
+
 	}
 
 	public int addPreferences(String clientId, Preferences preferences) {
-			int added = dao.addClientPreferences(preferences, clientId);
-			if (added == 0) {
-				throw new RuntimeException("Failed to add preferences");
-			}
-			
-			return added;
+		int added = dao.addClientPreferences(preferences, clientId);
+		if (added == 0) {
+			throw new RuntimeException("Failed to add preferences");
+		}
+
+		return added;
 	}
 
 	public int updatePreferences(String clientId, Preferences preference) {
 		if (preference == null) {
 			throw new IllegalArgumentException("Preference cannot be null");
 		}
-		
+
 		int updatedRows = dao.updateClientPreferences(preference, clientId);
 		if (updatedRows == 0) {
 			throw new RuntimeException("Failed to update preferences");
@@ -259,11 +244,10 @@ public class ClientService {
 	}
 
 	public Preferences getPreferences(String clientId) {
-		if(clientId=="") {
+		if (clientId == "") {
 			throw new IllegalArgumentException();
 		}
 		return dao.getClientPreferences(clientId);
 	}
-
 
 }
