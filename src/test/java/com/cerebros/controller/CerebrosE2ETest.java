@@ -35,6 +35,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -52,9 +53,8 @@ import com.cerebros.models.Order;
 
 import com.cerebros.models.Preferences;
 
-@Transactional
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql(scripts = { "classpath:schema.sql" }, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(scripts = { "classpath:schema.sql" }, executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 public class CerebrosE2ETest {
     @Autowired
     private TestRestTemplate restTemplate;
@@ -67,9 +67,6 @@ public class CerebrosE2ETest {
     private Set<ClientIdentification> clientIdentifications;
     private Client client;
     private Preferences preferences;
-
-    @Rollback
-    @Test
 
     @BeforeEach
     void setUp() throws Exception {
