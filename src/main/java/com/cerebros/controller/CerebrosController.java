@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 
+import com.cerebros.exceptions.OrderInvalidException;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -250,6 +251,8 @@ public class CerebrosController {
             logger.error("runtime exception", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 
+        } catch (OrderInvalidException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
         if (tradeCount != 0 && portfolioCount != 0) {
             response = ResponseEntity.status(HttpStatus.OK).body(new DatabaseRequestResult(tradeCount));

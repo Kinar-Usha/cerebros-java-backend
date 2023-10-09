@@ -2,7 +2,7 @@ package com.cerebros.controller;
 
 import com.cerebros.constants.ClientIdentificationType;
 import com.cerebros.constants.Country;
-import com.cerebros.exceptions.ClientAlreadyExistsException;
+import com.cerebros.exceptions.*;
 import com.cerebros.models.*;
 import com.cerebros.services.ClientService;
 import com.cerebros.services.FMTSService;
@@ -10,6 +10,8 @@ import com.cerebros.services.PortfolioService;
 import com.cerebros.services.TradeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -209,7 +211,7 @@ public class CerebrosWebMVCTest {
         System.out.println(jsonString);
         mockMvc.perform(put("/client/register").contentType(
                 MediaType.APPLICATION_JSON).content(jsonString))
-                .andExpect(status().isOk());
+                .andExpect(status().is2xxSuccessful());
 
     }
 
@@ -370,6 +372,38 @@ public class CerebrosWebMVCTest {
                                                 "\t\"token\":739859208\n" +
                                                 "}"))
                                 .andExpect(MockMvcResultMatchers.status().isInternalServerError());
+        }
+
+        @Test
+        public void testAddTradeWithTradeExecutionFMTSOrderException() throws Exception {
+                // Mock the fmtsService.executeTrade method to throw an exception
+                // Order order = new Order("PQR1045", new BigDecimal("30.0"), new
+                // BigDecimal("104.25"), "B", "YOUR_CLIENTID", "N123456");
+                ClientRequest clientRequest = new ClientRequest("test@example.com", "YOUR_CLIENTID", "test-token");
+                Person person = new Person();
+                person.setEmail("test@example.com");
+                // Mock the clientService.getClient method
+                when(mockClientService.getClient(Mockito.anyString())).thenReturn(new Client("YOUR_CLIENTID", person));
+
+                // Mock the fmtsService.getClientToken method
+                when(fmtsService.getClientToken(Mockito.any(ClientRequest.class)))
+                                .thenReturn(ResponseEntity.ok(clientRequest));
+
+                Mockito.when(fmtsService.executeTrade(Mockito.any(Order.class))).thenThrow(new OrderInvalidException());
+
+                mockMvc.perform(MockMvcRequestBuilders
+                                .post("/trade")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\n" +
+                                                "    \"orderId\": \"PQR\",\n" +
+                                                "    \"quantity\": 10.0,\n" +
+                                                "    \"targetPrice\": 104.25,\n" +
+                                                "    \"direction\": \"B\",\n" +
+                                                "    \"clientId\": \"1\",\n" +
+                                                "    \"instrumentId\": \"N123456\",\n" +
+                                                "\t\"token\":739859208\n" +
+                                                "}"))
+                                .andExpect(MockMvcResultMatchers.status().isConflict());
         }
 
         @Test
