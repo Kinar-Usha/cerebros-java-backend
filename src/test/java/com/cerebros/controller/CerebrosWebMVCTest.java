@@ -213,9 +213,9 @@ public class CerebrosWebMVCTest {
 
     }
 
-    @Test
-    void registrationFailsOnExistingClient() throws Exception {
-            
+        @Test
+        void registrationFailsOnExistingClient() throws Exception {
+                
         when(mockClientService.registerClient(person, clientIdentifications, "1234"))
                 .thenThrow(ClientAlreadyExistsException.class);
 
@@ -227,7 +227,7 @@ public class CerebrosWebMVCTest {
         mockMvc.perform(put("/client/register").contentType(
                 MediaType.APPLICATION_JSON).content(jsonString))
                 .andExpect(status().isConflict());
-    }
+        }
 
         @Test
         public void testLogin_success() throws Exception {

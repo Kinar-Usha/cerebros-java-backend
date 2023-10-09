@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -44,8 +45,10 @@
     </dependency>
 
 
-
-
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-devtools</artifactId>
+    </dependency>
 
 
     <dependency>
@@ -134,20 +137,18 @@
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-jsr310</artifactId>
-<!--      <version>2.15.2</version>-->
+      <!--      <version>2.15.2</version>-->
     </dependency>
 
     <!--    <dependency>-->
-<!--      <groupId>org.junit.jupiter</groupId>-->
-<!--      <artifactId>junit-jupiter-params</artifactId>-->
-<!--      <version>5.10.0</version>-->
-<!--      <scope>test</scope>-->
-<!--    </dependency>-->
-
+    <!--      <groupId>org.junit.jupiter</groupId>-->
+    <!--      <artifactId>junit-jupiter-params</artifactId>-->
+    <!--      <version>5.10.0</version>-->
+    <!--      <scope>test</scope>-->
+    <!--    </dependency>-->
 
 
   </dependencies>
-
 
 
   <!-- This section lets us add Bill Of Materials (bom) style poms. These
@@ -182,7 +183,6 @@
   </dependencyManagement>
 
 
-
   <build>
     <finalName>Cerebros</finalName>
     <plugins>
@@ -204,7 +204,8 @@
         <artifactId>maven-surefire-plugin</artifactId>
       </plugin>
 
-      <!-- Generate Javadoc for this project with the following command (ignore the errors and warnings):
+      <!-- Generate Javadoc for this project with the following command (ignore the errors and
+      warnings):
               mvn javadoc:javadoc
            Then open target/site/apidocs/index.html -->
       <plugin>

@@ -116,29 +116,35 @@ public class CerebrosController {
     }
 
     @PutMapping(value = "/client/register")
-    public ResponseEntity<DatabaseRequestResult> registerClient(@RequestBody ClientRegisterRequest client) {
+    public ResponseEntity<Void> registerClient(@RequestBody ClientRegisterRequest client) {
         ResponseEntity<DatabaseRequestResult> response;
         int count = 0;
         try {
             if (client == null) {
                 return ResponseEntity.badRequest().build();
             }
-            count = clientService.registerClient(client.getPerson(), client.getClientIdentifications(),
+            count = clientService.registerClient(
+                    client.getPerson(),
+                    client.getClientIdentifications(),
                     client.getPassword());
+
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
+
         } catch (ClientAlreadyExistsException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
+
         } catch (Exception e) {
             logger.error("internal error", e);
             return ResponseEntity.internalServerError().build();
         }
-        if (count != 0) {
-            response = ResponseEntity.ok(new DatabaseRequestResult(count));
+
+        if (count == 1) {
+            return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.internalServerError().build();
         }
-        return response;
+
     }
 
     @PostMapping(value = "/client/login")
