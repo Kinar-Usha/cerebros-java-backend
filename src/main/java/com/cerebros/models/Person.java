@@ -4,29 +4,34 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 import com.cerebros.constants.Country;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 
 public class Person {
 
 	private String name;
 	private String email;
-	private LocalDate dateofBirth;
+	@JsonDeserialize(using = LocalDateDeserializer.class)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	private LocalDate dateOfBirth;
 	private Country country;
 	private String postalCode;
 
 	public Person() {
 	}
 
-	public Person(String email, LocalDate dateofBirth, Country country, String postalCode) {
+	public Person(String email, LocalDate dateOfBirth, Country country, String postalCode) {
 		this.setEmail(email);
-		this.setDateofBirth(dateofBirth);
+		this.setDateofBirth(dateOfBirth);
 		this.setCountry(country);
 		this.setPostalCode(postalCode);
 	}
 
-	public Person(String name, String email, LocalDate dateofBirth, Country country, String postalCode) {
+	public Person(String name, String email, LocalDate dateOfBirth, Country country, String postalCode) {
 		this.setName(name);
 		this.setEmail(email);
-		this.setDateofBirth(dateofBirth);
+		this.setDateofBirth(dateOfBirth);
 		this.setCountry(country);
 		this.setPostalCode(postalCode);
 	}
@@ -48,11 +53,11 @@ public class Person {
 	}
 
 	public LocalDate getDateofBirth() {
-		return dateofBirth;
+		return dateOfBirth;
 	}
 
-	public void setDateofBirth(LocalDate dateofBirth) {
-		this.dateofBirth = dateofBirth;
+	public void setDateofBirth(LocalDate dateOfBirth) {
+		this.dateOfBirth = dateOfBirth;
 	}
 
 	public Country getCountry() {
@@ -73,7 +78,7 @@ public class Person {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(country, dateofBirth, email, postalCode);
+		return Objects.hash(country, dateOfBirth, email, postalCode);
 	}
 
 	@Override
@@ -85,7 +90,7 @@ public class Person {
 		if (getClass() != obj.getClass())
 			return false;
 		Person other = (Person) obj;
-		return country == other.country && Objects.equals(dateofBirth, other.dateofBirth)
+		return country == other.country && Objects.equals(dateOfBirth, other.dateOfBirth)
 				&& Objects.equals(email, other.email) && Objects.equals(postalCode, other.postalCode);
 	}
 

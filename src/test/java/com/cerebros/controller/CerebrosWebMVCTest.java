@@ -211,13 +211,13 @@ public class CerebrosWebMVCTest {
         System.out.println(jsonString);
         mockMvc.perform(put("/client/register").contentType(
                 MediaType.APPLICATION_JSON).content(jsonString))
-                .andExpect(status().isOk());
+                .andExpect(status().is2xxSuccessful());
 
     }
 
-    @Test
-    void registrationFailsOnExistingClient() throws Exception {
-            
+        @Test
+        void registrationFailsOnExistingClient() throws Exception {
+                
         when(mockClientService.registerClient(person, clientIdentifications, "1234"))
                 .thenThrow(ClientAlreadyExistsException.class);
 
@@ -229,7 +229,7 @@ public class CerebrosWebMVCTest {
         mockMvc.perform(put("/client/register").contentType(
                 MediaType.APPLICATION_JSON).content(jsonString))
                 .andExpect(status().isConflict());
-    }
+        }
 
         @Test
         public void testLogin_success() throws Exception {
@@ -276,27 +276,26 @@ public class CerebrosWebMVCTest {
                 .andExpect(status().isNoContent());
     }
 
+        @Test
+        public void testQueryTradeHistory() throws Exception {
 
-    @Test
-    public void testQueryTradeHistory() throws Exception {
+                List<Trade> tradeList = new ArrayList<>();
+                when(mockTradeService.getClientTradeHistory("YOUR_CLIENTID")).thenReturn(tradeList);
 
-        List<Trade> tradeList = new ArrayList<>();
-        when(mockTradeService.getClientTradeHistory("YOUR_CLIENTID")).thenReturn(tradeList);
+                mockMvc.perform(MockMvcRequestBuilders.get("/tradehistory/YOUR_CLIENTID"))
+                                .andExpect(MockMvcResultMatchers.status().isNoContent());
+        }
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/tradehistory/YOUR_CLIENTID"))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
-    }
+        @Test
+        public void testGetPortfolio() throws Exception {
 
-    @Test
-    public void testGetPortfolio() throws Exception {
+                List<Portfolio> portfolioList = new ArrayList<>();
+                when(mockPortfolioService.getPortfolio("YOUR_CLIENTID")).thenReturn(portfolioList);
 
-        List<Portfolio> portfolioList = new ArrayList<>();
-        when(mockPortfolioService.getPortfolio("YOUR_CLIENTID")).thenReturn(portfolioList);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/portfolio/YOUR_CLIENTID"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(jsonPath("$").isEmpty());
-    }
+                mockMvc.perform(MockMvcRequestBuilders.get("/portfolio/YOUR_CLIENTID"))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(jsonPath("$").isEmpty());
+        }
 
     @Test
     public void testGetPortfolio_ClientNotFound() throws Exception {
@@ -304,103 +303,108 @@ public class CerebrosWebMVCTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/portfolio/INVALID_CLIENT"))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
-    @Test
-    public void testExxecuteTrade() throws Exception {
-        Order order = new Order("PQR1045", new BigDecimal("30.0"), new BigDecimal("104.25"), "B", "YOUR_CLIENTID", "N123456");
-        ClientRequest clientRequest = new ClientRequest("test@example.com", "YOUR_CLIENTID", "test-token");
-        Person person= new Person();
-        person.setEmail("test@example.com");
-        // Mock the clientService.getClient method
-        when(mockClientService.getClient(Mockito.anyString())).thenReturn(new Client( "YOUR_CLIENTID",person));
 
-        // Mock the fmtsService.getClientToken method
-        when(fmtsService.getClientToken(Mockito.any(ClientRequest.class))).thenReturn(ResponseEntity.ok(clientRequest));
+        @Test
+        public void testExxecuteTrade() throws Exception {
+                Order order = new Order("PQR1045", new BigDecimal("30.0"), new BigDecimal("104.25"), "B",
+                                "YOUR_CLIENTID", "N123456");
+                ClientRequest clientRequest = new ClientRequest("test@example.com", "YOUR_CLIENTID", "test-token");
+                Person person = new Person();
+                person.setEmail("test@example.com");
+                // Mock the clientService.getClient method
+                when(mockClientService.getClient(Mockito.anyString())).thenReturn(new Client("YOUR_CLIENTID", person));
 
-        // Mock the fmtsService.executeTrade method
-        Trade trade = new Trade();
-        when(fmtsService.executeTrade(Mockito.any(Order.class))).thenReturn(ResponseEntity.ok(trade));
+                // Mock the fmtsService.getClientToken method
+                when(fmtsService.getClientToken(Mockito.any(ClientRequest.class)))
+                                .thenReturn(ResponseEntity.ok(clientRequest));
 
-        // Mock the tradeService.updateClientTradeHistory method
-        when(mockTradeService.updateClientTradeHistory(Mockito.any(Trade.class))).thenReturn(1);
+                // Mock the fmtsService.executeTrade method
+                Trade trade = new Trade();
+                when(fmtsService.executeTrade(Mockito.any(Order.class))).thenReturn(ResponseEntity.ok(trade));
 
-        // Mock the portfolioService.updatePortfolio method
-        when(mockPortfolioService.updatePortfolio(Mockito.any(Trade.class))).thenReturn(1);
+                // Mock the tradeService.updateClientTradeHistory method
+                when(mockTradeService.updateClientTradeHistory(Mockito.any(Trade.class))).thenReturn(1);
 
-        mockMvc.perform(MockMvcRequestBuilders
-                        .post("/trade")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\n" +
-                                "    \"orderId\": \"PQR\",\n" +
-                                "    \"quantity\": 10.0,\n" +
-                                "    \"targetPrice\": 104.25,\n" +
-                                "    \"direction\": \"B\",\n" +
-                                "    \"clientId\": \"1\",\n" +
-                                "    \"instrumentId\": \"N123456\",\n" +
-                                "\t\"token\":739859208\n" +
-                                "}")
+                // Mock the portfolioService.updatePortfolio method
+                when(mockPortfolioService.updatePortfolio(Mockito.any(Trade.class))).thenReturn(1);
+
+                mockMvc.perform(MockMvcRequestBuilders
+                                .post("/trade")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\n" +
+                                                "    \"orderId\": \"PQR\",\n" +
+                                                "    \"quantity\": 10.0,\n" +
+                                                "    \"targetPrice\": 104.25,\n" +
+                                                "    \"direction\": \"B\",\n" +
+                                                "    \"clientId\": \"1\",\n" +
+                                                "    \"instrumentId\": \"N123456\",\n" +
+                                                "\t\"token\":739859208\n" +
+                                                "}"))
+                                .andExpect(MockMvcResultMatchers.status().isOk());
+        }
+
+        @Test
+        public void testAddTradeWithNullOrder() throws Exception {
+                mockMvc.perform(MockMvcRequestBuilders
+                                .post("/trade")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{}") // Sending an empty JSON object to simulate a null order
                 )
-                .andExpect(MockMvcResultMatchers.status().isOk());
-    }
-    @Test
-    public void testAddTradeWithNullOrder() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders
-                        .post("/trade")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{}") // Sending an empty JSON object to simulate a null order
-                )
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
-    }
-    @Test
-    public void testAddTradeWithTradeExecutionException() throws Exception {
-        // Mock the fmtsService.executeTrade method to throw an exception
-        Mockito.when(fmtsService.executeTrade(Mockito.any(Order.class))).thenThrow(new RuntimeException("Trade execution failed"));
+                                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+        }
 
+        @Test
+        public void testAddTradeWithTradeExecutionException() throws Exception {
+                // Mock the fmtsService.executeTrade method to throw an exception
+                Mockito.when(fmtsService.executeTrade(Mockito.any(Order.class)))
+                                .thenThrow(new RuntimeException("Trade execution failed"));
 
-        mockMvc.perform(MockMvcRequestBuilders
-                        .post("/trade")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\n" +
-                                "    \"orderId\": \"PQR\",\n" +
-                                "    \"quantity\": 10.0,\n" +
-                                "    \"targetPrice\": 104.25,\n" +
-                                "    \"direction\": \"B\",\n" +
-                                "    \"clientId\": \"1\",\n" +
-                                "    \"instrumentId\": \"N123456\",\n" +
-                                "\t\"token\":739859208\n" +
-                                "}")
-                )
-                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
-    }
-    @Test
-    public void testAddTradeWithTradeExecutionFMTSOrderException() throws Exception {
-        // Mock the fmtsService.executeTrade method to throw an exception
-//        Order order = new Order("PQR1045", new BigDecimal("30.0"), new BigDecimal("104.25"), "B", "YOUR_CLIENTID", "N123456");
-        ClientRequest clientRequest = new ClientRequest("test@example.com", "YOUR_CLIENTID", "test-token");
-        Person person= new Person();
-        person.setEmail("test@example.com");
-        // Mock the clientService.getClient method
-        when(mockClientService.getClient(Mockito.anyString())).thenReturn(new Client( "YOUR_CLIENTID",person));
+                mockMvc.perform(MockMvcRequestBuilders
+                                .post("/trade")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\n" +
+                                                "    \"orderId\": \"PQR\",\n" +
+                                                "    \"quantity\": 10.0,\n" +
+                                                "    \"targetPrice\": 104.25,\n" +
+                                                "    \"direction\": \"B\",\n" +
+                                                "    \"clientId\": \"1\",\n" +
+                                                "    \"instrumentId\": \"N123456\",\n" +
+                                                "\t\"token\":739859208\n" +
+                                                "}"))
+                                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
+        }
 
-        // Mock the fmtsService.getClientToken method
-        when(fmtsService.getClientToken(Mockito.any(ClientRequest.class))).thenReturn(ResponseEntity.ok(clientRequest));
+        @Test
+        public void testAddTradeWithTradeExecutionFMTSOrderException() throws Exception {
+                // Mock the fmtsService.executeTrade method to throw an exception
+                // Order order = new Order("PQR1045", new BigDecimal("30.0"), new
+                // BigDecimal("104.25"), "B", "YOUR_CLIENTID", "N123456");
+                ClientRequest clientRequest = new ClientRequest("test@example.com", "YOUR_CLIENTID", "test-token");
+                Person person = new Person();
+                person.setEmail("test@example.com");
+                // Mock the clientService.getClient method
+                when(mockClientService.getClient(Mockito.anyString())).thenReturn(new Client("YOUR_CLIENTID", person));
 
-        Mockito.when(fmtsService.executeTrade(Mockito.any(Order.class))).thenThrow(new OrderInvalidException());
+                // Mock the fmtsService.getClientToken method
+                when(fmtsService.getClientToken(Mockito.any(ClientRequest.class)))
+                                .thenReturn(ResponseEntity.ok(clientRequest));
 
-        mockMvc.perform(MockMvcRequestBuilders
-                        .post("/trade")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\n" +
-                                "    \"orderId\": \"PQR\",\n" +
-                                "    \"quantity\": 10.0,\n" +
-                                "    \"targetPrice\": 104.25,\n" +
-                                "    \"direction\": \"B\",\n" +
-                                "    \"clientId\": \"1\",\n" +
-                                "    \"instrumentId\": \"N123456\",\n" +
-                                "\t\"token\":739859208\n" +
-                                "}")
-                )
-                .andExpect(MockMvcResultMatchers.status().isConflict());
-    }
+                Mockito.when(fmtsService.executeTrade(Mockito.any(Order.class))).thenThrow(new OrderInvalidException());
+
+                mockMvc.perform(MockMvcRequestBuilders
+                                .post("/trade")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\n" +
+                                                "    \"orderId\": \"PQR\",\n" +
+                                                "    \"quantity\": 10.0,\n" +
+                                                "    \"targetPrice\": 104.25,\n" +
+                                                "    \"direction\": \"B\",\n" +
+                                                "    \"clientId\": \"1\",\n" +
+                                                "    \"instrumentId\": \"N123456\",\n" +
+                                                "\t\"token\":739859208\n" +
+                                                "}"))
+                                .andExpect(MockMvcResultMatchers.status().isConflict());
+        }
 
         @Test
         public void testGetPreferenceById() throws Exception {
@@ -454,105 +458,101 @@ public class CerebrosWebMVCTest {
                 String clientId = "YOUR_CLIENTID1";
                 Preferences preferences = null;
 
-	        mockMvc.perform(post("/client/add/preferences/{clientId}", clientId)
-	                .contentType("application/json")
-	                .content(new ObjectMapper().writeValueAsString(preferences)))
-	                .andExpect(status().isBadRequest());
+                mockMvc.perform(post("/client/add/preferences/{clientId}", clientId)
+                                .contentType("application/json")
+                                .content(new ObjectMapper().writeValueAsString(preferences)))
+                                .andExpect(status().isBadRequest());
 
-	    }
+        }
 
-	  @Test
-	    public void testAddPreferencesWithIllegalArgumentException() throws Exception {
-		  String clientId = "YOUR_CLIENTID";
-		  Preferences preference = new Preferences("Investment","High","Long-term","High");
+        @Test
+        public void testAddPreferencesWithIllegalArgumentException() throws Exception {
+                String clientId = "YOUR_CLIENTID";
+                Preferences preference = new Preferences("Investment", "High", "Long-term", "High");
 
-	        when(mockClientService.addPreferences(clientId, preferences))
-	                .thenThrow(new IllegalArgumentException("Invalid input"));
+                when(mockClientService.addPreferences(clientId, preferences))
+                                .thenThrow(new IllegalArgumentException("Invalid input"));
 
-	        mockMvc.perform(post("/client/add/preferences/{clientId}", clientId)
-	                .contentType("application/json")
-	                .content(new ObjectMapper().writeValueAsString(preferences)))
-	                .andExpect(status().isBadRequest());
+                mockMvc.perform(post("/client/add/preferences/{clientId}", clientId)
+                                .contentType("application/json")
+                                .content(new ObjectMapper().writeValueAsString(preferences)))
+                                .andExpect(status().isBadRequest());
 
-	        verify(mockClientService, times(1)).addPreferences(clientId, preferences);
-	    }
+                verify(mockClientService, times(1)).addPreferences(clientId, preferences);
+        }
 
+        @Test
+        public void testAddPreferencesWithInternalServerError() throws Exception {
+                String clientId = "YOUR_CLIENTID1";
+                Preferences preference = new Preferences("Investment", "High", "Long-term", "High");
+                when(mockClientService.addPreferences(clientId, preferences))
+                                .thenThrow(new RuntimeException());
 
-	  @Test
-	    public void testAddPreferencesWithInternalServerError() throws Exception {
-		  String clientId = "YOUR_CLIENTID1";
-		  Preferences preference = new Preferences("Investment","High","Long-term","High");
-	        when(mockClientService.addPreferences(clientId, preferences))
-	                .thenThrow(new RuntimeException());
+                mockMvc.perform(post("/client/add/preferences/{clientId}", clientId)
+                                .contentType("application/json")
+                                .content(new ObjectMapper().writeValueAsString(preferences)))
+                                .andExpect(status().isInternalServerError());
 
-	        mockMvc.perform(post("/client/add/preferences/{clientId}", clientId)
-	                .contentType("application/json")
-	                .content(new ObjectMapper().writeValueAsString(preferences)))
-	                .andExpect(status().isInternalServerError());
+                verify(mockClientService, times(1)).addPreferences(clientId, preferences);
+        }
 
-	        verify(mockClientService, times(1)).addPreferences(clientId, preferences);
-	    }
+        @Test
+        public void testUpdatePreferencesWithValidInput() throws Exception {
+                String clientId = "YOUR_CLIENTID";
+                Preferences preference = new Preferences("Investment", "High", "Long-term", "High");
 
+                when(mockClientService.updatePreferences(clientId, preferences)).thenReturn(1);
 
-	  @Test
-	    public void testUpdatePreferencesWithValidInput() throws Exception {
-		  String clientId = "YOUR_CLIENTID";
-		  Preferences preference = new Preferences("Investment","High","Long-term","High");
+                mockMvc.perform(put("/client/update/preferences/{clientId}", clientId)
+                                .contentType("application/json")
+                                .content(new ObjectMapper().writeValueAsString(preferences)))
+                                .andExpect(status().isOk());
 
-	        when(mockClientService.updatePreferences(clientId, preferences)).thenReturn(1);
+                verify(mockClientService, times(1)).updatePreferences(clientId, preferences);
+        }
 
-	        mockMvc.perform(put("/client/update/preferences/{clientId}", clientId)
-	                .contentType("application/json")
-	                .content(new ObjectMapper().writeValueAsString(preferences)))
-	                .andExpect(status().isOk());
+        @Test
+        public void testUpdatePreferencesWithNullPreferences() throws Exception {
+                String clientId = "YOUR_CLIENTID";
+                Preferences preferences = null;
 
-	        verify(mockClientService, times(1)).updatePreferences(clientId, preferences);
-	    }
+                mockMvc.perform(put("/client/update/preferences/{clientId}", clientId)
+                                .contentType("application/json")
+                                .content(new ObjectMapper().writeValueAsString(preferences)))
+                                .andExpect(status().isBadRequest());
 
-	  @Test
-	    public void testUpdatePreferencesWithNullPreferences() throws Exception {
-		  String clientId = "YOUR_CLIENTID";
-	        Preferences preferences = null;
+        }
 
-	        mockMvc.perform(put("/client/update/preferences/{clientId}", clientId)
-	                .contentType("application/json")
-	                .content(new ObjectMapper().writeValueAsString(preferences)))
-	                .andExpect(status().isBadRequest());
+        @Test
+        public void testUpdatePreferencesWithIllegalArgumentException() throws Exception {
+                String clientId = "YOUR_CLIENTID";
+                Preferences preference = new Preferences("Investment", "High", "Long-term", "High");
 
-	    }
+                when(mockClientService.updatePreferences(clientId, preferences))
+                                .thenThrow(new IllegalArgumentException("Invalid input"));
 
-	  @Test
-	    public void testUpdatePreferencesWithIllegalArgumentException() throws Exception {
-		  String clientId = "YOUR_CLIENTID";
-		  Preferences preference = new Preferences("Investment","High","Long-term","High");
+                mockMvc.perform(put("/client/update/preferences/{clientId}", clientId)
+                                .contentType("application/json")
+                                .content(new ObjectMapper().writeValueAsString(preferences)))
+                                .andExpect(status().isBadRequest());
 
-	        when(mockClientService.updatePreferences(clientId, preferences))
-	                .thenThrow(new IllegalArgumentException("Invalid input"));
+                verify(mockClientService, times(1)).updatePreferences(clientId, preferences);
+        }
 
-	        mockMvc.perform(put("/client/update/preferences/{clientId}", clientId)
-	                .contentType("application/json")
-	                .content(new ObjectMapper().writeValueAsString(preferences)))
-	                .andExpect(status().isBadRequest());
+        @Test
+        public void testUpdatePreferencesWithInternalServerError() throws Exception {
+                String clientId = "YOUR_CLIENTID1";
+                Preferences preference = new Preferences("Investment", "High", "Long-term", "High");
 
-	        verify(mockClientService, times(1)).updatePreferences(clientId, preferences);
-	    }
+                when(mockClientService.updatePreferences(clientId, preferences))
+                                .thenThrow(new RuntimeException("Internal Server Error"));
 
+                mockMvc.perform(put("/client/update/preferences/{clientId}", clientId)
+                                .contentType("application/json")
+                                .content(new ObjectMapper().writeValueAsString(preferences)))
+                                .andExpect(status().isInternalServerError());
 
-	  @Test
-	    public void testUpdatePreferencesWithInternalServerError() throws Exception {
-		  String clientId = "YOUR_CLIENTID1";
-		  Preferences preference = new Preferences("Investment","High","Long-term","High");
-
-	        when(mockClientService.updatePreferences(clientId, preferences))
-	                .thenThrow(new RuntimeException("Internal Server Error"));
-
-	        mockMvc.perform(put("/client/update/preferences/{clientId}", clientId)
-	                .contentType("application/json")
-	                .content(new ObjectMapper().writeValueAsString(preferences)))
-	                .andExpect(status().isInternalServerError());
-
-	        verify(mockClientService, times(1)).updatePreferences(clientId, preferences);
-	    }
-
+                verify(mockClientService, times(1)).updatePreferences(clientId, preferences);
+        }
 
 }
