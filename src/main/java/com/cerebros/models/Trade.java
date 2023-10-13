@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Objects;
 
 public class Trade {
+
     private String tradeId;
     private BigDecimal quantity;
     private BigDecimal executionPrice;
@@ -13,20 +14,8 @@ public class Trade {
     private String clientId;
     private String instrumentId;
     private Order order;
+    private String description;
     private Date executedTime;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Trade trade = (Trade) o;
-        return Objects.equals(tradeId, trade.tradeId) && Objects.equals(quantity, trade.quantity) && Objects.equals(executionPrice, trade.executionPrice) && Objects.equals(direction, trade.direction) && Objects.equals(cashValue, trade.cashValue) && Objects.equals(clientId, trade.clientId) && Objects.equals(instrumentId, trade.instrumentId) && Objects.equals(order, trade.order) && Objects.equals(executedTime, trade.executedTime);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(tradeId, quantity, executionPrice, direction, cashValue, clientId, instrumentId, order, executedTime);
-    }
 
     public Trade() {
     }
@@ -138,6 +127,40 @@ public class Trade {
         this.executedTime = executedTime;
     }
 
+    public Trade(String tradeId, BigDecimal quantity, BigDecimal executionPrice, String direction, BigDecimal cashValue, String clientId, String instrumentId, Order order, String description, Date executedTime) {
+        this.tradeId = tradeId;
+        this.quantity = quantity;
+        this.executionPrice = executionPrice;
+        this.direction = direction;
+        this.cashValue = cashValue;
+        this.clientId = clientId;
+        this.instrumentId = instrumentId;
+        this.order = order;
+        this.description = description;
+        this.executedTime = executedTime;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Trade trade = (Trade) o;
+        return Objects.equals(tradeId, trade.tradeId) && Objects.equals(quantity, trade.quantity) && Objects.equals(executionPrice, trade.executionPrice) && Objects.equals(direction, trade.direction) && Objects.equals(cashValue, trade.cashValue) && Objects.equals(clientId, trade.clientId) && Objects.equals(instrumentId, trade.instrumentId) && Objects.equals(order, trade.order) && Objects.equals(description, trade.description) && Objects.equals(executedTime, trade.executedTime);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(tradeId, quantity, executionPrice, direction, cashValue, clientId, instrumentId, order, description, executedTime);
+    }
+
     @Override
     public String toString() {
         return "Trade{" +
@@ -149,6 +172,7 @@ public class Trade {
                 ", clientId='" + clientId + '\'' +
                 ", instrumentId='" + instrumentId + '\'' +
                 ", order=" + order +
+                ", description='" + description + '\'' +
                 ", executedTime=" + executedTime +
                 '}';
     }

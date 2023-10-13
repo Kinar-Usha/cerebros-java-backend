@@ -1,7 +1,9 @@
 package com.cerebros.services;
 
 import com.cerebros.exceptions.ClientNotFoundException;
+import com.cerebros.exceptions.NotEnoughHoldingsException;
 import com.cerebros.integration.doa.PortfolioDao;
+import com.cerebros.models.Instrument;
 import com.cerebros.models.Portfolio;
 import com.cerebros.models.Trade;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +20,12 @@ public class PortfolioService {
     List<Portfolio> portfolioList;
     private Map<String, List<Portfolio>> clientPortfolios;
 
+    private final FMTSService fmtsService;
+
     @Autowired
-    public PortfolioService(PortfolioDao portfolioDao) {
+    public PortfolioService(PortfolioDao portfolioDao, FMTSService fmtsService) {
         this.portfolioDao = portfolioDao;
+        this.fmtsService=fmtsService;
     }
 
 
@@ -43,13 +48,14 @@ public int updatePortfolio(Trade trade) {
     List<Portfolio> portfolioList = portfolioDao.getPortfolio(clientId);
 
     Portfolio portfolioItem = findPortfolioItemByInstrumentId(portfolioList, instrumentId);
+    System.out.println(portfolioItem);
 
     if (portfolioItem != null) {
         updateExistingPortfolioItem(trade, portfolioItem);
          rows=portfolioDao.updatePortfolio(portfolioItem, clientId);
     } else {
         if ("B".equals(trade.getDirection())) {
-            createNewPortfolioItem(trade, clientId);
+            rows=createNewPortfolioItem(trade, clientId);
         } else {
             throw new RuntimeException("No Item in Portfolio to Sell");
         }
@@ -77,7 +83,7 @@ public int updatePortfolio(Trade trade) {
         } else if ("S".equals(trade.getDirection())) {
             BigDecimal remainingHoldings = portfolioItem.getHoldings().subtract(trade.getQuantity());
             if (remainingHoldings.compareTo(BigDecimal.ZERO) < 0) {
-                throw new RuntimeException("Not enough holdings to sell.");
+                throw new NotEnoughHoldingsException("Not enough holdings to sell.");
             }
             if (remainingHoldings.compareTo(BigDecimal.ZERO) == 0) {
                 portfolioItem.setPrice(BigDecimal.ZERO);
@@ -90,9 +96,16 @@ public int updatePortfolio(Trade trade) {
         }
     }
 
-    private void createNewPortfolioItem(Trade trade, String clientId) {
-        Portfolio newItem = new Portfolio(trade.getInstrumentId(), "", "", trade.getQuantity(), trade.getExecutionPrice());
-        portfolioDao.addToPortfolio(newItem, clientId);
+    private int createNewPortfolioItem(Trade trade, String clientId) {
+        Instrument instrument= fmtsService.getInstruments().stream() .filter(item -> item.getInstrumentId().equals(trade.getInstrumentId()))
+                .findFirst()
+                .orElse(null);;
+
+        Portfolio newItem = null;
+        if (instrument != null) {
+            newItem = new Portfolio(trade.getInstrumentId(),instrument.getInstrumentDescription() , instrument.getCategoryId(), trade.getQuantity(), trade.getExecutionPrice());
+        }
+       return portfolioDao.addToPortfolio(newItem, clientId);
     }
 
 }

@@ -2,6 +2,7 @@ package com.cerebros.services;
 
 import com.cerebros.exceptions.ClientNotFoundException;
 import com.cerebros.integration.doa.PortfolioDao;
+import com.cerebros.models.Instrument;
 import com.cerebros.models.Portfolio;
 import com.cerebros.models.Trade;
 import org.junit.jupiter.api.AfterEach;
@@ -11,6 +12,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -28,6 +32,8 @@ class PortfolioServiceTest {
 	@Mock
 	private PortfolioDao portfolioDao;
 
+	@Mock
+	private FMTSService fmtsService;
 	@InjectMocks
 	private PortfolioService portfolioService;
 	private List<Portfolio> portfolioList;
@@ -168,8 +174,16 @@ class PortfolioServiceTest {
 		trade.setQuantity(BigDecimal.TEN);
 		trade.setExecutionPrice(BigDecimal.valueOf(100));
 
+		Instrument instrument=new Instrument();
+		instrument.setInstrumentId("instrument1");
+		instrument.setInstrumentDescription("");
+		instrument.setCategoryId("");
+		instrument.setMaxQuantity(BigDecimal.ONE);
+		instrument.setMinQuantity(BigDecimal.ONE);
+
 		// Simulate that there are no existing portfolio rows for the client
 		when(portfolioDao.getPortfolio("client1")).thenReturn(new ArrayList<>());
+		when(fmtsService.getInstruments()).thenReturn(List.of(instrument));
 
 		// Perform the buy operation
 		portfolioService.updatePortfolio(trade);

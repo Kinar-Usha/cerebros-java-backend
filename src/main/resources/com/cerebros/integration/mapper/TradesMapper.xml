@@ -16,6 +16,7 @@
             t.cashvalue,
             t.clientId,
             t.instrumentid,
+            t.t_description as description,
             o.orderId,
             o.quantity AS orderQuantity,
             o.targetPrice,
@@ -37,8 +38,8 @@
 </insert>
 
     <insert id="insertTrade" parameterType="com.cerebros.models.Trade">
-    INSERT INTO Cerebros_Trades ( clientId, instrumentId,orderId ,direction, quantity, executionPrice, cashValue)
-    VALUES ( #{clientId}, #{instrumentId}, #{order.orderId},#{direction} ,#{quantity}, #{executionPrice}, #{cashValue} )
+    INSERT INTO Cerebros_Trades ( clientId, instrumentId,t_description,orderId ,direction, quantity, executionPrice, cashValue)
+    VALUES ( #{clientId}, #{instrumentId},#{description}, #{order.orderId},#{direction} ,#{quantity}, #{executionPrice}, #{cashValue} )
 </insert>
 </mapper>
         <!-- Enable transaction demarcation with annotations -->

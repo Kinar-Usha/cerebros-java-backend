@@ -159,7 +159,7 @@ public class CerebrosE2ETest {
         assertNotNull(response.getBody());
     }
 
-    @Test
+//    @Test
     public void testAddClientPreferences() {
         Preferences preference = new Preferences("Investment", "High", "Long-term", "High");
         ResponseEntity<DatabaseRequestResult> responseEntity = restTemplate

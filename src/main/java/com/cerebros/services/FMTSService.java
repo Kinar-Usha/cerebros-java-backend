@@ -1,10 +1,7 @@
 package com.cerebros.services;
 
 import com.cerebros.exceptions.OrderInvalidException;
-import com.cerebros.models.ClientRequest;
-import com.cerebros.models.Order;
-import com.cerebros.models.Price;
-import com.cerebros.models.Trade;
+import com.cerebros.models.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -46,6 +43,17 @@ public class FMTSService {
         objectMapper.registerModule(new JavaTimeModule());
         try {
             return objectMapper.readValue(jsonResponse, new TypeReference<List<Price>>() {});
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to deserialize response: " + e.getMessage());
+        }
+    }
+
+    public List<Instrument> getInstruments(){
+        String apiUrl= fmtsApiUrl+"/fmts/trades/instruments";
+        String jsonResponse= restTemplate.getForObject(apiUrl,String.class);
+        ObjectMapper objectMapper= new ObjectMapper();
+        try {
+            return objectMapper.readValue(jsonResponse, new TypeReference<List<Instrument>>() {});
         } catch (IOException e) {
             throw new RuntimeException("Failed to deserialize response: " + e.getMessage());
         }

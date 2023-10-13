@@ -3,28 +3,19 @@ package com.cerebros.controller;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
-import com.cerebros.exceptions.OrderInvalidException;
+import com.cerebros.exceptions.*;
+import com.cerebros.models.*;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import com.cerebros.exceptions.ClientAlreadyExistsException;
-import com.cerebros.exceptions.ClientNotFoundException;
-import com.cerebros.exceptions.DatabaseException;
-import com.cerebros.exceptions.InvalidCredentialsException;
-import com.cerebros.models.ActivityReport;
-import com.cerebros.models.Client;
-import com.cerebros.models.ClientRequest;
-import com.cerebros.models.Order;
-import com.cerebros.models.Portfolio;
-import com.cerebros.models.Preferences;
-import com.cerebros.models.Price;
-import com.cerebros.models.Trade;
 import com.cerebros.services.ClientService;
 import com.cerebros.services.FMTSService;
 import com.cerebros.services.PortfolioService;
@@ -213,6 +204,7 @@ public class CerebrosController {
         }
     }
 
+    @Transactional
     @PostMapping("/trade")
     public ResponseEntity<DatabaseRequestResult> addTrade(@RequestBody Order order) {
         ResponseEntity<DatabaseRequestResult> response;
@@ -240,20 +232,30 @@ public class CerebrosController {
             Trade trade = fmtsService.executeTrade(order).getBody();
             System.out.println(trade);
             trade.setOrder(order);
-            tradeCount = tradeService.updateClientTradeHistory(trade);
-            if (tradeCount != 0) {
-                portfolioCount = portfolioService.updatePortfolio(trade);
+            Instrument instrument= fmtsService.getInstruments().stream() .filter(item -> item.getInstrumentId().equals(trade.getInstrumentId()))
+                    .findFirst()
+                    .orElse(null);;
+            if (instrument != null) {
+                trade.setDescription(instrument.getInstrumentDescription());
             }
-        } catch (DatabaseException e) {
+            portfolioCount = portfolioService.updatePortfolio(trade);
+            if (portfolioCount != 0) {
+                tradeCount = tradeService.updateClientTradeHistory(trade);
+
+            }
+        }
+        catch (OrderInvalidException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        catch (DatabaseException e) {
             logger.error("unique key constraint exception");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 
-        } catch (RuntimeException e) {
-            logger.error("runtime exception", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-
-        } catch (OrderInvalidException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        catch (RuntimeException e){
+            if(Objects.equals(e.getMessage(), "No Item in Portfolio to Sell")) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
         }
         if (tradeCount != 0 && portfolioCount != 0) {
             response = ResponseEntity.status(HttpStatus.OK).body(new DatabaseRequestResult(tradeCount));

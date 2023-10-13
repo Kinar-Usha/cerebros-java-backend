@@ -78,7 +78,7 @@ public class TradesDaoTest {
         Order order = new Order(orderId, quantity, targetPrice, direction, clientId, instrumentId, placedTimestamp);
 
         // Create a dummy Trade
-        Trade trade = new Trade("11", quantity, targetPrice, direction, targetPrice.multiply(quantity).negate(), clientId, instrumentId, order, placedTimestamp);
+        Trade trade = new Trade("11", quantity, targetPrice, direction, targetPrice.multiply(quantity).negate(), clientId, instrumentId, order,"description", placedTimestamp);
         tradesDao.addTrade(trade, clientId);
 
     }
@@ -100,7 +100,7 @@ public class TradesDaoTest {
         Order order = new Order(orderId, quantity, targetPrice, direction, clientId, instrumentId, placedTimestamp);
 
         // Create a dummy Trade
-        Trade trade = new Trade("11", quantity, targetPrice, direction, targetPrice.multiply(quantity).negate(), clientId, instrumentId, order, placedTimestamp);
+        Trade trade = new Trade("11", quantity, targetPrice, direction, targetPrice.multiply(quantity).negate(), clientId, instrumentId, order,"description", placedTimestamp);
         int rows = tradesDao.addTrade(trade, clientId);
         assertEquals(1, rows);
 

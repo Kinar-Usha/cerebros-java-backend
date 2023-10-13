@@ -74,6 +74,7 @@ CREATE TABLE Cerebros_Trades (
     tradeId NUMBER GENERATED as IDENTITY(START with 1 INCREMENT by 1) PRIMARY KEY,
     clientId VARCHAR(50) REFERENCES Cerebros_Client(clientId),
     instrumentId VARCHAR(50),
+    t_description VARCHAR(100),
     orderId VARCHAR(50),
     direction varchar(10),
     quantity DECIMAL(10,2),
@@ -282,33 +283,33 @@ VALUES
 -------------------------------------------------------------------
 
 ---- add quantity and direction values
-INSERT INTO Cerebros_Trades ( clientId, instrumentId, orderId,direction,quantity, executionPrice, cashValue, executedTimestamp)
+INSERT INTO Cerebros_Trades ( clientId, instrumentId,t_description,orderId,direction,quantity, executionPrice, cashValue, executedTimestamp)
 VALUES
-    ( 'YOUR_CLIENTID', 'Q123', 'BUY_ORDER_Q123_1','B',100, 100, -10475.00, '21-AUG-19');
-INSERT INTO Cerebros_Trades ( clientId, instrumentId, orderId,direction,quantity, executionPrice, cashValue, executedTimestamp)
+    ( 'YOUR_CLIENTID', 'Q123', 'JPMorgan Chase  Co. Capital Stock','BUY_ORDER_Q123_1','B',100, 100, -10475.00, '21-AUG-19');
+INSERT INTO Cerebros_Trades ( clientId, instrumentId,t_description, orderId,direction,quantity, executionPrice, cashValue, executedTimestamp)
 VALUES
-    ( 'YOUR_CLIENTID', 'Q456', 'BUY_ORDER_Q456_1','B',50, 100, -16169.50, '21-AUG-19');
-INSERT INTO Cerebros_Trades ( clientId, instrumentId, orderId,direction,quantity, executionPrice, cashValue, executedTimestamp)
+    ( 'YOUR_CLIENTID', 'Q456','JPMorgan Chase  Co. Capital Stock', 'BUY_ORDER_Q456_1','B',50, 100, -16169.50, '21-AUG-19');
+INSERT INTO Cerebros_Trades ( clientId, instrumentId, t_description,orderId,direction,quantity, executionPrice, cashValue, executedTimestamp)
 VALUES
-    ( 'YOUR_CLIENTID', 'N123456', 'BUY_ORDER_N123456_1','B',200, 100, -20850.00, '21-AUG-19');
-INSERT INTO Cerebros_Trades ( clientId, instrumentId, orderId,direction,quantity, executionPrice, cashValue, executedTimestamp)
+    ( 'YOUR_CLIENTID', 'N123456', 'JPMorgan Chase  Co. Capital Stock','BUY_ORDER_N123456_1','B',200, 100, -20850.00, '21-AUG-19');
+INSERT INTO Cerebros_Trades ( clientId, instrumentId,t_description, orderId,direction,quantity, executionPrice, cashValue, executedTimestamp)
 VALUES
-    ( 'YOUR_CLIENTID', 'N123789', 'BUY_ORDER_N123789_1','B',10, 100, -9592.00, '21-AUG-19');
-INSERT INTO Cerebros_Trades ( clientId, instrumentId, orderId,direction,quantity, executionPrice, cashValue, executedTimestamp)
+    ( 'YOUR_CLIENTID', 'N123789', 'JPMorgan Chase  Co. Capital Stock','BUY_ORDER_N123789_1','B',10, 100, -9592.00, '21-AUG-19');
+INSERT INTO Cerebros_Trades ( clientId, instrumentId,t_description, orderId,direction,quantity, executionPrice, cashValue, executedTimestamp)
 VALUES
-    ( 'YOUR_CLIENTID', 'C100', 'BUY_ORDER_C100_1','B',500, 100, -1033.75, '21-AUG-19');
-INSERT INTO Cerebros_Trades ( clientId, instrumentId, orderId,direction,quantity, executionPrice, cashValue, executedTimestamp)
+    ( 'YOUR_CLIENTID', 'C100','JPMorgan Chase  Co. Capital Stock', 'BUY_ORDER_C100_1','B',500, 100, -1033.75, '21-AUG-19');
+INSERT INTO Cerebros_Trades ( clientId, instrumentId,t_description, orderId,direction,quantity, executionPrice, cashValue, executedTimestamp)
 VALUES
-    ( 'YOUR_CLIENTID', 'T67890', 'BUY_ORDER_T67890_1','B',1000, 100, -9981.25, '21-AUG-19');
-INSERT INTO Cerebros_Trades ( clientId, instrumentId, orderId,direction,quantity, executionPrice, cashValue, executedTimestamp)
+    ( 'YOUR_CLIENTID', 'T67890', 'JPMorgan Chase  Co. Capital Stock','BUY_ORDER_T67890_1','B',1000, 100, -9981.25, '21-AUG-19');
+INSERT INTO Cerebros_Trades ( clientId, instrumentId,t_description, orderId,direction,quantity, executionPrice, cashValue, executedTimestamp)
 VALUES
-    ( 'YOUR_CLIENTID', 'T67894', 'BUY_ORDER_T67894_1','B',300, 100, -10000.00, '21-AUG-19');
-INSERT INTO Cerebros_Trades ( clientId, instrumentId, orderId,direction,quantity, executionPrice, cashValue, executedTimestamp)
+    ( 'YOUR_CLIENTID', 'T67894', 'JPMorgan Chase  Co. Capital Stock','BUY_ORDER_T67894_1','B',300, 100, -10000.00, '21-AUG-19');
+INSERT INTO Cerebros_Trades ( clientId, instrumentId,t_description, orderId,direction,quantity, executionPrice, cashValue, executedTimestamp)
 VALUES
-    ( 'YOUR_CLIENTID', 'T67895', 'BUY_ORDER_T67895_1','B',700, 100, -9993.75, '21-AUG-19');
-INSERT INTO Cerebros_Trades ( clientId, instrumentId, orderId,direction,quantity, executionPrice, cashValue, executedTimestamp)
+    ( 'YOUR_CLIENTID', 'T67895', 'JPMorgan Chase  Co. Capital Stock','BUY_ORDER_T67895_1','B',700, 100, -9993.75, '21-AUG-19');
+INSERT INTO Cerebros_Trades ( clientId, instrumentId, t_description,orderId,direction,quantity, executionPrice, cashValue, executedTimestamp)
 VALUES
-    ( 'YOUR_CLIENTID', 'T67897', 'BUY_ORDER_T67897_1','B',200, 100, -9993.75, '21-AUG-19');
+    ( 'YOUR_CLIENTID', 'T67897','JPMorgan Chase  Co. Capital Stock', 'BUY_ORDER_T67897_1','B',200, 100, -9993.75, '21-AUG-19');
 --    (10, 'YOUR_CLIENTID', 'T67899', 'BUY_ORDER_T67899_1', 1.00375, -10037.50, '2023-09-19 13:30:00'),
 --    (11, 'YOUR_CLIENTID', 'T67880', 'BUY_ORDER_T67880_1', 1.0596875, -10596.88, '2023-09-19 14:00:00'),
 --    (12, 'YOUR_CLIENTID', 'T67883', 'BUY_ORDER_T67883_1', 0.9853125, -9853.13, '2023-09-19 14:30:00'),
