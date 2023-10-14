@@ -42,6 +42,13 @@
 		WHERE
 			CLIENTID = #{clientId}
     </select>
+
+	<select id="getCashRemaining" resultType="com.cerebros.models.Cash">
+		select cashRemaining from cerebros_cash where clientid=#{clientId}
+	</select>
+	<insert id="insertCash" parameterType="map">
+		INSERT INTO cerebros_cash VALUES(#{clientId}, #{cashRemaining})
+	</insert>
     
     <select id="checkLoginCreds" resultType="Integer">
 		SELECT

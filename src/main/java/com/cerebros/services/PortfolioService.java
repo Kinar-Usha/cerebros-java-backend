@@ -28,6 +28,18 @@ public class PortfolioService {
         this.fmtsService=fmtsService;
     }
 
+    public  int updateCash(String clientId, BigDecimal cash, BigDecimal tradedCash){
+        BigDecimal remainingCash= cash.subtract(tradedCash);
+        int res=0;
+        if(remainingCash.compareTo(BigDecimal.ONE)>=0){
+            System.out.println(remainingCash);
+            res=portfolioDao.updateCash(clientId,remainingCash);
+        }
+        else{
+            throw  new RuntimeException("not enough cash");
+        }
+        return res;
+    }
 
     public List<Portfolio> getPortfolio(String clientID) {
         try {

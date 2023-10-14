@@ -1,6 +1,9 @@
 package com.cerebros.integration.doa.impl;
 
+import java.math.BigDecimal;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -8,6 +11,7 @@ import com.cerebros.exceptions.DatabaseException;
 import com.cerebros.integration.mapper.ClientMapper;
 import com.cerebros.integration.mapper.PreferencesMapper;
 import com.cerebros.integration.doa.ClientDao;
+import com.cerebros.models.Cash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -192,4 +196,26 @@ public class ClientDaoImpl implements ClientDao {
 		return pref;
 	}
 
+	@Override
+	public Cash getCashRemaining(String clientId){
+		if (clientId == "") {
+			throw new IllegalArgumentException("Client ID cannot be null");
+		}
+		Cash cash=null;
+		cash=mapper.getCashRemaining(clientId);
+		if (cash == null) {
+			throw new DatabaseException("Client not found");
+		}
+		return cash;
+	}
+	@Override
+	public int insertCash(String clientId, BigDecimal cash){
+		if (clientId == "") {
+			throw new IllegalArgumentException("Client ID cannot be null");
+		}
+		Map<String, Object> cashMap= new HashMap<>();
+		cashMap.put("clientId", clientId);
+		cashMap.put("cashRemaining", cash);
+		return mapper.insertCash(cashMap);
+	}
 }

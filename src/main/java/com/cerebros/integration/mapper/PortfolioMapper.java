@@ -13,4 +13,5 @@ public interface PortfolioMapper {
     int addToPortfolio(Map<String, Object> paramMap);
 
     int updatePortfolio(Map<String, Object> paramMap);
+    int updateCash(Map<String,Object> paramMap);
 }

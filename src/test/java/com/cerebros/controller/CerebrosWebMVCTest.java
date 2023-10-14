@@ -328,6 +328,8 @@ public class CerebrosWebMVCTest {
 
                 // Mock the portfolioService.updatePortfolio method
                 when(mockPortfolioService.updatePortfolio(Mockito.any(Trade.class))).thenReturn(1);
+                when(mockClientService.getCash(Mockito.anyString())).thenReturn(new Cash(new BigDecimal("100")));
+                when(mockPortfolioService.updateCash(Mockito.anyString(),Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class))).thenReturn(1);
 
                 mockMvc.perform(MockMvcRequestBuilders
                                 .post("/trade")

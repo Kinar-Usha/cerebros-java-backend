@@ -1,5 +1,6 @@
 package com.cerebros.controller;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -216,10 +217,11 @@ public class CerebrosController {
 
     @Transactional
     @PostMapping("/trade")
-    public ResponseEntity<DatabaseRequestResult> addTrade(@RequestBody Order order) {
+    public ResponseEntity<?> addTrade(@RequestBody Order order) {
         ResponseEntity<DatabaseRequestResult> response;
         int tradeCount = 0;
         int portfolioCount = 0;
+        int cashCount=0;
         System.out.println(order);
         try {
             if (order == null || order.getOrderId() == null ||
@@ -251,6 +253,16 @@ public class CerebrosController {
             portfolioCount = portfolioService.updatePortfolio(trade);
             if (portfolioCount != 0) {
                 tradeCount = tradeService.updateClientTradeHistory(trade);
+                if(tradeCount!=0){
+                    BigDecimal cash= clientService.getCash(order.getClientId()).getCashRemaining();
+                    System.out.println(trade.getCashValue());
+                    System.out.println(cash);
+
+                    if(cash!=null){
+                        cashCount= portfolioService.updateCash(order.getClientId(), cash, trade.getCashValue() );
+
+                    }
+                }
 
             }
         }
@@ -265,9 +277,12 @@ public class CerebrosController {
         catch (RuntimeException e){
             if(Objects.equals(e.getMessage(), "No Item in Portfolio to Sell")) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            } else if (Objects.equals(e.getMessage(), "not enough cash")) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Not Enough Cash"); // Change the response body here
             }
         }
-        if (tradeCount != 0 && portfolioCount != 0) {
+        if (tradeCount != 0 && cashCount != 0) {
+
             response = ResponseEntity.status(HttpStatus.OK).body(new DatabaseRequestResult(tradeCount));
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

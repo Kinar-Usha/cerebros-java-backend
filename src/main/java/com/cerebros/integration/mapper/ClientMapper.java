@@ -1,10 +1,15 @@
 package com.cerebros.integration.mapper;
 
+import com.cerebros.models.Cash;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 
 import com.cerebros.models.Client;
 import com.cerebros.models.ClientIdentification;
+
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 public interface ClientMapper {
 
@@ -23,4 +28,6 @@ public interface ClientMapper {
 
 	int insertClientPassword(@Param("clientId") String clientId, @Param("password") String password);
 
+    Cash getCashRemaining(String clientId);
+	int insertCash(Map<String, Object> paramMap);
 }

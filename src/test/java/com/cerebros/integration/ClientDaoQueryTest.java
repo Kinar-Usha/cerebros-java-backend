@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.cerebros.integration.doa.impl.ClientDaoImpl;
+import com.cerebros.models.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,10 +26,6 @@ import com.cerebros.constants.ClientIdentificationType;
 import com.cerebros.constants.Country;
 import com.cerebros.exceptions.ClientNotFoundException;
 import com.cerebros.exceptions.DatabaseException;
-import com.cerebros.models.Client;
-import com.cerebros.models.ClientIdentification;
-import com.cerebros.models.Person;
-import com.cerebros.models.Preferences;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -55,6 +52,18 @@ class ClientDaoQueryTest {
 	@AfterEach
 	void tearDown() throws Exception {
 
+	}
+
+	@Test
+	void testGetCashRemaining(){
+		Cash cash= dao.getCashRemaining("YOUR_CLIENTID");
+		assertNotNull(cash);
+	}
+	@Test
+	void testInvalidClientCash(){
+		assertThrows(DatabaseException.class,()->{
+			dao.getCashRemaining("Invalid_ClientID");
+		});
 	}
 
 	// Email Exists or Not

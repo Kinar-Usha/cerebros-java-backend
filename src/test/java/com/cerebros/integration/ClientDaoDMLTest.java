@@ -1,9 +1,6 @@
 package com.cerebros.integration;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -34,6 +31,8 @@ import com.cerebros.models.Client;
 import com.cerebros.models.ClientIdentification;
 import com.cerebros.models.Person;
 import com.cerebros.models.Preferences;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -76,6 +75,10 @@ class ClientDaoDMLTest {
 
 	// Client Registration Tests
 
+//	@Test
+	void testInsertCash(){
+		assertEquals(1,dao.insertCash("YOUR_CLIENTID1", BigDecimal.TEN));
+	}
 	@Test
 	void registerClientWithExistingEmail() {
 		client2.getPerson().setEmail("john.doe@gmail.com");
