@@ -75,7 +75,7 @@ class ClientDaoDMLTest {
 
 	// Client Registration Tests
 
-//	@Test
+	@Test
 	void testInsertCash(){
 		assertEquals(1,dao.insertCash("YOUR_CLIENTID1", BigDecimal.TEN));
 	}

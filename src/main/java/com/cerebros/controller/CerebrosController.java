@@ -214,6 +214,26 @@ public class CerebrosController {
 
         }
     }
+    @GetMapping("/cash/{clientId}")
+    public ResponseEntity<?> addTrade(@PathVariable String clientId){
+        try {
+            if (clientId.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+            Cash cash=clientService.getCash(clientId);
+            if(cash==null){
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            }
+            else{
+                return  ResponseEntity.status(HttpStatus.OK).body(cash);
+            }
+        } catch (DatabaseException e) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+
+        }
+    }
 
     @Transactional
     @PostMapping("/trade")
@@ -260,6 +280,7 @@ public class CerebrosController {
 
                     if(cash!=null){
                         cashCount= portfolioService.updateCash(order.getClientId(), cash, trade.getCashValue() );
+                        System.out.println(cashCount);
 
                     }
                 }
