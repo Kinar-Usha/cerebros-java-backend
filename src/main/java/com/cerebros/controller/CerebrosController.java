@@ -113,6 +113,28 @@ public class CerebrosController {
         }
     }
 
+    @GetMapping(value = "/client/email/{email}")
+    public ResponseEntity<Client> getClientFromEmail(@PathVariable String email) {
+        try {
+            if (email.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+            Client client = clientService.getClientFromEmail(email);
+            if (client == null) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            } else {
+                return ResponseEntity.status(HttpStatus.OK).body(client);
+            }
+        } catch (ClientNotFoundException e) {
+            logger.error("Client Not found");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (RuntimeException e) {
+            logger.error("client run time error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+
+        }
+    }
+
     @PutMapping(value = "/client/register")
     public ResponseEntity<Void> registerClient(@RequestBody ClientRegisterRequest client) {
         ResponseEntity<DatabaseRequestResult> response;
