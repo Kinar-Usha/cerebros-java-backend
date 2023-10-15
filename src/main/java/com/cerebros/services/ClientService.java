@@ -1,5 +1,6 @@
 package com.cerebros.services;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.cerebros.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,12 +23,6 @@ import com.cerebros.constants.Country;
 import com.cerebros.exceptions.ClientAlreadyExistsException;
 import com.cerebros.exceptions.InvalidCredentialsException;
 import com.cerebros.integration.doa.ClientDao;
-import com.cerebros.models.ActivityReport;
-import com.cerebros.models.Client;
-import com.cerebros.models.ClientIdentification;
-import com.cerebros.models.ClientRequest;
-import com.cerebros.models.Person;
-import com.cerebros.models.Preferences;
 
 import io.micrometer.core.ipc.http.HttpSender.Response;
 
@@ -243,4 +239,10 @@ public class ClientService {
 		return dao.getClientPreferences(clientId);
 	}
 
+	public int addCash(String clientId, BigDecimal cash){
+		return  dao.insertCash(clientId,cash);
+	}
+	public Cash getCash(String  clientId){
+		return dao.getCashRemaining(clientId);
+	}
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.cerebros.integration.mapper.ClientMapper">
 
 	<resultMap id="clientResultMap" type="com.cerebros.models.Client">
@@ -24,6 +25,16 @@
 		CEREBROS_CLIENTPASSWORDS WHERE clientId = (SELECT clientID FROM CEREBROS_CLIENT WHERE email
 		= #{email}) AND passwordHash = #{password} </select>
 
+    <!-- Query Statements -->
+
+	<select id="getCashRemaining" resultType="com.cerebros.models.Cash">
+		select cashRemaining from cerebros_cash where clientid=#{clientId}
+	</select>
+	<insert id="insertCash" parameterType="map">
+		INSERT INTO cerebros_cash VALUES(#{clientId}, #{cashRemaining})
+	</insert>
+
+
 	<!-- DML Statements -->
 
 	<insert id="insertClient" parameterType="com.cerebros.models.Client"> INSERT INTO
@@ -39,4 +50,3 @@
 
 
 </mapper>
-        

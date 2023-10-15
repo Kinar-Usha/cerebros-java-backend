@@ -32,6 +32,10 @@ public class PortfolioDaoTest {
     }
 
     @Test
+    void testUpdateCash() {
+        assertEquals(1, portfolioDao.updateCash("YOUR_CLIENTID", BigDecimal.TEN));
+    }
+    @Test
     void testGetPortfolio() throws
             ClientNotFoundException {
         String testClientId = "YOUR_CLIENTID";

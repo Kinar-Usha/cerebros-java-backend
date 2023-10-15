@@ -1,7 +1,10 @@
 package com.cerebros.integration.doa;
 
+import com.cerebros.models.Cash;
 import com.cerebros.models.Client;
 import com.cerebros.models.Preferences;
+
+import java.math.BigDecimal;
 
 public interface ClientDao {
 
@@ -22,5 +25,8 @@ public interface ClientDao {
 	int updateClientPreferences(Preferences preferences, String clientId);
 
 	Preferences getClientPreferences(String clientId);
+
+	Cash getCashRemaining(String clientId);
+	int insertCash(String clientId, BigDecimal cash);
 
 }

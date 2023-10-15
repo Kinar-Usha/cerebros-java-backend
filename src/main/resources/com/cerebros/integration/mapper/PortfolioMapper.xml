@@ -13,6 +13,8 @@
         <result property="price" column="price"/>
     </resultMap>
 
+
+
     <!-- Define the SQL query -->
     <select id="getPortfolio" resultMap="portfolioResultMap">
         SELECT p.instrumentid, p.description, p.categoryid, p.holdings, p.price as price
@@ -31,6 +33,11 @@
         SET holdings = #{portfolio.holdings},
         price=${portfolio.price}
         WHERE clientid = #{clientId} AND instrumentid = #{portfolio.instrumentId}
+    </update>
+
+    <update id="updateCash" parameterType="map">
+        UPDATE cerebros_cash SET cashRemaining=#{cashRemaining}
+        WHERE clientid=#{clientId}
     </update>
     <!-- Define the resultMap for Employee with Job -->
 
