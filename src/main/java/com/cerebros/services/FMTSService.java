@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class FMTSService {
@@ -92,8 +93,11 @@ public class FMTSService {
         ResponseEntity<String> responseEntity =
                 restTemplate.exchange(apiUrl, HttpMethod.POST, requestEntity, String.class);
         if (responseEntity.getStatusCode() == HttpStatus.OK) {
+
             String responseBody = responseEntity.getBody();
-            System.out.println(responseBody);
+            if(Objects.equals(responseBody, "null")){
+                throw new RuntimeException("execution price not proper");
+            }
             ObjectMapper objectMapper = new ObjectMapper();
             try {
                 Trade trade = objectMapper.readValue(responseBody, Trade.class);
@@ -104,8 +108,9 @@ public class FMTSService {
             }
         }else if (responseEntity.getStatusCode().value()==HttpStatus.CONFLICT.value()){
             throw new OrderInvalidException("49 error");
-        }
-        else {
+        } else if (responseEntity.getStatusCode()==HttpStatus.NOT_ACCEPTABLE) {
+            throw new RuntimeException("execution price not proper");
+        } else {
             throw new RuntimeException("Failed to get client token. HTTP status code: " + responseEntity.getStatusCode());
         }
 

@@ -297,9 +297,11 @@ public class CerebrosController {
         }
         catch (RuntimeException e){
             if(Objects.equals(e.getMessage(), "No Item in Portfolio to Sell")) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Not enough holdings");
             } else if (Objects.equals(e.getMessage(), "not enough cash")) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Not Enough Cash"); // Change the response body here
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Not Enough Cash"); // Change the response body here
+            } else if (Objects.equals(e.getMessage(), "execution price not proper")) {
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Invalid price/ Invalid quantity");
             }
         }
         if (tradeCount != 0 && cashCount != 0) {

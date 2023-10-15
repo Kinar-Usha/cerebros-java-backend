@@ -96,9 +96,9 @@ public class ClientService {
 		System.out.println(clientId);
 
 		Client client = new Client(clientId, person, clientIdentifications);
+		return dao.register(client, password);
 
 		// Insert into DB
-		return dao.register(client, password);
 
 	}
 

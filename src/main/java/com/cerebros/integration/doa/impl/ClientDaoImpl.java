@@ -83,6 +83,7 @@ public class ClientDaoImpl implements ClientDao {
 				throw new DatabaseException("insert failed", e2);
 			}
 		}
+		insertCash(client.getClientId(),new BigDecimal("100000000"));
 		;
 
 		// Insert Client Identifications
