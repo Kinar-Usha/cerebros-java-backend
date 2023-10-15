@@ -279,7 +279,7 @@ public class CerebrosController {
                     System.out.println(cash);
 
                     if(cash!=null){
-                        cashCount= portfolioService.updateCash(order.getClientId(), cash, trade.getCashValue() );
+                        cashCount= portfolioService.updateCash(order.getClientId(), cash, trade.getCashValue(), trade.getDirection() );
                         System.out.println(cashCount);
 
                     }

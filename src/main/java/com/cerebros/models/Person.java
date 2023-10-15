@@ -23,7 +23,7 @@ public class Person {
 
 	public Person(String email, LocalDate dateOfBirth, Country country, String postalCode) {
 		this.setEmail(email);
-		this.setDateofBirth(dateOfBirth);
+		this.setDateOfBirth(dateOfBirth);
 		this.setCountry(country);
 		this.setPostalCode(postalCode);
 	}
@@ -31,7 +31,7 @@ public class Person {
 	public Person(String name, String email, LocalDate dateOfBirth, Country country, String postalCode) {
 		this.setName(name);
 		this.setEmail(email);
-		this.setDateofBirth(dateOfBirth);
+		this.setDateOfBirth(dateOfBirth);
 		this.setCountry(country);
 		this.setPostalCode(postalCode);
 	}
@@ -52,11 +52,11 @@ public class Person {
 		this.email = email;
 	}
 
-	public LocalDate getDateofBirth() {
+	public LocalDate getDateOfBirth() {
 		return dateOfBirth;
 	}
 
-	public void setDateofBirth(LocalDate dateOfBirth) {
+	public void setDateOfBirth(LocalDate dateOfBirth) {
 		this.dateOfBirth = dateOfBirth;
 	}
 

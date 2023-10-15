@@ -320,12 +320,13 @@ public class CerebrosWebMVCTest {
         Trade trade = new Trade();
         trade.setCashValue(BigDecimal.TEN);
         trade.setInstrumentId("1");
+        trade.setDirection("B");
         when(fmtsService.executeTrade(Mockito.any(Order.class))).thenReturn(ResponseEntity.ok(trade));
         // Mock the behavior of services
         when(fmtsService.getInstruments()).thenReturn(new ArrayList<Instrument>());
         when(mockPortfolioService.updatePortfolio(Mockito.any(Trade.class))).thenReturn(1);
         when(mockClientService.getCash(Mockito.anyString())).thenReturn(new Cash(new BigDecimal("100")));
-        when(mockPortfolioService.updateCash(Mockito.anyString(),Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class))).thenReturn(1);
+        when(mockPortfolioService.updateCash(Mockito.anyString(),Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class), Mockito.anyString())).thenReturn(1);
         when(mockTradeService.updateClientTradeHistory(Mockito.any(Trade.class))).thenReturn(1);
 
 

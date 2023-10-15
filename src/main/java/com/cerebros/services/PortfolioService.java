@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class PortfolioService {
@@ -28,11 +29,17 @@ public class PortfolioService {
         this.fmtsService=fmtsService;
     }
 
-    public  int updateCash(String clientId, BigDecimal cash, BigDecimal tradedCash){
-        BigDecimal remainingCash= cash.subtract(tradedCash);
+    public  int updateCash(String clientId, BigDecimal cash, BigDecimal tradedCash, String action){
+        System.out.println(tradedCash);
+        BigDecimal remainingCash;
+        if(Objects.equals(action, "B")){
+           remainingCash = cash.subtract(tradedCash);
+        }
+        else {
+            remainingCash= cash.add(tradedCash);
+        }
         int res=0;
         if(remainingCash.compareTo(BigDecimal.ONE)>=0){
-            System.out.println(remainingCash);
             res=portfolioDao.updateCash(clientId,remainingCash);
         }
         else{
