@@ -363,12 +363,12 @@ public class CerebrosController {
     }
 
     @GetMapping(value = "/client/activity/{clientId}")
-    public ResponseEntity<List<String>> getClientActivity(@PathVariable String clientId) {
+    public ResponseEntity<List<Trade>> getClientActivity(@PathVariable String clientId) {
         try {
             if (clientId.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
-            List<String> report = reportService.generateClientActivityReport(clientId);
+            List<Trade> report = reportService.generateClientActivityReport(clientId);
             if (report == null) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
             } else {

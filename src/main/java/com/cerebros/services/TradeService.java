@@ -106,10 +106,29 @@ public class TradeService {
 
     private Price calculateTradeSuitability(Price price, BigDecimal riskTolerance, BigDecimal timeHorizon, BigDecimal incomeBracket) {
         BigDecimal randomFactor = BigDecimal.valueOf(new Random().nextDouble());
-        logger.debug("", randomFactor);
         BigDecimal suitabilityScore = riskTolerance.multiply(randomFactor)
                 .multiply(timeHorizon)
                 .multiply(incomeBracket);
+
+        if (riskTolerance.compareTo(BigDecimal.valueOf(0.2)) == 0) {
+            // Low risk preference, suggest bonds and cash deposits
+            if (price.getInstrument().getCategoryId().equalsIgnoreCase("Bonds") || price.getInstrument().getCategoryId().equalsIgnoreCase("Cash")) {
+                suitabilityScore = suitabilityScore.multiply(BigDecimal.valueOf(1.2));
+            }
+            
+        } else if (riskTolerance.compareTo(BigDecimal.valueOf(0.8)) == 0) {
+            // High risk preference, suggest stocks with higher minimum quantities and higher prices
+            if (price.getInstrument().getCategoryId().equalsIgnoreCase("Stocks")) {
+                suitabilityScore = suitabilityScore.multiply(BigDecimal.valueOf(1.5));
+            }
+        }
+
+        if (incomeBracket.compareTo(BigDecimal.valueOf(0.8)) == 0) {
+            // High income bracket, suggest stocks with higher minimum quantities and higher prices
+            if (price.getInstrument().getCategoryId().equalsIgnoreCase("Stocks")) {
+                suitabilityScore = suitabilityScore.multiply(BigDecimal.valueOf(1.5));
+            }
+        }
 
         price.setSuitabilityScore(suitabilityScore);
         return price;

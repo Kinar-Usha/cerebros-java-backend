@@ -58,6 +58,16 @@ public class Price {
 	}
 
 
+	public Price(BigDecimal askPrice, BigDecimal bidPrice, BigDecimal suitabilityScore, String priceTimestamp,
+			Instrument instrument) {
+		super();
+		this.askPrice = askPrice;
+		this.bidPrice = bidPrice;
+		this.suitabilityScore = suitabilityScore;
+		this.priceTimestamp = priceTimestamp;
+		this.instrument = instrument;
+	}
+
 	public BigDecimal getAskPrice() {
 		return askPrice;
 	}
