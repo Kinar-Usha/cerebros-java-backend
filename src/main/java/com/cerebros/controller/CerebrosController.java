@@ -277,7 +277,9 @@ public class CerebrosController {
             List<Portfolio> portfolios;
             BigDecimal cashcheck= clientService.getCash(order.getClientId()).getCashRemaining();
             if((order.getQuantity().multiply(order.getTargetPrice())).compareTo(cashcheck)>0){
-                throw new RuntimeException("not enough cash");
+                if(order.getDirection().equals("B")) {
+                    throw new RuntimeException("not enough cash");
+                }
             }
             try {
                portfolios = portfolioService.getPortfolio(order.getClientId());
