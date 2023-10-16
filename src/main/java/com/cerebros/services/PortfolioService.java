@@ -48,6 +48,9 @@ public class PortfolioService {
         }
         return res;
     }
+    public int updateCash(String clientId, BigDecimal cash){
+        return portfolioDao.updateCash(clientId,cash);
+    }
 
     public List<Portfolio> getPortfolio(String clientID) {
         try {

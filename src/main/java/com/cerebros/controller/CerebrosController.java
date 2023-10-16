@@ -253,6 +253,18 @@ public class CerebrosController {
 
         }
     }
+    @PostMapping("/updateCash")
+    public ResponseEntity<?> addCash(@RequestBody CashRequest cash){
+       int  rows=0;
+        try{
+            rows=portfolioService.updateCash(cash.getClientId(), cash.getCashRemaining());
+        }catch (Exception e){
+            return  ResponseEntity.internalServerError().body("cash Update failed");
+        }
+        return ResponseEntity.ok(rows);
+
+    }
+
 
     @Transactional
     @PostMapping("/trade")
@@ -391,6 +403,7 @@ public class CerebrosController {
         }
     }
 
+    @CrossOrigin("")
     @GetMapping(value = "/roboadvisor/{clientId}")
     public ResponseEntity<List<Trade>> getRoboAdvisorStocks(@RequestBody Preferences preferences,
             @PathVariable String clientId) {

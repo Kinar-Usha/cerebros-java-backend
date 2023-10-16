@@ -245,4 +245,5 @@ public class ClientService {
 	public Cash getCash(String  clientId){
 		return dao.getCashRemaining(clientId);
 	}
+
 }
