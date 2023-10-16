@@ -2,10 +2,7 @@ package com.cerebros.controller;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 import com.cerebros.exceptions.*;
 import com.cerebros.models.*;
@@ -274,6 +271,29 @@ public class CerebrosController {
                     order.getInstrumentId() == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
+            List<Portfolio> portfolios;
+            try {
+               portfolios = portfolioService.getPortfolio(order.getClientId());
+
+            }catch (ClientNotFoundException e){
+                portfolios=new ArrayList<>();
+                logger.error(e.getMessage());
+            }
+            Portfolio portfolioItem= portfolioService.findPortfolioItemByInstrumentId(portfolios, order.getInstrumentId());
+            BigDecimal holding;
+            if(portfolioItem==null){
+                holding=BigDecimal.ZERO;
+            }
+            else {
+                holding=portfolioItem.getHoldings();
+            }
+            if(order.getQuantity().compareTo(holding)>0){
+                System.out.println(order.getDirection());
+                if(Objects.equals(order.getDirection(), "S")){
+                    throw new RuntimeException("No Item in Portfolio to Sell");
+                }
+            }
+
             String orderId= UUID.randomUUID().toString();
             order.setOrderId(orderId);
             String clientId = order.getClientId();

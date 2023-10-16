@@ -11,4 +11,5 @@ public interface PortfolioDao {
     int addToPortfolio(Portfolio dummyPortfolio, String clientId);
     int updatePortfolio(Portfolio portfolio, String clientId);
     int updateCash(String clientId, BigDecimal cash);
+    int deletePortfolio(String clientId, String instrumentId);
 }

@@ -47,6 +47,16 @@ public class PortfolioDaoImpl implements PortfolioDao {
 
 
     }
+    @Override
+    public int deletePortfolio(String clientId, String instrumentId){
+        int rowsUpdated=0;
+        try{
+            rowsUpdated= mapper.deletePortfolio(clientId,instrumentId);
+        }catch (Exception e){
+            throw  new DatabaseException("delete failed");
+        }
+        return rowsUpdated;
+    }
 
     @Override
     public int updatePortfolio(Portfolio portfolio, String clientId) {

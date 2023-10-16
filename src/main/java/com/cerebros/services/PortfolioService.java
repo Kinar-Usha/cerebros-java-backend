@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -64,14 +65,27 @@ public int updatePortfolio(Trade trade) {
     String clientId = trade.getClientid();
     String instrumentId = trade.getInstrumentId();
     int rows=0;
-    List<Portfolio> portfolioList = portfolioDao.getPortfolio(clientId);
+    Portfolio portfolioItem;
+    List<Portfolio> portfolioList;
+    try {
+         portfolioList = portfolioDao.getPortfolio(clientId);
+         portfolioItem = findPortfolioItemByInstrumentId(portfolioList, instrumentId);
+        System.out.println(portfolioItem);
+    }
+    catch (ClientNotFoundException e){
+        portfolioList= new ArrayList<>();
+        portfolioItem=null;
+    }
 
-    Portfolio portfolioItem = findPortfolioItemByInstrumentId(portfolioList, instrumentId);
-    System.out.println(portfolioItem);
+
 
     if (portfolioItem != null) {
         updateExistingPortfolioItem(trade, portfolioItem);
-         rows=portfolioDao.updatePortfolio(portfolioItem, clientId);
+        if(Objects.equals(portfolioItem.getHoldings(), BigDecimal.ZERO)){
+            rows =portfolioDao.deletePortfolio(clientId, portfolioItem.getInstrumentId());
+        }else {
+            rows = portfolioDao.updatePortfolio(portfolioItem, clientId);
+        }
     } else {
         if ("B".equals(trade.getDirection())) {
             rows=createNewPortfolioItem(trade, clientId);
@@ -82,7 +96,7 @@ public int updatePortfolio(Trade trade) {
     return  rows;
 }
 
-    private Portfolio findPortfolioItemByInstrumentId(List<Portfolio> portfolioList, String instrumentId) {
+    public Portfolio findPortfolioItemByInstrumentId(List<Portfolio> portfolioList, String instrumentId) {
         return portfolioList.stream()
                 .filter(item -> item.getInstrumentId().equals(instrumentId))
                 .findFirst()
