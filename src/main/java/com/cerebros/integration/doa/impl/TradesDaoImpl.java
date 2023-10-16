@@ -24,6 +24,7 @@ public class TradesDaoImpl implements TradesDao {
     public List<Trade> getTrades(String clientId) {
 
         List<Trade> Trades= mapper.getTrades(clientId);
+        
         if(Trades.isEmpty()){
             throw new DatabaseException("Client Invalid or no Trade history");
         }

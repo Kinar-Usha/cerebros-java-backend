@@ -15,14 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.cerebros.services.ClientService;
 import com.cerebros.services.FMTSService;
@@ -311,16 +303,18 @@ public class CerebrosController {
         }
     }
 
-    @GetMapping(value = "/roboadvisor/{clientId}")
-    public ResponseEntity<List<Trade>> getRoboAdvisorStocks(@RequestBody Preferences preferences,
-            @PathVariable String clientId) {
+    @GetMapping(value = "/roboadvisor/preferences/{clientId}")
+    public ResponseEntity<List<Price>> getRoboAdvisorStocks(@RequestParam String risk,
+            @RequestParam String time,
+            @RequestParam String income,@PathVariable String clientId) {
         try {
-            List<Trade> topBuyAndSellTrades = tradeService.getTopBuyAndSellTrades(preferences, clientId);
-
-            return ResponseEntity.ok(topBuyAndSellTrades.subList(0, Math.min(topBuyAndSellTrades.size(), 5))); // Return
-                                                                                                               // the
-                                                                                                               // top 5
-                                                                                                               // trades
+                Preferences preferences = new Preferences();
+                preferences.setRisk(risk);
+                preferences.setTime(time);
+                preferences.setIncome(income);
+                logger.debug("{}",preferences.getRisk());
+            List<Price> topBuyAndSellTrades = tradeService.getTopBuyAndSellTrades(preferences,clientId);
+            return ResponseEntity.ok(topBuyAndSellTrades);                                                                            // the
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

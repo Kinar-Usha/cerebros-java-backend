@@ -1,26 +1,45 @@
 package com.cerebros.services;
-
+import org.slf4j.Logger;
 import com.cerebros.exceptions.DatabaseException;
 import com.cerebros.integration.doa.TradesDao;
+import com.cerebros.models.Instrument;
 import com.cerebros.models.Preferences;
+import com.cerebros.models.Price;
 import com.cerebros.models.Trade;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
+import java.util.logging.ConsoleHandler;
 import java.util.stream.Collectors;
 
 @Service
 public class TradeService {
 
     private final TradesDao tradesDao;
+    @Value("${fmts.api.url}")
+    private String fmtsApiUrl="http://localhost:3000";
+    private final RestTemplate restTemplate;
+    
+    @Autowired
+    private Logger logger;
 
     @Autowired
-    public TradeService(TradesDao tradesDao) {
+    public TradeService(TradesDao tradesDao,RestTemplate restTemplate) {
         this.tradesDao = tradesDao;
+        this.restTemplate = restTemplate;
     }
 
     public List<Trade> getClientTradeHistory(String clientId) throws DatabaseException {
@@ -39,36 +58,63 @@ public class TradeService {
         }
 
     }
-    public List<Trade> getTopBuyAndSellTrades(Preferences preferences, String clientId) {
-        List<Trade> allTrades = tradesDao.getTrades(clientId); 
-        return calculateTopTradesBasedOnPreferences(allTrades, preferences);
-        }
-        private List<Trade> calculateTopTradesBasedOnPreferences(List<Trade> trades, Preferences preferences) {
-            String riskTolerance = preferences.getRisk();
-            String timeHorizon = preferences.getTime();
-            String incomeBracket = preferences.getIncome();
+    public List<Price> getTopBuyAndSellTrades(Preferences preferences, String clientId) {
+        String instrumentsApiUrl = fmtsApiUrl + "/fmts/trades/instruments";
+        String pricesApiUrl = fmtsApiUrl + "/fmts/trades/prices";
 
-            return trades.stream()
-                    .filter(trade -> isTradeSuitable(trade, riskTolerance, timeHorizon, incomeBracket))
-                    .sorted(Comparator.comparing(Trade::getExecutionPrice))
-                    .limit(5) // Get the top 5 trades
-                    .collect(Collectors.toList());
+        // Fetch instruments data
+        String instrumentsJsonResponse = restTemplate.getForObject(instrumentsApiUrl, String.class);
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // Fetch prices data
+        String pricesJsonResponse = restTemplate.getForObject(pricesApiUrl, String.class);
+        List<Price> prices;
+        try {
+            prices = objectMapper.readValue(pricesJsonResponse, new TypeReference<List<Price>>() {});
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to deserialize response: " + e.getMessage());
         }
 
-        private boolean isTradeSuitable(Trade trade, String riskTolerance, String timeHorizon, String incomeBracket) {
-        	 BigDecimal bidPrice = trade.getExecutionPrice();
-             if ("HIGH".equalsIgnoreCase(riskTolerance) &&
-                     "HIGH".equalsIgnoreCase(timeHorizon) &&
-                     "HIGH".equalsIgnoreCase(incomeBracket)) {
-                 // High bid price stock
-                 return bidPrice.compareTo(BigDecimal.valueOf(100.0)) > 0;
-             } else if ("LOW".equalsIgnoreCase(riskTolerance) &&
-                     "HIGH".equalsIgnoreCase(timeHorizon)) {
-                 // Lower bid price stock
-                 return bidPrice.compareTo(BigDecimal.valueOf(50.0)) <= 0;
-             }
-             return false;
+        return calculateTopTradesBasedOnPreferences(prices, preferences);
+    }
+
+    private List<Price> calculateTopTradesBasedOnPreferences(List<Price> prices, Preferences preferences) {
+        BigDecimal riskToleranceValue = getPreferenceValue(preferences.getRisk());
+        BigDecimal timeHorizonValue = getPreferenceValue(preferences.getTime());
+        BigDecimal incomeBracketValue = getPreferenceValue(preferences.getIncome());
+        logger.debug("{}", preferences.getRisk());
+        return prices.stream()
+                .map(price -> calculateTradeSuitability(price, riskToleranceValue, timeHorizonValue, incomeBracketValue))
+                .sorted(Comparator.comparing(Price::getSuitabilityScore).reversed())
+                .limit(10)
+                .collect(Collectors.toList());
+    }
+
+    private BigDecimal getPreferenceValue(String preference) {
+        logger.debug("{}", preference);
+        switch (preference.toUpperCase()) {
+            case "LOW":
+                return BigDecimal.valueOf(0.2);
+            case "MEDIUM":
+                return BigDecimal.valueOf(0.5);
+            case "HIGH":
+                return BigDecimal.valueOf(0.8);
+            default:
+                return BigDecimal.valueOf(0.5);
         }
+    }
+
+    private Price calculateTradeSuitability(Price price, BigDecimal riskTolerance, BigDecimal timeHorizon, BigDecimal incomeBracket) {
+        BigDecimal randomFactor = BigDecimal.valueOf(new Random().nextDouble());
+        logger.debug("", randomFactor);
+        BigDecimal suitabilityScore = riskTolerance.multiply(randomFactor)
+                .multiply(timeHorizon)
+                .multiply(incomeBracket);
+
+        price.setSuitabilityScore(suitabilityScore);
+        return price;
+    }
+
 //public Trade executeSellTrade(Order order) throws Exception{
 //
 //
