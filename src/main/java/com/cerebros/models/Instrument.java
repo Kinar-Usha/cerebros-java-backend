@@ -12,6 +12,15 @@ public class Instrument {
 	private String instrumentDescription;
 	private BigDecimal minQuantity;
 	private BigDecimal maxQuantity;
+	private BigDecimal suitabilityScore;
+
+	public BigDecimal getSuitabilityScore() {
+		return suitabilityScore;
+	}
+
+	public void setSuitabilityScore(BigDecimal suitabilityScore) {
+		this.suitabilityScore = suitabilityScore;
+	}
 
 	public Instrument(String instrumentId, String externalIdType, String externalId, String categoryId,
 			String instrumentDescription, BigDecimal minQuantity, BigDecimal maxQuantity) {
@@ -26,28 +35,33 @@ public class Instrument {
 
 	@Override
 	public String toString() {
-		return "Instrument{" +
-				"instrumentId='" + instrumentId + '\'' +
-				", externalIdType='" + externalIdType + '\'' +
-				", externalId='" + externalId + '\'' +
-				", categoryId='" + categoryId + '\'' +
-				", instrumentDescription='" + instrumentDescription + '\'' +
-				", minQuantity=" + minQuantity +
-				", maxQuantity=" + maxQuantity +
-				'}';
+		return "Instrument [instrumentId=" + instrumentId + ", externalIdType=" + externalIdType + ", externalId="
+				+ externalId + ", categoryId=" + categoryId + ", instrumentDescription=" + instrumentDescription
+				+ ", minQuantity=" + minQuantity + ", maxQuantity=" + maxQuantity + ", suitabilityScore="
+				+ suitabilityScore + "]";
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		Instrument that = (Instrument) o;
-		return Objects.equals(instrumentId, that.instrumentId) && Objects.equals(externalIdType, that.externalIdType) && Objects.equals(externalId, that.externalId) && Objects.equals(categoryId, that.categoryId) && Objects.equals(instrumentDescription, that.instrumentDescription) && Objects.equals(minQuantity, that.minQuantity) && Objects.equals(maxQuantity, that.maxQuantity);
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Instrument other = (Instrument) obj;
+		return Objects.equals(categoryId, other.categoryId) && Objects.equals(externalId, other.externalId)
+				&& Objects.equals(externalIdType, other.externalIdType)
+				&& Objects.equals(instrumentDescription, other.instrumentDescription)
+				&& Objects.equals(instrumentId, other.instrumentId) && Objects.equals(maxQuantity, other.maxQuantity)
+				&& Objects.equals(minQuantity, other.minQuantity)
+				&& Objects.equals(suitabilityScore, other.suitabilityScore);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(instrumentId, externalIdType, externalId, categoryId, instrumentDescription, minQuantity, maxQuantity);
+		return Objects.hash(categoryId, externalId, externalIdType, instrumentDescription, instrumentId, maxQuantity,
+				minQuantity, suitabilityScore);
 	}
 
 	public Instrument() {

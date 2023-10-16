@@ -11,6 +11,7 @@ import com.cerebros.services.TradeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -24,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,9 +35,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import com.cerebros.exceptions.ClientNotFoundException;
-import com.cerebros.exceptions.InvalidCredentialsException;
-
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.internal.matchers.Or;
@@ -49,6 +48,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.mockito.Mockito.doReturn;
@@ -60,8 +60,6 @@ import org.springframework.web.client.RestTemplate;
 
 import com.cerebros.constants.ClientIdentificationType;
 import com.cerebros.constants.Country;
-import com.cerebros.exceptions.ClientAlreadyExistsException;
-import com.cerebros.exceptions.ClientNotFoundException;
 import com.cerebros.services.ClientService;
 import com.cerebros.services.PortfolioService;
 import com.cerebros.services.TradeService;
@@ -86,6 +84,8 @@ public class CerebrosWebMVCTest {
         @Autowired
         private RestTemplate restTemplate;
 
+        @Autowired
+    private CerebrosController controller;
         @MockBean
         private TradeService mockTradeService;
 
@@ -147,7 +147,31 @@ public class CerebrosWebMVCTest {
             mockMvc.perform(post("/client/verifyEmail").content(email))
                     .andExpect(status().isOk());
 	}
+ @Test
+    public void testGetRoboAdvisorStocks() {
+        Preferences preferences = new Preferences();
+        preferences.setRisk("LOW");
+        preferences.setTime("MEDIUM");
+        preferences.setIncome("HIGH");
+        Mockito.when(mockTradeService.getTopBuyAndSellTrades(preferences, "clientId"))
+               .thenReturn(Collections.singletonList(new Price()));
+        ResponseEntity<List<Price>> response = controller.getRoboAdvisorStocks("LOW", "MEDIUM", "HIGH", "clientId");
 
+        // Assertions
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(1, response.getBody().size());
+    }
+    @Test
+    public void testGetRoboAdvisorStocksIntegration() throws Exception {
+
+    	mockMvc.perform(MockMvcRequestBuilders.get("/roboadvisor/preferences/YOUR_CLIENTID")
+    		    .param("risk", "LOW")
+    		    .param("time", "MEDIUM")
+    		    .param("income", "HIGH"))
+    		    .andExpect(MockMvcResultMatchers.status().isOk())
+    		    .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+    		    .andDo(MockMvcResultHandlers.print());
+    }
     @ParameterizedTest
 	@ValueSource(strings = { "sadsad", "invalidemail@", "@invalidemail.com", "invalidemail.com", "ds@dsd" })
 	void verifyInvalidEmailAddress(String email) throws Exception {

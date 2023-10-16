@@ -117,9 +117,20 @@ public class ClientService {
 	}
 
 	public int addPreferences(String clientId, Preferences preferences) {
-		int added = dao.addClientPreferences(preferences, clientId);
+		Preferences pref = dao.getClientPreferences(clientId);
+		int added=0;
+		if(pref==null) {
+		added = dao.addClientPreferences(preferences, clientId);
 		if (added == 0) {
 			throw new RuntimeException("Failed to add preferences");
+		}
+		}
+		else {
+			
+			added=dao.updateClientPreferences(preferences, clientId);
+			if (added == 0) {
+				throw new RuntimeException("Failed to add preferences");
+			}
 		}
 
 		return added;
@@ -236,7 +247,9 @@ public class ClientService {
 		if (clientId == "") {
 			throw new IllegalArgumentException();
 		}
-		return dao.getClientPreferences(clientId);
+		Preferences pref = dao.getClientPreferences(clientId);
+		System.out.println(pref+"HI");
+		return pref;
 	}
 
 	public int addCash(String clientId, BigDecimal cash){
