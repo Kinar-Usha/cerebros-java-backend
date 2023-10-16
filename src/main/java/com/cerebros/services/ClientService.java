@@ -1,5 +1,6 @@
 package com.cerebros.services;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.cerebros.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,12 +23,6 @@ import com.cerebros.constants.Country;
 import com.cerebros.exceptions.ClientAlreadyExistsException;
 import com.cerebros.exceptions.InvalidCredentialsException;
 import com.cerebros.integration.doa.ClientDao;
-import com.cerebros.models.ActivityReport;
-import com.cerebros.models.Client;
-import com.cerebros.models.ClientIdentification;
-import com.cerebros.models.ClientRequest;
-import com.cerebros.models.Person;
-import com.cerebros.models.Preferences;
 
 import io.micrometer.core.ipc.http.HttpSender.Response;
 
@@ -100,9 +96,9 @@ public class ClientService {
 		System.out.println(clientId);
 
 		Client client = new Client(clientId, person, clientIdentifications);
+		return dao.register(client, password);
 
 		// Insert into DB
-		return dao.register(client, password);
 
 	}
 
@@ -121,9 +117,20 @@ public class ClientService {
 	}
 
 	public int addPreferences(String clientId, Preferences preferences) {
-		int added = dao.addClientPreferences(preferences, clientId);
+		Preferences pref = dao.getClientPreferences(clientId);
+		int added=0;
+		if(pref==null) {
+		added = dao.addClientPreferences(preferences, clientId);
 		if (added == 0) {
 			throw new RuntimeException("Failed to add preferences");
+		}
+		}
+		else {
+			
+			added=dao.updateClientPreferences(preferences, clientId);
+			if (added == 0) {
+				throw new RuntimeException("Failed to add preferences");
+			}
 		}
 
 		return added;
@@ -240,7 +247,15 @@ public class ClientService {
 		if (clientId == "") {
 			throw new IllegalArgumentException();
 		}
-		return dao.getClientPreferences(clientId);
+		Preferences pref = dao.getClientPreferences(clientId);
+		System.out.println(pref+"HI");
+		return pref;
 	}
 
+	public int addCash(String clientId, BigDecimal cash){
+		return  dao.insertCash(clientId,cash);
+	}
+	public Cash getCash(String  clientId){
+		return dao.getCashRemaining(clientId);
+	}
 }

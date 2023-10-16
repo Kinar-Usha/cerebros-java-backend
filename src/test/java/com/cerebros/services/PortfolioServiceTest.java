@@ -131,12 +131,12 @@ class PortfolioServiceTest {
 		Portfolio existingPortfolio = new Portfolio("instrument1", "", "", BigDecimal.TEN, BigDecimal.valueOf(100));
 
 		when(portfolioDao.getPortfolio("client1")).thenReturn(new ArrayList<>(List.of(existingPortfolio)));
-		when(portfolioDao.updatePortfolio(any(), eq("client1"))).thenReturn(1);
+		when(portfolioDao.deletePortfolio(any(),  anyString())).thenReturn(1);
 
 		portfolioService.updatePortfolio(trade);
 
 		verify(portfolioDao, times(1)).getPortfolio("client1");
-		verify(portfolioDao, times(1)).updatePortfolio(any(), eq("client1"));
+		verify(portfolioDao, times(1)).deletePortfolio(any(), anyString());
 		assertEquals(BigDecimal.valueOf(0), existingPortfolio.getHoldings());
 		assertEquals(
 				BigDecimal.valueOf(0), // Replace with your expected price value

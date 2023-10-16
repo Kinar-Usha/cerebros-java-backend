@@ -8,6 +8,7 @@ import com.cerebros.models.Portfolio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,16 @@ public class PortfolioDaoImpl implements PortfolioDao {
 
 
     }
+    @Override
+    public int deletePortfolio(String clientId, String instrumentId){
+        int rowsUpdated=0;
+        try{
+            rowsUpdated= mapper.deletePortfolio(clientId,instrumentId);
+        }catch (Exception e){
+            throw  new DatabaseException("delete failed");
+        }
+        return rowsUpdated;
+    }
 
     @Override
     public int updatePortfolio(Portfolio portfolio, String clientId) {
@@ -62,5 +73,19 @@ public class PortfolioDaoImpl implements PortfolioDao {
         }
         return rowsUpdated;
 
+    }
+    @Override
+    public int updateCash(String clientId, BigDecimal cash){
+        int rowsUpdated=0;
+        try {
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("clientId", clientId);
+            paramMap.put("cashRemaining", cash);
+            rowsUpdated= mapper.updateCash(paramMap);
+
+        } catch (Exception e) {
+            throw new DatabaseException("update failed",e);
+        }
+        return rowsUpdated;
     }
 }

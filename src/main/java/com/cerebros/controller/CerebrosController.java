@@ -1,10 +1,8 @@
 package com.cerebros.controller;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 import com.cerebros.exceptions.*;
 import com.cerebros.models.*;
@@ -90,6 +88,28 @@ public class CerebrosController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
             Client client = clientService.getClient(clientId);
+            if (client == null) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            } else {
+                return ResponseEntity.status(HttpStatus.OK).body(client);
+            }
+        } catch (ClientNotFoundException e) {
+            logger.error("Client Not found");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (RuntimeException e) {
+            logger.error("client run time error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+
+        }
+    }
+
+    @GetMapping(value = "/client/email/{email}")
+    public ResponseEntity<Client> getClientFromEmail(@PathVariable String email) {
+        try {
+            if (email.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+            Client client = clientService.getClientFromEmail(email);
             if (client == null) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
             } else {
@@ -205,13 +225,34 @@ public class CerebrosController {
 
         }
     }
+    @GetMapping("/cash/{clientId}")
+    public ResponseEntity<?> addTrade(@PathVariable String clientId){
+        try {
+            if (clientId.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+            Cash cash=clientService.getCash(clientId);
+            if(cash==null){
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            }
+            else{
+                return  ResponseEntity.status(HttpStatus.OK).body(cash);
+            }
+        } catch (DatabaseException e) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+
+        }
+    }
 
     @Transactional
     @PostMapping("/trade")
-    public ResponseEntity<DatabaseRequestResult> addTrade(@RequestBody Order order) {
+    public ResponseEntity<?> addTrade(@RequestBody Order order) {
         ResponseEntity<DatabaseRequestResult> response;
         int tradeCount = 0;
         int portfolioCount = 0;
+        int cashCount=0;
         System.out.println(order);
         try {
             if (order == null || order.getOrderId() == null ||
@@ -222,6 +263,29 @@ public class CerebrosController {
                     order.getInstrumentId() == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
+            List<Portfolio> portfolios;
+            try {
+               portfolios = portfolioService.getPortfolio(order.getClientId());
+
+            }catch (ClientNotFoundException e){
+                portfolios=new ArrayList<>();
+                logger.error(e.getMessage());
+            }
+            Portfolio portfolioItem= portfolioService.findPortfolioItemByInstrumentId(portfolios, order.getInstrumentId());
+            BigDecimal holding;
+            if(portfolioItem==null){
+                holding=BigDecimal.ZERO;
+            }
+            else {
+                holding=portfolioItem.getHoldings();
+            }
+            if(order.getQuantity().compareTo(holding)>0){
+                System.out.println(order.getDirection());
+                if(Objects.equals(order.getDirection(), "S")){
+                    throw new RuntimeException("No Item in Portfolio to Sell");
+                }
+            }
+
             String orderId= UUID.randomUUID().toString();
             order.setOrderId(orderId);
             String clientId = order.getClientId();
@@ -243,6 +307,17 @@ public class CerebrosController {
             portfolioCount = portfolioService.updatePortfolio(trade);
             if (portfolioCount != 0) {
                 tradeCount = tradeService.updateClientTradeHistory(trade);
+                if(tradeCount!=0){
+                    BigDecimal cash= clientService.getCash(order.getClientId()).getCashRemaining();
+                    System.out.println(trade.getCashValue());
+                    System.out.println(cash);
+
+                    if(cash!=null){
+                        cashCount= portfolioService.updateCash(order.getClientId(), cash, trade.getCashValue(), trade.getDirection() );
+                        System.out.println(cashCount);
+
+                    }
+                }
 
             }
         }
@@ -256,10 +331,15 @@ public class CerebrosController {
         }
         catch (RuntimeException e){
             if(Objects.equals(e.getMessage(), "No Item in Portfolio to Sell")) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Not enough holdings");
+            } else if (Objects.equals(e.getMessage(), "not enough cash")) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Not Enough Cash"); // Change the response body here
+            } else if (Objects.equals(e.getMessage(), "execution price not proper")) {
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Invalid price/ Invalid quantity");
             }
         }
-        if (tradeCount != 0 && portfolioCount != 0) {
+        if (tradeCount != 0 && cashCount != 0) {
+
             response = ResponseEntity.status(HttpStatus.OK).body(new DatabaseRequestResult(tradeCount));
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

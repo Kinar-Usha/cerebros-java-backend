@@ -329,44 +329,45 @@ public class CerebrosWebMVCTest {
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
-        @Test
-        public void testExxecuteTrade() throws Exception {
-                Order order = new Order("PQR1045", new BigDecimal("30.0"), new BigDecimal("104.25"), "B",
-                                "YOUR_CLIENTID", "N123456");
-                ClientRequest clientRequest = new ClientRequest("test@example.com", "YOUR_CLIENTID", "test-token");
-                Person person = new Person();
-                person.setEmail("test@example.com");
-                // Mock the clientService.getClient method
-                when(mockClientService.getClient(Mockito.anyString())).thenReturn(new Client("YOUR_CLIENTID", person));
 
-                // Mock the fmtsService.getClientToken method
-                when(fmtsService.getClientToken(Mockito.any(ClientRequest.class)))
-                                .thenReturn(ResponseEntity.ok(clientRequest));
+    @Test
+    public void testAddTradeEndpoint() throws Exception {
+        Order order = new Order("PQR1045", new BigDecimal("30.0"), new BigDecimal("104.25"), "B",
+                "YOUR_CLIENTID", "N123456");
+        ClientRequest clientRequest = new ClientRequest("test@example.com", "YOUR_CLIENTID", "test-token");
+        Person person = new Person();
+        person.setEmail("test@example.com");
+        // Mock the clientService.getClient method
+        when(mockClientService.getClient(Mockito.anyString())).thenReturn(new Client("YOUR_CLIENTID", person));
+        when(fmtsService.getClientToken(Mockito.any(ClientRequest.class)))
+                .thenReturn(ResponseEntity.ok(clientRequest));
+        Trade trade = new Trade();
+        trade.setCashValue(BigDecimal.TEN);
+        trade.setInstrumentId("1");
+        trade.setDirection("B");
+        when(fmtsService.executeTrade(Mockito.any(Order.class))).thenReturn(ResponseEntity.ok(trade));
+        // Mock the behavior of services
+        when(fmtsService.getInstruments()).thenReturn(new ArrayList<Instrument>());
+        when(mockPortfolioService.updatePortfolio(Mockito.any(Trade.class))).thenReturn(1);
+        when(mockClientService.getCash(Mockito.anyString())).thenReturn(new Cash(new BigDecimal("100")));
+        when(mockPortfolioService.updateCash(Mockito.anyString(),Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class), Mockito.anyString())).thenReturn(1);
+        when(mockTradeService.updateClientTradeHistory(Mockito.any(Trade.class))).thenReturn(1);
 
-                // Mock the fmtsService.executeTrade method
-                Trade trade = new Trade();
-                when(fmtsService.executeTrade(Mockito.any(Order.class))).thenReturn(ResponseEntity.ok(trade));
 
-                // Mock the tradeService.updateClientTradeHistory method
-                when(mockTradeService.updateClientTradeHistory(Mockito.any(Trade.class))).thenReturn(1);
-
-                // Mock the portfolioService.updatePortfolio method
-                when(mockPortfolioService.updatePortfolio(Mockito.any(Trade.class))).thenReturn(1);
-
-                mockMvc.perform(MockMvcRequestBuilders
-                                .post("/trade")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\n" +
-                                                "    \"orderId\": \"PQR\",\n" +
-                                                "    \"quantity\": 10.0,\n" +
-                                                "    \"targetPrice\": 104.25,\n" +
-                                                "    \"direction\": \"B\",\n" +
-                                                "    \"clientId\": \"1\",\n" +
-                                                "    \"instrumentId\": \"N123456\",\n" +
-                                                "\t\"token\":739859208\n" +
-                                                "}"))
-                                .andExpect(MockMvcResultMatchers.status().isOk());
-        }
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/trade")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\n" +
+                                "    \"orderId\": \"PQR\",\n" +
+                                "    \"quantity\": 10.0,\n" +
+                                "    \"targetPrice\": 104.25,\n" +
+                                "    \"direction\": \"B\",\n" +
+                                "    \"clientId\": \"1\",\n" +
+                                "    \"instrumentId\": \"N123456\",\n" +
+                                "\t\"token\":739859208\n" +
+                                "}"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
 
         @Test
         public void testAddTradeWithNullOrder() throws Exception {

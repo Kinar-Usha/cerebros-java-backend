@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.cerebros.integration.doa.impl.ClientDaoImpl;
+import com.cerebros.models.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,10 +26,6 @@ import com.cerebros.constants.ClientIdentificationType;
 import com.cerebros.constants.Country;
 import com.cerebros.exceptions.ClientNotFoundException;
 import com.cerebros.exceptions.DatabaseException;
-import com.cerebros.models.Client;
-import com.cerebros.models.ClientIdentification;
-import com.cerebros.models.Person;
-import com.cerebros.models.Preferences;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -46,8 +43,11 @@ class ClientDaoQueryTest {
 		Person person1 = new Person("john.doe@gmail.com", LocalDate.of(2001, 9, 11), Country.INDIA, "600097");
 		ClientIdentification clientIdentification1 = new ClientIdentification(ClientIdentificationType.PASSPORT,
 				"B7654321");
+		ClientIdentification clientIdentification2 = new ClientIdentification(ClientIdentificationType.SSN,
+				"333-12-4445");
 		Set<ClientIdentification> clientIdentifications = new HashSet<ClientIdentification>();
 		clientIdentifications.add(clientIdentification1);
+		clientIdentifications.add(clientIdentification2);
 
 		client1 = new Client("YOUR_CLIENTID", person1, clientIdentifications);
 	}
@@ -55,6 +55,19 @@ class ClientDaoQueryTest {
 	@AfterEach
 	void tearDown() throws Exception {
 
+	}
+
+	@Test
+	void testGetCashRemaining() {
+		Cash cash = dao.getCashRemaining("YOUR_CLIENTID");
+		assertNotNull(cash);
+	}
+
+	@Test
+	void testInvalidClientCash() {
+		assertThrows(DatabaseException.class, () -> {
+			dao.getCashRemaining("Invalid_ClientID");
+		});
 	}
 
 	// Email Exists or Not
@@ -81,7 +94,7 @@ class ClientDaoQueryTest {
 	@Test
 	void testGetClientReturnsClient1() {
 		Client actualClient = dao.getClient("YOUR_CLIENTID");
-		client1.setClientIdentifications(null);
+		// client1.setClientIdentifications(null);
 		assertEquals(client1, actualClient);
 	}
 
@@ -95,9 +108,26 @@ class ClientDaoQueryTest {
 	@Test
 	void testGetClientByEmailReturnsClient1() {
 		Client actualClient = dao.getClientByEmail("john.doe@gmail.com");
-		client1.setClientIdentifications(null);
+		// client1.setClientIdentifications(null);
 		assertEquals(client1, actualClient);
 	}
+
+	// Get client identifications
+
+	@Test
+	void testGetClientIdentificationsWithNonExistentId() {
+		assertTrue(dao.getClientIdentifications("NO_ID").size() == 0);
+	}
+
+	@Test
+	void testGetClientIdentifications() {
+		Set<ClientIdentification> actualClientIdentifications = dao.getClientIdentifications("YOUR_CLIENTID");
+		Set<ClientIdentification> expectedClientIdentifications = new HashSet<ClientIdentification>();
+		expectedClientIdentifications.add(new ClientIdentification(ClientIdentificationType.PASSPORT, "B7654321"));
+		expectedClientIdentifications.add(new ClientIdentification(ClientIdentificationType.SSN, "333-12-4445"));
+		assertEquals(expectedClientIdentifications, actualClientIdentifications);
+	}
+
 
 	// Login
 
@@ -115,40 +145,35 @@ class ClientDaoQueryTest {
 	void testLoginWithValidCreds() {
 		assertTrue(() -> dao.login("john.doe@gmail.com", "1234567890"));
 	}
-	
+
 	@Test
 	void testInstantiateObjectNotNull() {
 		assertNotNull(dao);
 	}
-	
+
 	@Test
 	void testGetAllPreferencesById() {
 		assertNotNull(dao.getClientPreferences("YOUR_CLIENTID"));
 	}
 
-	
 	@Test
 	void testGetPreferencesByIdEqualsPurposes() {
-		Preferences pref = new Preferences("Investment","High","Long-term","High");
-		assertEquals(pref.getPurpose(),dao.getClientPreferences("YOUR_CLIENTID").getPurpose());
+		Preferences pref = new Preferences("Investment", "High", "Long-term", "High");
+		assertEquals(pref.getPurpose(), dao.getClientPreferences("YOUR_CLIENTID").getPurpose());
 	}
-	
+
 	@Test
 	void testGetPreferencesByEmptyString() {
 		assertThrows(IllegalArgumentException.class, () -> {
 			dao.getClientPreferences("");
 		});
 	}
-	
+
 	@Test
 	void testGetPreferencesByInvalidId() {
 		assertThrows(DatabaseException.class, () -> {
 			dao.getClientPreferences("YOUR_CLIENTID123444");
 		});
 	}
-	
-	 
-	 
-	
 
 }

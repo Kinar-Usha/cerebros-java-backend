@@ -11,8 +11,10 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class PortfolioService {
@@ -28,6 +30,24 @@ public class PortfolioService {
         this.fmtsService=fmtsService;
     }
 
+    public  int updateCash(String clientId, BigDecimal cash, BigDecimal tradedCash, String action){
+        System.out.println(tradedCash);
+        BigDecimal remainingCash;
+        if(Objects.equals(action, "B")){
+           remainingCash = cash.subtract(tradedCash);
+        }
+        else {
+            remainingCash= cash.add(tradedCash);
+        }
+        int res=0;
+        if(remainingCash.compareTo(BigDecimal.ONE)>=0){
+            res=portfolioDao.updateCash(clientId,remainingCash);
+        }
+        else{
+            throw  new RuntimeException("not enough cash");
+        }
+        return res;
+    }
 
     public List<Portfolio> getPortfolio(String clientID) {
         try {
@@ -45,14 +65,27 @@ public int updatePortfolio(Trade trade) {
     String clientId = trade.getClientid();
     String instrumentId = trade.getInstrumentId();
     int rows=0;
-    List<Portfolio> portfolioList = portfolioDao.getPortfolio(clientId);
+    Portfolio portfolioItem;
+    List<Portfolio> portfolioList;
+    try {
+         portfolioList = portfolioDao.getPortfolio(clientId);
+         portfolioItem = findPortfolioItemByInstrumentId(portfolioList, instrumentId);
+        System.out.println(portfolioItem);
+    }
+    catch (ClientNotFoundException e){
+        portfolioList= new ArrayList<>();
+        portfolioItem=null;
+    }
 
-    Portfolio portfolioItem = findPortfolioItemByInstrumentId(portfolioList, instrumentId);
-    System.out.println(portfolioItem);
+
 
     if (portfolioItem != null) {
         updateExistingPortfolioItem(trade, portfolioItem);
-         rows=portfolioDao.updatePortfolio(portfolioItem, clientId);
+        if(Objects.equals(portfolioItem.getHoldings(), BigDecimal.ZERO)){
+            rows =portfolioDao.deletePortfolio(clientId, portfolioItem.getInstrumentId());
+        }else {
+            rows = portfolioDao.updatePortfolio(portfolioItem, clientId);
+        }
     } else {
         if ("B".equals(trade.getDirection())) {
             rows=createNewPortfolioItem(trade, clientId);
@@ -63,7 +96,7 @@ public int updatePortfolio(Trade trade) {
     return  rows;
 }
 
-    private Portfolio findPortfolioItemByInstrumentId(List<Portfolio> portfolioList, String instrumentId) {
+    public Portfolio findPortfolioItemByInstrumentId(List<Portfolio> portfolioList, String instrumentId) {
         return portfolioList.stream()
                 .filter(item -> item.getInstrumentId().equals(instrumentId))
                 .findFirst()

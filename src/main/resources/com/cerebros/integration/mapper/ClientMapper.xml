@@ -3,7 +3,7 @@
 <mapper namespace="com.cerebros.integration.mapper.ClientMapper">
 
 	<resultMap id="clientResultMap" type="com.cerebros.models.Client">
-		<id property="clientId" column="clientId" />
+		<id property="clientId" column="CLIENTID" />
 		<association property="person" javaType="com.cerebros.models.Person">
 			<result property="email" column="EMAIL" />
 			<result property="name" column="NAME" />
@@ -11,18 +11,42 @@
 			<result property="country" column="COUNTRY" />
 			<result property="postalCode" column="POSTALCODE" />
 		</association>
+		<!-- <collection property="clientIdentifications" resultMap="clientIdentificationMap" /> -->
 	</resultMap>
 
+	<!-- <resultMap id="clientIdentificationMap" type="com.cerebros.models.ClientIdentification">
+		<result property="type" column="TYPE" />
+		<result property="value" column="VALUE" />
+	</resultMap> -->
+
 	<!-- Query Statements -->
-	<select id="getClientByEmail" resultMap="clientResultMap"> SELECT CLIENTID , EMAIL , NAME , DOB
-		, POSTALCODE , COUNTRY FROM CEREBROS_CLIENT WHERE EMAIL = #{email} </select>
+	<select id="getClientByEmail" resultMap="clientResultMap"> 
+		SELECT
+			c.CLIENTID , c.EMAIL , c.NAME, c.DOB , c.POSTALCODE , c.COUNTRY, 
+			i.CLIENTID as icid, i.IDTYPE as TYPE, i.IDNUMBER as VALUE
+		FROM 
+			CEREBROS_CLIENT c LEFT OUTER JOIN CEREBROS_CLIENTIDENTIFICATIONS i 
+		ON c.CLIENTID = i.CLIENTID WHERE c.EMAIL = #{email} </select>
 
 	<select id="getClient" resultMap="clientResultMap"> SELECT CLIENTID, EMAIL , NAME , DOB ,
 		POSTALCODE , COUNTRY FROM CEREBROS_CLIENT WHERE CLIENTID = #{clientId} </select>
 
+	<select id="getClientIdentifications" resultType="com.cerebros.models.ClientIdentification">
+		SELECT IDTYPE as TYPE, IDNUMBER as VALUE FROM CEREBROS_CLIENTIDENTIFICATIONS WHERE CLIENTID =
+		#{clientId}
+	</select>
+
 	<select id="checkLoginCreds" resultType="Integer"> SELECT COUNT(*) IS_CRED_VALID FROM
 		CEREBROS_CLIENTPASSWORDS WHERE clientId = (SELECT clientID FROM CEREBROS_CLIENT WHERE email
 		= #{email}) AND passwordHash = #{password} </select>
+
+	<!-- Query Statements -->
+
+	<select id="getCashRemaining" resultType="com.cerebros.models.Cash"> select cashRemaining from
+		cerebros_cash where clientid=#{clientId} </select>
+	<insert id="insertCash" parameterType="map"> INSERT INTO cerebros_cash VALUES(#{clientId},
+		#{cashRemaining}) </insert>
+
 
 	<!-- DML Statements -->
 
@@ -39,4 +63,3 @@
 
 
 </mapper>
-        

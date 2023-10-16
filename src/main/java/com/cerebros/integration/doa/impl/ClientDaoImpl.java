@@ -1,6 +1,10 @@
 package com.cerebros.integration.doa.impl;
 
+import java.math.BigDecimal;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -8,6 +12,7 @@ import com.cerebros.exceptions.DatabaseException;
 import com.cerebros.integration.mapper.ClientMapper;
 import com.cerebros.integration.mapper.PreferencesMapper;
 import com.cerebros.integration.doa.ClientDao;
+import com.cerebros.models.Cash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +84,7 @@ public class ClientDaoImpl implements ClientDao {
 				throw new DatabaseException("insert failed", e2);
 			}
 		}
+		insertCash(client.getClientId(),new BigDecimal("100000000"));
 		;
 
 		// Insert Client Identifications
@@ -91,6 +97,7 @@ public class ClientDaoImpl implements ClientDao {
 				try {
 					throw e.getCause();
 				} catch (SQLIntegrityConstraintViolationException e1) {
+					mapper.deleteCash(client.getClientId());
 					mapper.deleteClientFromClient(client.getClientId());
 					logger.error("Failed to insert row as client identification already exists", e1);
 					throw new ClientAlreadyExistsException("Client is already registered");
@@ -135,13 +142,26 @@ public class ClientDaoImpl implements ClientDao {
 			throw new ClientNotFoundException();
 		}
 
+		client.setClientIdentifications(getClientIdentifications(client.getClientId()));
+
 		return client;
 	}
 
 	@Override
 	public Client getClientByEmail(String email) {
 		Client client = mapper.getClientByEmail(email);
+		if (client == null) {
+			return null;
+		}
+
+		client.setClientIdentifications(getClientIdentifications(client.getClientId()));
 		return client;
+	}
+
+	@Override
+	public Set<ClientIdentification> getClientIdentifications(String clientId) {
+		Set<ClientIdentification> clientIdentifications = mapper.getClientIdentifications(clientId);
+		return clientIdentifications;
 	}
 
 	@Override
@@ -186,10 +206,33 @@ public class ClientDaoImpl implements ClientDao {
 		}
 		Preferences pref = null;
 		pref = preferenceMapper.getClientPreferecesById(clientId);
-		if (pref == null) {
-			throw new DatabaseException("Client not found");
-		}
+//		if (pref == null) {
+//			throw new DatabaseException("Client not found");
+//		}
 		return pref;
 	}
 
+	@Override
+	public Cash getCashRemaining(String clientId) {
+		if (clientId == "") {
+			throw new IllegalArgumentException("Client ID cannot be null");
+		}
+		Cash cash = null;
+		cash = mapper.getCashRemaining(clientId);
+		if (cash == null) {
+			throw new DatabaseException("Client not found");
+		}
+		return cash;
+	}
+
+	@Override
+	public int insertCash(String clientId, BigDecimal cash) {
+		if (clientId == "") {
+			throw new IllegalArgumentException("Client ID cannot be null");
+		}
+		Map<String, Object> cashMap = new HashMap<>();
+		cashMap.put("clientId", clientId);
+		cashMap.put("cashRemaining", cash);
+		return mapper.insertCash(cashMap);
+	}
 }
