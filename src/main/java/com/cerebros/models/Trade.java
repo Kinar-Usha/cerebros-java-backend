@@ -19,14 +19,14 @@ public class Trade {
     private BigDecimal suitabilityScore;
 
     public BigDecimal getSuitabilityScore() {
-		return suitabilityScore;
-	}
+        return suitabilityScore;
+    }
 
-	public void setSuitabilityScore(BigDecimal suitabilityScore) {
-		this.suitabilityScore = suitabilityScore;
-	}
+    public void setSuitabilityScore(BigDecimal suitabilityScore) {
+        this.suitabilityScore = suitabilityScore;
+    }
 
-	public Trade() {
+    public Trade() {
     }
 
     public String getClientId() {
@@ -37,10 +37,10 @@ public class Trade {
         this.clientId = clientId;
     }
 
-    public Trade(String tradeId, BigDecimal quantity, BigDecimal executionPrice, String direction, BigDecimal cashValue, String clientid, String instrumentId, Order order, Date executedTime, BigDecimal  suitabilityScore) {
+    public Trade(String tradeId, BigDecimal quantity, BigDecimal executionPrice, String direction, BigDecimal cashValue,
+            String clientid, String instrumentId, Order order, Date executedTime) {
         this.tradeId = tradeId;
         this.quantity = quantity;
-        this.suitabilityScore= suitabilityScore;
         this.executionPrice = executionPrice;
         this.direction = direction;
         this.cashValue = cashValue;
@@ -50,16 +50,57 @@ public class Trade {
         this.executedTime = executedTime;
     }
 
-    public Trade(String tradeId, BigDecimal quantity, BigDecimal executionPrice, String direction, BigDecimal cashValue, String clientid, String instrumentId, Order order,BigDecimal suitabilityScore) {
+    public Trade(String tradeId, BigDecimal quantity, BigDecimal executionPrice, String direction, BigDecimal cashValue,
+            String clientid, String instrumentId, Order order) {
         this.tradeId = tradeId;
         this.quantity = quantity;
         this.executionPrice = executionPrice;
-        this.suitabilityScore= suitabilityScore;
         this.direction = direction;
         this.cashValue = cashValue;
         this.clientId = clientid;
         this.instrumentId = instrumentId;
         this.order = order;
+    }
+
+    public Trade(String tradeId, BigDecimal quantity, BigDecimal executionPrice, String direction, BigDecimal cashValue,
+            String clientid, String instrumentId, Order order, Date executedTime, BigDecimal suitabilityScore) {
+        this.tradeId = tradeId;
+        this.quantity = quantity;
+        this.suitabilityScore = suitabilityScore;
+        this.executionPrice = executionPrice;
+        this.direction = direction;
+        this.cashValue = cashValue;
+        this.clientId = clientid;
+        this.instrumentId = instrumentId;
+        this.order = order;
+        this.executedTime = executedTime;
+    }
+
+    public Trade(String tradeId, BigDecimal quantity, BigDecimal executionPrice, String direction, BigDecimal cashValue,
+            String clientid, String instrumentId, Order order, BigDecimal suitabilityScore) {
+        this.tradeId = tradeId;
+        this.quantity = quantity;
+        this.executionPrice = executionPrice;
+        this.suitabilityScore = suitabilityScore;
+        this.direction = direction;
+        this.cashValue = cashValue;
+        this.clientId = clientid;
+        this.instrumentId = instrumentId;
+        this.order = order;
+    }
+
+    public Trade(String tradeId, BigDecimal quantity, BigDecimal executionPrice, String direction, BigDecimal cashValue,
+            String clientId, String instrumentId, Order order, String description, Date executedTime) {
+        this.tradeId = tradeId;
+        this.quantity = quantity;
+        this.executionPrice = executionPrice;
+        this.direction = direction;
+        this.cashValue = cashValue;
+        this.clientId = clientId;
+        this.instrumentId = instrumentId;
+        this.order = order;
+        this.description = description;
+        this.executedTime = executedTime;
     }
 
     public String getTradeId() {
@@ -93,6 +134,7 @@ public class Trade {
     public Order getOrder() {
         return order;
     }
+
     public Date getExecutedTime() {
         return executedTime;
     }
@@ -130,15 +172,12 @@ public class Trade {
     }
 
     public void setExecutedTime(Date executedTime) {
-        if(executedTime==null){
-            executedTime=new Date("20-1-2022");
+        if (executedTime == null) {
+            executedTime = new Date("20-1-2022");
         }
-
 
         this.executedTime = executedTime;
     }
-
-
 
     public String getDescription() {
         return description;
@@ -149,28 +188,28 @@ public class Trade {
     }
 
     @Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Trade other = (Trade) obj;
-		return Objects.equals(cashValue, other.cashValue) && Objects.equals(clientId, other.clientId)
-				&& Objects.equals(description, other.description) && Objects.equals(direction, other.direction)
-				&& Objects.equals(executedTime, other.executedTime)
-				&& Objects.equals(executionPrice, other.executionPrice)
-				&& Objects.equals(instrumentId, other.instrumentId) && Objects.equals(order, other.order)
-				&& Objects.equals(quantity, other.quantity) && Objects.equals(suitabilityScore, other.suitabilityScore)
-				&& Objects.equals(tradeId, other.tradeId);
-	}
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Trade other = (Trade) obj;
+        return Objects.equals(cashValue, other.cashValue) && Objects.equals(clientId, other.clientId)
+                && Objects.equals(description, other.description) && Objects.equals(direction, other.direction)
+                && Objects.equals(executedTime, other.executedTime)
+                && Objects.equals(executionPrice, other.executionPrice)
+                && Objects.equals(instrumentId, other.instrumentId) && Objects.equals(order, other.order)
+                && Objects.equals(quantity, other.quantity) && Objects.equals(suitabilityScore, other.suitabilityScore)
+                && Objects.equals(tradeId, other.tradeId);
+    }
 
     @Override
-	public int hashCode() {
-		return Objects.hash(cashValue, clientId, description, direction, executedTime, executionPrice, instrumentId,
-				order, quantity, suitabilityScore, tradeId);
-	}
+    public int hashCode() {
+        return Objects.hash(cashValue, clientId, description, direction, executedTime, executionPrice, instrumentId,
+                order, quantity, suitabilityScore, tradeId);
+    }
 
     @Override
     public String toString() {

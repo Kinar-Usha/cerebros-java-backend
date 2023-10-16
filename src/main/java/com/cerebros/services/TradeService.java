@@ -37,7 +37,7 @@ public class TradeService {
     private Logger logger;
 
     @Autowired
-    public TradeService(TradesDao tradesDao,RestTemplate restTemplate) {
+    public TradeService(TradesDao tradesDao, RestTemplate restTemplate) {
         this.tradesDao = tradesDao;
         this.restTemplate = restTemplate;
     }

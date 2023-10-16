@@ -6,6 +6,7 @@ import com.cerebros.models.Trade;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -21,13 +22,14 @@ class TradeServiceTest {
 
 	@Mock
 	private TradesDao tradesDao;
+
+	@InjectMocks
 	private TradeService tradeService;
 
 
 	@BeforeEach
 	void setUp() {
 		MockitoAnnotations.openMocks(this);
-		tradeService = new TradeService(tradesDao);
 //		tradeService.setupTradeHistory();
 
 	}

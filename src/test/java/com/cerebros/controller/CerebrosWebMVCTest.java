@@ -154,8 +154,8 @@ public class CerebrosWebMVCTest {
         preferences.setTime("MEDIUM");
         preferences.setIncome("HIGH");
         Mockito.when(mockTradeService.getTopBuyAndSellTrades(preferences, "clientId"))
-               .thenReturn(Collections.singletonList(new Trade()));
-        ResponseEntity<List<Trade>> response = controller.getRoboAdvisorStocks("LOW", "MEDIUM", "HIGH", "clientId");
+               .thenReturn(Collections.singletonList(new Price()));
+        ResponseEntity<List<Price>> response = controller.getRoboAdvisorStocks("LOW", "MEDIUM", "HIGH", "clientId");
 
         // Assertions
         assertEquals(HttpStatus.OK, response.getStatusCode());
