@@ -33,4 +33,6 @@ public interface ClientMapper {
 
     Cash getCashRemaining(String clientId);
 	int insertCash(Map<String, Object> paramMap);
+	@Delete("DELETE FROM CEREBROS_CASH where clientid=#{clientId}")
+	int deleteCash(String clientId);
 }

@@ -97,6 +97,7 @@ public class ClientDaoImpl implements ClientDao {
 				try {
 					throw e.getCause();
 				} catch (SQLIntegrityConstraintViolationException e1) {
+					mapper.deleteCash(client.getClientId());
 					mapper.deleteClientFromClient(client.getClientId());
 					logger.error("Failed to insert row as client identification already exists", e1);
 					throw new ClientAlreadyExistsException("Client is already registered");
