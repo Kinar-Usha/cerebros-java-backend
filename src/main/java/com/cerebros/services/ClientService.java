@@ -12,6 +12,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.cerebros.exceptions.DatabaseException;
 import com.cerebros.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -117,22 +118,17 @@ public class ClientService {
 	}
 
 	public int addPreferences(String clientId, Preferences preferences) {
-		Preferences pref = dao.getClientPreferences(clientId);
+		Preferences pref;
 		int added=0;
-		if(pref==null) {
-		added = dao.addClientPreferences(preferences, clientId);
+		try {
+			pref = dao.getClientPreferences(clientId);
+			added=dao.updateClientPreferences(preferences, clientId);
+		}catch (DatabaseException e){
+			added = dao.addClientPreferences(preferences, clientId);
+		}
 		if (added == 0) {
 			throw new RuntimeException("Failed to add preferences");
 		}
-		}
-		else {
-			
-			added=dao.updateClientPreferences(preferences, clientId);
-			if (added == 0) {
-				throw new RuntimeException("Failed to add preferences");
-			}
-		}
-
 		return added;
 	}
 
