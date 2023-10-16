@@ -10,12 +10,15 @@ import com.cerebros.models.ClientIdentification;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public interface ClientMapper {
 
 	Client getClientByEmail(@Param("email") String email);
 
 	Client getClient(@Param("clientId") String clientId);
+
+	Set<ClientIdentification> getClientIdentifications(@Param("clientId") String clientId);
 
 	int checkLoginCreds(@Param("email") String email, @Param("password") String password);
 
@@ -30,4 +33,6 @@ public interface ClientMapper {
 
     Cash getCashRemaining(String clientId);
 	int insertCash(Map<String, Object> paramMap);
+	@Delete("DELETE FROM CEREBROS_CASH where clientid=#{clientId}")
+	int deleteCash(String clientId);
 }
