@@ -190,9 +190,9 @@ public class ClientDaoImpl implements ClientDao {
 		}
 		Preferences pref = null;
 		pref = preferenceMapper.getClientPreferecesById(clientId);
-		if (pref == null) {
-			throw new DatabaseException("Client not found");
-		}
+//		if (pref == null) {
+//			throw new DatabaseException("Client not found");
+//		}
 		return pref;
 	}
 
