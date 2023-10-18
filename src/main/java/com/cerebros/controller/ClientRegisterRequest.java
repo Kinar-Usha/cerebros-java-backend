@@ -10,6 +10,9 @@ public class ClientRegisterRequest {
     private Set<ClientIdentification> clientIdentifications;
     private String password;
 
+    public ClientRegisterRequest() {
+    }
+
     public ClientRegisterRequest(Person person, Set<ClientIdentification> clientIdentifications, String password) {
         this.person = person;
         this.clientIdentifications = clientIdentifications;

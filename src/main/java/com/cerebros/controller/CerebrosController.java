@@ -356,7 +356,6 @@ public class CerebrosController {
             }
         }
         if (tradeCount != 0 && cashCount != 0) {
-
             response = ResponseEntity.status(HttpStatus.OK).body(new DatabaseRequestResult(tradeCount));
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

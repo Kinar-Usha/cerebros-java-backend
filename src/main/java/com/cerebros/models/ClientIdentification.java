@@ -9,6 +9,9 @@ public class ClientIdentification {
 	private ClientIdentificationType type;
 	private String value;
 
+	public ClientIdentification() {
+	}
+
 	public ClientIdentification(ClientIdentificationType type, String value) {
 		setType(type);
 		setValue(value);

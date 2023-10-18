@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hsqldb.Database;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,11 +29,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.metrics.MetricsProperties.Data;
 import org.springframework.http.ResponseEntity;
 
 import com.cerebros.constants.ClientIdentificationType;
 import com.cerebros.constants.Country;
 import com.cerebros.exceptions.ClientAlreadyExistsException;
+import com.cerebros.exceptions.DatabaseException;
 import com.cerebros.exceptions.InvalidCredentialsException;
 import com.cerebros.integration.doa.ClientDao;
 import com.cerebros.models.Client;
@@ -125,7 +128,8 @@ class ClientServiceTest {
 
 		Mockito.when(clientDao.register(client, "1234")).thenReturn(1);
 
-		Mockito.when(fmtsService.getClientToken(new ClientRequest(person.getEmail(), "", ""))).thenReturn(ResponseEntity.ok(new ClientRequest(person.getEmail(), "1234")));
+		Mockito.when(fmtsService.getClientToken(new ClientRequest(person.getEmail(), "", "")))
+				.thenReturn(ResponseEntity.ok(new ClientRequest(person.getEmail(), "1234")));
 
 		assertEquals(1, clientService.registerClient(person, clientIdentifications, "1234"));
 	}
@@ -133,7 +137,8 @@ class ClientServiceTest {
 	@Test
 	void registrationFailsOnExistingClientEmail() {
 
-		Mockito.when(fmtsService.getClientToken(new ClientRequest(person.getEmail(), "", ""))).thenReturn(ResponseEntity.ok(new ClientRequest(person.getEmail(), "1234")));
+		Mockito.when(fmtsService.getClientToken(new ClientRequest(person.getEmail(), "", "")))
+				.thenReturn(ResponseEntity.ok(new ClientRequest(person.getEmail(), "1234")));
 
 		Mockito.when(clientDao.emailExists(person.getEmail())).thenReturn(true);
 
@@ -144,7 +149,8 @@ class ClientServiceTest {
 	@Test
 	void registrationAddsExistingClientWithNewEmail() {
 
-		Mockito.when(fmtsService.getClientToken(new ClientRequest(person.getEmail(), "", ""))).thenReturn(ResponseEntity.ok(new ClientRequest(person.getEmail(), "1234")));
+		Mockito.when(fmtsService.getClientToken(new ClientRequest(person.getEmail(), "", "")))
+				.thenReturn(ResponseEntity.ok(new ClientRequest(person.getEmail(), "1234")));
 
 		Mockito.doThrow(ClientAlreadyExistsException.class).when(clientDao).register(Mockito.any(Client.class),
 				Mockito.anyString());
@@ -152,105 +158,104 @@ class ClientServiceTest {
 		assertThrows(ClientAlreadyExistsException.class,
 				() -> clientService.registerClient(person, clientIdentifications, "123456"));
 	}
-	
-	 @Test
-	 public void testGetPreferencesWithValidClientId() {
-	        String clientId = "YOUR_CLIENTID";
-	        Preferences preference = new Preferences("Investment","High","Long-term","High");
-	        when(clientDao.getClientPreferences(clientId)).thenReturn(preference);
 
-	        Preferences actualPreferences = clientService.getPreferences(clientId);
+	@Test
+	public void testGetPreferencesWithValidClientId() {
+		String clientId = "YOUR_CLIENTID";
+		Preferences preference = new Preferences("Investment", "High", "Long-term", "High");
+		when(clientDao.getClientPreferences(clientId)).thenReturn(preference);
 
-	        assertEquals(preference, actualPreferences);
-	        verify(clientDao, times(1)).getClientPreferences(clientId);
-	    }
-	 
-	 @Test
-	    public void testGetPreferencesWithEmptyClientId() {
-	        String emptyClientId = "";
+		Preferences actualPreferences = clientService.getPreferences(clientId);
 
+		assertEquals(preference, actualPreferences);
+		verify(clientDao, times(1)).getClientPreferences(clientId);
+	}
 
-	        assertThrows(IllegalArgumentException.class, () -> {
-	            clientService.getPreferences(emptyClientId);
-	        });
+	@Test
+	public void testGetPreferencesWithEmptyClientId() {
+		String emptyClientId = "";
 
-	        verify(clientDao, never()).getClientPreferences(emptyClientId);
-	    }
-	 
-	 
-	 @Test
-	    public void testAddPreferencesWithSuccessfulAddition() {
-	        String clientId = "YOUR_CLIENTID1";
-	        Preferences preference = new Preferences("Investment","High","Long-term","High");
-		       
-	        when(clientDao.addClientPreferences(preferences, clientId)).thenReturn(1);
+		assertThrows(IllegalArgumentException.class, () -> {
+			clientService.getPreferences(emptyClientId);
+		});
 
-	        int result = clientService.addPreferences(clientId, preferences);
+		verify(clientDao, never()).getClientPreferences(emptyClientId);
+	}
 
-	        assertEquals(1, result);
-	        verify(clientDao, times(1)).addClientPreferences(preferences, clientId);
-	    }
-	 
-	  @Test
-	    public void testAddPreferencesWithFailedAddition() {
-	        String clientId = "YOUR_CLIENTID";
-	        Preferences preference = new Preferences("Investment","High","Long-term","High");
-		       
-	        when(clientDao.addClientPreferences(preferences, clientId)).thenReturn(0);
+	@Test
+	public void testAddPreferencesWithSuccessfulAddition() {
+		String clientId = "YOUR_CLIENTID1";
+		Preferences preference = new Preferences("Investment", "High", "Long-term", "High");
 
-	        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-	        	clientService.addPreferences(clientId, preferences);
-	        });
+		when(clientDao.addClientPreferences(preferences, clientId)).thenReturn(1);
+		when(clientDao.getClientPreferences(clientId)).thenThrow(DatabaseException.class);
 
-	        assertEquals("Failed to add preferences", exception.getMessage());
+		int result = clientService.addPreferences(clientId, preferences);
 
-	        verify(clientDao, times(1)).addClientPreferences(preferences, clientId);
-	    }
+		assertEquals(1, result);
+		verify(clientDao, times(1)).addClientPreferences(preferences, clientId);
+	}
 
+	@Test
+	public void testAddPreferencesWithFailedAddition() {
+		String clientId = "YOUR_CLIENTID";
+		Preferences preference = new Preferences("Investment", "High", "Long-term", "High");
 
-	  @Test
-	    public void testUpdatePreferencesWithValidInput() {
-		   String clientId = "YOUR_CLIENTID";
-	       Preferences preference = new Preferences("Investment","High","Long-term","High");
-		       
-	       when(clientDao.updateClientPreferences(preferences, clientId)).thenReturn(1);
+		when(clientDao.addClientPreferences(preferences, clientId)).thenReturn(0);
+		when(clientDao.getClientPreferences(clientId)).thenThrow(DatabaseException.class);
 
-	        int updatedRows = clientDao.updateClientPreferences(preferences, clientId);
+		RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+			clientService.addPreferences(clientId, preferences);
+		});
 
-	        assertEquals(1, updatedRows);
-	        verify(clientDao, times(1)).updateClientPreferences(preferences, clientId);
-	    }
-	  
-	  @Test
-	    public void testUpdatePreferencesWithNullPreference() {
-	        String clientId = "YOUR_CLIENTID";
-	        Preferences nullPreference = null;
+		assertEquals("Failed to add preferences", exception.getMessage());
 
-	        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-	            clientService.updatePreferences(clientId, nullPreference);
-	        });
+		verify(clientDao, times(1)).addClientPreferences(preferences, clientId);
+	}
 
-	        assertEquals("Preference cannot be null", exception.getMessage());
+	@Test
+	public void testUpdatePreferencesWithValidInput() {
+		String clientId = "YOUR_CLIENTID";
+		Preferences preference = new Preferences("Investment", "High", "Long-term", "High");
 
-	        // Verify that dao.updateClientPreferences is never called in this case
-	        verify(clientDao, never()).updateClientPreferences(nullPreference, clientId);
-	    }
-	  
-	  @Test
-	    public void testUpdatePreferencesWithFailedUpdate() {
-	        String clientId = "YOUR_CLIENTID1";
-	        Preferences preference = new Preferences("Investment","High","Long-term","High");
-			  
-	        when(clientDao.updateClientPreferences(preferences, clientId)).thenReturn(0);
+		when(clientDao.updateClientPreferences(preferences, clientId)).thenReturn(1);
 
-	        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-	            clientService.updatePreferences(clientId, preferences);
-	        });
+		int updatedRows = clientDao.updateClientPreferences(preferences, clientId);
 
-	        assertEquals("Failed to update preferences", exception.getMessage());
+		assertEquals(1, updatedRows);
+		verify(clientDao, times(1)).updateClientPreferences(preferences, clientId);
+	}
 
-	        verify(clientDao, times(1)).updateClientPreferences(preferences, clientId);
-	    }
+	@Test
+	public void testUpdatePreferencesWithNullPreference() {
+		String clientId = "YOUR_CLIENTID";
+		Preferences nullPreference = null;
+
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+			clientService.updatePreferences(clientId, nullPreference);
+		});
+
+		assertEquals("Preference cannot be null", exception.getMessage());
+
+		// Verify that dao.updateClientPreferences is never called in this case
+		verify(clientDao, never()).updateClientPreferences(nullPreference, clientId);
+	}
+
+	@Test
+	public void testUpdatePreferencesWithFailedUpdate() {
+		String clientId = "YOUR_CLIENTID1";
+		Preferences preference = new Preferences("Investment", "High", "Long-term", "High");
+
+		when(clientDao.updateClientPreferences(preferences, clientId)).thenReturn(0);
+
+		RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+			clientService.updatePreferences(clientId, preferences);
+		});
+
+		assertEquals("Failed to update preferences", exception.getMessage());
+
+		verify(clientDao, times(1)).updateClientPreferences(preferences, clientId);
+	}
 
 	@Test
 	public void invalidEmailLogin() {
